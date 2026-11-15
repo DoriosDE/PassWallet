@@ -20,6 +20,7 @@ import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.PassStoreProjection
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.ui.pass_view_holder.PassListCardViewHolder
+import org.ligi.passandroid.ui.rendering.PassListAppearance
 import org.ligi.passandroid.ui.rendering.PassRenderers
 
 class PassAdapter(
@@ -146,7 +147,8 @@ class PassAdapter(
     }
 
     private fun createStackEdge(pass: Pass): View = MaterialCardView(passListActivity).apply {
-        radius = resources.getDimension(R.dimen.pass_card_corner_radius)
+        // same shape as a full card - tickets get the notch on every card of the stack
+        PassListCardViewHolder.applyShape(this, PassListAppearance(pass).hasTicketNotch)
         cardElevation = 0f
         strokeWidth = resources.getDimensionPixelSize(R.dimen.pass_stack_stroke_width)
         strokeColor = ContextCompat.getColor(context, R.color.outline_variant)

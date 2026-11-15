@@ -2,9 +2,11 @@ package org.ligi.passandroid.ui.pass_view_holder
 
 import android.content.res.ColorStateList
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.graphics.ColorUtils
+import androidx.core.view.updateLayoutParams
 import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
@@ -45,6 +47,9 @@ class PassListCardViewHolder(val card: MaterialCardView) : RecyclerView.ViewHold
         title.text = leftText
         title.visibility = if (leftText.isNullOrEmpty()) View.GONE else View.VISIBLE
         title.setTextColor(appearance.foregroundColor)
+        title.updateLayoutParams<ViewGroup.MarginLayoutParams> {
+            marginStart = if (logoBitmap != null) card.resources.getDimensionPixelSize(R.dimen.pass_card_logo_spacing) else 0
+        }
 
         headerLabel.text = appearance.headerLabel
         headerLabel.visibility = if (appearance.headerLabel.isNullOrEmpty()) View.GONE else View.VISIBLE
@@ -71,7 +76,12 @@ class PassListCardViewHolder(val card: MaterialCardView) : RecyclerView.ViewHold
             val builder = ShapeAppearanceModel.builder()
                 .setAllCornerSizes(resources.getDimension(R.dimen.pass_card_corner_radius))
             if (ticketNotch) {
-                builder.setTopEdge(TicketNotchEdgeTreatment(resources.getDimension(R.dimen.pass_card_notch_radius)))
+                builder.setTopEdge(
+                    TicketNotchEdgeTreatment(
+                        resources.getDimension(R.dimen.pass_card_notch_width),
+                        resources.getDimension(R.dimen.pass_card_notch_depth)
+                    )
+                )
             }
             card.shapeAppearanceModel = builder.build()
         }
