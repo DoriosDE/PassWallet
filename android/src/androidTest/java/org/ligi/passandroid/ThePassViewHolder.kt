@@ -21,6 +21,6 @@ class ThePassViewHolder {
         rule.launchActivity()
 
         onView(withId(R.id.pass_card)).check(matches(isDisplayed()))
-        onView(withId(R.id.passTitle)).check(matches(isDisplayed()))
+        onView(withId(R.id.headerValue)).check(matches(isDisplayed()))
     }
 }

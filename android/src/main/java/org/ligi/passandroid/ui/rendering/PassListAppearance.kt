@@ -9,7 +9,7 @@ import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 
 /**
- * What a pass card in the list shows: logo (or logo text / title) on the left and the most important
+ * What a pass card in the list shows: the logo on the left and the most important
  * header field (label + value) on the right, in the colors the pass defines - like a wallet card.
  */
 class PassListAppearance(private val pass: Pass) {
@@ -24,14 +24,6 @@ class PassListAppearance(private val pass: Pass) {
         pass.labelColorValue.parseColorOrNull() ?: ColorUtils.setAlphaComponent(foregroundColor, 200)
     }
 
-    /** the logo text of the pass, if it defines one */
-    val logoText: String? get() = pass.logoText?.trim()?.takeIf { it.isNotEmpty() }
-
-    /** text on the left when there is no logo image: the title (the logo text belongs to the logo only) */
-    val fallbackText: String by lazy {
-        PassRenderers.forPass(pass).listTitle(pass)?.trim().orEmpty()
-    }
-
     private val headerField: PassField? by lazy {
         pass.visibleField("headerFields") ?: pass.visibleField("secondaryFields")
     }
@@ -43,7 +35,6 @@ class PassListAppearance(private val pass: Pass) {
     val headerValue: String? by lazy {
         headerField?.value?.cleaned() ?: pass.calendarTimespan?.from?.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
     }
-
 
     companion object {
         fun readableForegroundFor(backgroundColor: Int) =

@@ -89,11 +89,11 @@ class PassAdapter(
 
     /**
      * A group is shown as a stack: only the front card (first pass) shows content, the other passes of the group
-     * are thin edges peeking out above it. The front card shows the number of passes below its logo.
+     * are thin edges peeking out above it.
      */
     private fun bindGroup(viewHolder: GroupViewHolder, group: PassListEntry.Group) {
         val frontPass = group.passes.first()
-        viewHolder.frontCard.bind(frontPass, passStore, groupSize = group.passes.size)
+        viewHolder.frontCard.bind(frontPass, passStore)
 
         bindStackEdges(viewHolder, group)
 

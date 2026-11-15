@@ -7,11 +7,10 @@
     <dimen name="pass_card_height">76dp</dimen>
     <dimen name="pass_card_corner_radius">12dp</dimen>
     <dimen name="pass_card_logo_height">40dp</dimen>
-    <dimen name="pass_card_logo_max_width">150dp</dimen>
+    <dimen name="pass_card_logo_max_width">170dp</dimen>
     <dimen name="pass_card_header_max_width">150dp</dimen>
     <dimen name="pass_card_side_margin">16dp</dimen>
     <dimen name="pass_stack_stroke_width">1dp</dimen>
     <dimen name="pass_stack_edge_offset">8dp</dimen>
     <dimen name="pass_stack_edge_inset">6dp</dimen>
-    <dimen name="pass_card_logo_spacing">10dp</dimen>
 </resources>
