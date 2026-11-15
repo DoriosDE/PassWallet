@@ -14,6 +14,4 @@
     <dimen name="pass_stack_edge_offset">8dp</dimen>
     <dimen name="pass_stack_edge_inset">6dp</dimen>
     <dimen name="pass_card_logo_spacing">10dp</dimen>
-    <dimen name="pass_stack_badge_strip">24dp</dimen>
-    <dimen name="pass_stack_badge_icon_padding">4dp</dimen>
 </resources>

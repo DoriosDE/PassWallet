@@ -1,10 +1,12 @@
 package org.ligi.passandroid.ui.pass_view_holder
 
+import android.content.res.ColorStateList
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.core.view.updateLayoutParams
+import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import org.ligi.passandroid.R
@@ -12,6 +14,7 @@ import org.ligi.passandroid.model.PassBitmapDefinitions
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.ui.rendering.PassListAppearance
+import java.text.NumberFormat
 
 /**
  * Binds a pass to the compact wallet card of the pass list (pass_list_item.xml).
@@ -22,8 +25,12 @@ class PassListCardViewHolder(val card: MaterialCardView) : RecyclerView.ViewHold
     private val title = card.findViewById<TextView>(R.id.passTitle)
     private val headerLabel = card.findViewById<TextView>(R.id.headerLabel)
     private val headerValue = card.findViewById<TextView>(R.id.headerValue)
+    private val groupBadge = card.findViewById<TextView>(R.id.groupBadge)
 
-    fun bind(pass: Pass, passStore: PassStore) {
+    /**
+     * @param groupSize number of passes when this card is the front of a group, null for a single pass
+     */
+    fun bind(pass: Pass, passStore: PassStore, groupSize: Int? = null) {
         val appearance = PassListAppearance(pass)
 
         card.setCardBackgroundColor(appearance.backgroundColor)
@@ -47,5 +54,10 @@ class PassListCardViewHolder(val card: MaterialCardView) : RecyclerView.ViewHold
         headerValue.text = appearance.headerValue
         headerValue.visibility = if (appearance.headerValue.isNullOrEmpty()) View.GONE else View.VISIBLE
         headerValue.setTextColor(appearance.foregroundColor)
+
+        groupBadge.visibility = if (groupSize != null) View.VISIBLE else View.GONE
+        groupBadge.text = groupSize?.let { NumberFormat.getIntegerInstance().format(it) }
+        groupBadge.setTextColor(appearance.labelColor)
+        TextViewCompat.setCompoundDrawableTintList(groupBadge, ColorStateList.valueOf(appearance.labelColor))
     }
 }
