@@ -166,7 +166,10 @@ class PassViewActivity : PassViewActivityBase() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         android.R.id.home -> {
-            startActivity(Intent(this, PassListActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP))
+            // opened from a list (active passes or archive): just go back there; otherwise (e.g. shortcut) open the list
+            if (isTaskRoot) {
+                startActivity(Intent(this, PassListActivity::class.java))
+            }
             finish()
             true
         }

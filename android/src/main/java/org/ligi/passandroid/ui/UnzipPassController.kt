@@ -11,6 +11,7 @@ import okio.source
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.functions.createPassForImageImport
 import org.ligi.passandroid.functions.createPassForPDFImport
@@ -131,7 +132,7 @@ object UnzipPassController : KoinComponent {
                     File(spec.zipFileString).copyTo(File(pathForID, "strip.png"))
 
                     spec.passStore.save(imagePass)
-                    spec.passStore.classifier.moveToTopic(imagePass, TopicNames.NEW)
+                    spec.passStore.classifier.moveToTopic(imagePass, PassArchive.ACTIVE)
                     return listOf(imagePass.id)
                 }
 
@@ -156,7 +157,7 @@ object UnzipPassController : KoinComponent {
                         pdfBitmap.compress(Bitmap.CompressFormat.PNG, 100, FileOutputStream(File(pathForID, "strip.png")))
 
                         spec.passStore.save(imagePass)
-                        spec.passStore.classifier.moveToTopic(imagePass, TopicNames.NEW)
+                        spec.passStore.classifier.moveToTopic(imagePass, PassArchive.ACTIVE)
                         return listOf(imagePass.id)
                     }
                 } catch (e: Exception) {

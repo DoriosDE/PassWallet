@@ -26,8 +26,20 @@
             custom:showAsAction="ifRoom" />
 
     <item
+            android:id="@+id/menu_archive_pass"
+            android:title="@string/menu_archive"
+            android:icon="@drawable/ic_pass_archive_24"
+            custom:showAsAction="ifRoom" />
+
+    <item
+            android:id="@+id/menu_restore_pass"
+            android:title="@string/menu_restore"
+            android:icon="@drawable/ic_pass_unarchive_24"
+            custom:showAsAction="ifRoom" />
+
+    <item
             android:id="@+id/menu_delete"
-            android:title="@string/menu_move_to_trash"
+            android:title="@string/menu_delete_permanently"
             android:icon="@drawable/ic_pass_delete_24"
             custom:showAsAction="ifRoom" />
 </menu>

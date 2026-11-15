@@ -12,6 +12,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.ligi.kaxt.startActivityFromClass
+import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.R
 import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.backup.BackupArchive
@@ -72,7 +73,7 @@ class PassImportActivity : AppCompatActivity() {
                             UnzipPassDialog.show(fromURI, this@PassImportActivity, passStore) { importedIds ->
                                 importedIds.forEach { id ->
                                     passStore.getPassbookForId(id)?.let { pass ->
-                                        passStore.classifier.moveToTopic(pass, TopicNames.NEW)
+                                        passStore.classifier.moveToTopic(pass, PassArchive.ACTIVE)
                                     }
                                 }
 

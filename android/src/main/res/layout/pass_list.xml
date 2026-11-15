@@ -22,30 +22,10 @@
             app:titleTextAppearance="@style/PassWallet.ToolbarTitle"
             app:titleTextColor="@android:color/white" />
 
-        <com.google.android.material.tabs.TabLayout
-            android:id="@+id/tab_layout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/top_app_bar"
-            android:paddingStart="12dp"
-            android:paddingEnd="12dp"
-            app:tabBackground="@android:color/transparent"
-            app:tabIndicatorColor="@color/accent"
-            app:tabIndicatorFullWidth="false"
-            app:tabIndicatorGravity="bottom"
-            app:tabIndicatorHeight="3dp"
-            app:tabMinWidth="88dp"
-            app:tabMode="scrollable"
-            app:tabPaddingStart="16dp"
-            app:tabPaddingEnd="16dp"
-            app:tabSelectedTextColor="@color/tab_text_selected"
-            app:tabTextAppearance="@style/PassWallet.TabText"
-            app:tabTextColor="@color/tab_text" />
-
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/view_pager"
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/pass_list_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />

@@ -20,6 +20,7 @@ import org.ligi.passandroid.R
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.ligi.passandroid.model.InputStreamWithSource
+import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_ICON
 import org.ligi.passandroid.model.State
 import org.ligi.passandroid.model.pass.Pass
@@ -108,6 +109,10 @@ open class PassViewActivityBase : PassAndroidActivity() {
         val res = super.onPrepareOptionsMenu(menu)
         menu.findItem(R.id.menu_light).isVisible = !fullBrightnessSet
         menu.findItem(R.id.menu_print).isVisible = true
+        val archived = hasCurrentPass() && PassArchive.isArchived(passStore.classifier, currentPass)
+        menu.findItem(R.id.menu_archive_pass).isVisible = !archived
+        menu.findItem(R.id.menu_restore_pass).isVisible = archived
+        menu.findItem(R.id.menu_delete).isVisible = archived
         return res
     }
 

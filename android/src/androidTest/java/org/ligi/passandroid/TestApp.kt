@@ -4,6 +4,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.ligi.passandroid.injections.FixedPassListPassStore
 import org.ligi.passandroid.model.PassStore
+import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.model.Settings
 import org.ligi.passandroid.model.comparator.PassSortOrder
 import org.ligi.passandroid.model.pass.BarCode
@@ -46,7 +47,7 @@ class TestApp : App() {
 
             fixedPassListPassStore().setList(passList)
 
-            passStore.classifier.moveToTopic(pass, "test")
+            passStore.classifier.moveToTopic(pass, PassArchive.ACTIVE)
         }
 
         fun emptyPassStore() {

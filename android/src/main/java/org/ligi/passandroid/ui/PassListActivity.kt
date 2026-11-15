@@ -17,31 +17,29 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.tabs.TabLayoutMediator
 import kotlinx.coroutines.launch
 import org.ligi.kaxt.startActivityFromClass
 import org.ligi.passandroid.R
 import org.ligi.passandroid.databinding.PassListBinding
 import org.ligi.passandroid.functions.createAndAddEmptyPass
-import org.ligi.passandroid.model.PassStoreProjection
-import org.ligi.passandroid.model.State
+import org.ligi.passandroid.model.PassArchive
 import org.ligi.tracedroid.TraceDroid
 import org.ligi.tracedroid.sending.sendTraceDroidStackTracesIfExist
 
 class PassListActivity : PassAndroidActivity() {
 
     private lateinit var binding: PassListBinding
-    private var tabLayoutMediator: TabLayoutMediator? = null
     private var fabMenuExpanded = false
+
+    /** the same screen shows either the active passes or - when started via [showArchive] - the archive */
+    private val isArchive by lazy { intent.getBooleanExtra(EXTRA_ARCHIVE, false) }
+    private val listState get() = if (isArchive) PassArchive.ARCHIVE else PassArchive.ACTIVE
     private val importPassLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
             startActivity(Intent(this, PassImportActivity::class.java).setData(it))
         }
     }
-
-    private val adapter by lazy { PassTopicFragmentPagerAdapter(passStore.classifier, this) }
 
 
     internal fun onImportPassClick() {
@@ -60,13 +58,25 @@ class PassListActivity : PassAndroidActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
-        binding.emptyView.text = createEmptyText()
+        binding.emptyView.text = if (isArchive) getString(R.string.archive_empty) else createEmptyText()
         applyMaterialInsets(
             root = binding.root,
             appBar = binding.appbar,
-            content = binding.viewPager,
+            content = binding.passListContainer,
             floatingView = binding.fam,
         )
+
+        if (isArchive) {
+            setTitle(R.string.archive_title)
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+            binding.fam.visibility = GONE
+        }
+
+        if (savedInstanceState == null) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.pass_list_container, PassListFragment.newInstance(listState))
+                .commit()
+        }
 
 
         // don't want too many windows in worst case - so check for errors first
@@ -91,22 +101,8 @@ class PassListActivity : PassAndroidActivity() {
             }
         }
 
-        binding.viewPager.adapter = adapter
-
-        if (adapter.itemCount > 0) {
-            binding.viewPager.currentItem = State.lastSelectedTab.coerceIn(0, adapter.itemCount - 1)
-        }
-        syncTabs()
-
-        binding.viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
-            override fun onPageSelected(position: Int) {
-                super.onPageSelected(position)
-                State.lastSelectedTab = position
-                invalidateOptionsMenu()
-            }
-        })
-        passStore.syncPassStoreWithClassifier(TopicNames.NEW)
-        migrateRemovedArchiveTopicToNew()
+        passStore.syncPassStoreWithClassifier(PassArchive.ACTIVE)
+        migrateLegacyTopics()
 
         refresh()
 
@@ -116,13 +112,7 @@ class PassListActivity : PassAndroidActivity() {
             setFabMenuExpanded(false)
             startActivityFromClass(PassEditActivity::class.java)
 
-            val newTitle = if (binding.tabLayout.selectedTabPosition < 0) {
-                TopicNames.NEW
-            } else {
-                adapter.getTopicAt(binding.tabLayout.selectedTabPosition) ?: TopicNames.NEW
-            }
-
-            passStore.classifier.moveToTopic(pass, newTitle)
+            passStore.classifier.moveToTopic(pass, PassArchive.ACTIVE)
         }
 
         binding.fabActionImport.setOnClickListener {
@@ -137,7 +127,7 @@ class PassListActivity : PassAndroidActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 passStore.updateChannel.collect {
-                    binding.viewPager.post {
+                    binding.root.post {
                         if (!isFinishing && !isDestroyed) {
                             refresh()
                         }
@@ -148,76 +138,65 @@ class PassListActivity : PassAndroidActivity() {
     }
 
     fun refresh() {
-        val selectedTopic = adapter.getTopicAt(binding.viewPager.currentItem)
-        adapter.refresh()
-        syncTabs()
-
-        if (adapter.itemCount > 0) {
-            val selectedPosition = adapter.getTopicPosition(selectedTopic)
-                .takeIf { it >= 0 }
-                ?: State.lastSelectedTab.coerceIn(0, adapter.itemCount - 1)
-            binding.viewPager.setCurrentItem(selectedPosition, false)
-        }
-
         invalidateOptionsMenu()
-        val empty = passStore.classifier.topicByIdMap.isEmpty()
-        binding.emptyView.visibility = if (empty) VISIBLE else GONE
-        val onlyDefaultTopicExists = passStore.classifier.getTopics().all { it == TopicNames.NEW }
-        binding.tabLayout.visibility = if (onlyDefaultTopicExists) GONE else VISIBLE
+        binding.emptyView.visibility = if (currentPasses().isEmpty()) VISIBLE else GONE
     }
+
+    private fun currentPasses() = passStore.classifier.getPassListByTopic(listState)
+
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.menu_settings -> {
             startActivityFromClass(PreferenceActivity::class.java)
             true
         }
 
-        R.id.menu_emptytrash -> {
-            val passStoreProjection = PassStoreProjection(
-                passStore,
-                TopicNames.TRASH,
-                null
-            )
-            val trashPasses = passStoreProjection.passList
+        R.id.menu_archive -> {
+            showArchive()
+            true
+        }
+
+        R.id.menu_empty_archive -> {
+            val archivedPasses = currentPasses()
             showDestructiveConfirmationDialog(
-                titleRes = R.string.empty_trash_dialog_title,
+                titleRes = R.string.empty_archive_dialog_title,
                 message = resources.getQuantityString(
-                    R.plurals.empty_trash_dialog_message,
-                    trashPasses.size,
-                    trashPasses.size,
+                    R.plurals.delete_passes_dialog_message,
+                    archivedPasses.size,
+                    archivedPasses.size,
                 ),
-                confirmTextRes = R.string.emtytrash_label
+                confirmTextRes = R.string.empty_archive_label
             ) {
-                for (pass in trashPasses) {
+                for (pass in archivedPasses) {
                     passStore.deletePassWithId(pass.id)
                 }
             }
             true
         }
+
+        android.R.id.home -> {
+            finish()
+            true
+        }
+
         else -> super.onOptionsItemSelected(item)
     }
 
     override fun onResume() {
         super.onResume()
 
-        adapter.refresh()
         refresh()
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.findItem(R.id.menu_emptytrash).isVisible = adapter.itemCount > 0 && adapter.getTopicAt(binding.viewPager.currentItem) == TopicNames.TRASH
+        menu.findItem(R.id.menu_archive).isVisible = !isArchive
+        menu.findItem(R.id.menu_settings).isVisible = !isArchive
+        menu.findItem(R.id.menu_empty_archive).isVisible = isArchive && currentPasses().isNotEmpty()
         return true
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.activity_pass_list_view, menu)
         return super.onCreateOptionsMenu(menu)
-    }
-
-    private fun syncTabs() {
-        tabLayoutMediator?.detach()
-        tabLayoutMediator = TabLayoutMediator(binding.tabLayout, binding.viewPager) { tab, position ->
-            tab.text = adapter.getPageTitle(position)
-        }.apply { attach() }
     }
 
     private fun setFabMenuExpanded(expanded: Boolean) {
@@ -240,18 +219,20 @@ class PassListActivity : PassAndroidActivity() {
         }
     }
 
-    private fun migrateRemovedArchiveTopicToNew() {
-        var migrated = false
-        passStore.classifier.topicByIdMap.toList().forEach { (id, topic) ->
-            if (TopicNames.isRemovedArchive(topic)) {
-                passStore.classifier.topicByIdMap[id] = TopicNames.NEW
-                migrated = true
-            }
-        }
-
-        if (migrated) {
-            passStore.classifier.processDataChange()
-        }
+    private fun showArchive() {
+        startActivity(Intent(this, PassListActivity::class.java).putExtra(EXTRA_ARCHIVE, true))
     }
 
+    /**
+     * Categories, tabs and the trash were replaced by groups and the archive - convert existing data once.
+     */
+    private fun migrateLegacyTopics() {
+        val changedPasses = PassArchive.migrateLegacyTopics(passStore.classifier.topicByIdMap) { passStore.getPassbookForId(it) }
+        changedPasses.forEach { passStore.save(it) }
+        passStore.classifier.processDataChange()
+    }
+
+    companion object {
+        const val EXTRA_ARCHIVE = "archive"
+    }
 }

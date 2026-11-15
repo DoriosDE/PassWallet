@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="menu_delete">Eliminar</string>
-    <string name="menu_move_to_trash">Mover a papelera</string>
     <string name="menu_share">Compartir</string>
     <string name="menu_print">Imprimir</string>
     <string name="menu_edit">Editar</string>
@@ -41,12 +40,6 @@
     <string name="update_error_invalid_message">El pase descargado no se ha podido importar: %s</string>
     <string name="action_update">actualizar</string>
     <string name="pass_updated">Pase actualizado</string>
-    <string name="topic_trash">Papelera</string>
-    <string name="topic_new">Nuevo</string>
-    <string name="move_to_new_topic">Mover a categoría</string>
-    <string name="move_topic_subtitle">Elige dónde guardar este pase.</string>
-    <string name="move_topic_new_subtitle">Pon nombre a la nueva categoría de este pase.</string>
-    <string name="emtytrash_label">Vaciar papelera</string>
     <string name="barcode_edit_hint_alternative_message">Mensaje alternativo</string>
     <string name="barcode_edit_scan">Escanear código</string>
     <string name="barcode_edit_message">Mensaje</string>
@@ -100,16 +93,7 @@
     <string name="add_header_image">Superior</string>
     <string name="add_barcode">Código</string>
     <string name="edit_barcode_dialog_title">Editar código de barras</string>
-    <string name="pass_moved_to_trash">Pase movido a la papelera</string>
-    <plurals name="empty_trash_dialog_message">
-        <item quantity="one">Se eliminará definitivamente %1$d pase de la papelera. No podrás restaurarlo.</item>
-        <item quantity="other">Se eliminarán definitivamente %1$d pases de la papelera. No podrás restaurarlos.</item>
-    </plurals>
-    <string name="empty_trash_dialog_title">¿Vaciar papelera?</string>
-    <string name="new_topic_input_hint">Nombre de la nueva categoría</string>
 
-    <string name="create_new_topic">Crear nueva categoría</string>
-    <string name="cannot_be_empty">no puede estar vacío</string>
     <string name="pass_title_hint">Título del pase</string>
     <string name="edit_field_label_hint">Etiqueta</string>
     <string name="edit_field_value_hint">Valor</string>
@@ -141,10 +125,10 @@
     <string name="backup_title">Copia de seguridad</string>
 
     <string name="backup_export_title">Exportar copia</string>
-    <string name="backup_export_summary">Guarda todos los pases, categorías y preferencias en un archivo ZIP.</string>
+    <string name="backup_export_summary">Guarda todos los pases, grupos, archivo y preferencias en un archivo ZIP.</string>
     <string name="backup_export_action">Crear ZIP de copia</string>
     <string name="backup_import_title">Importar copia</string>
-    <string name="backup_import_summary">Restaura pases, categorías y preferencias desde una copia ZIP de PassWallet.</string>
+    <string name="backup_import_summary">Restaura pases, grupos, archivo y preferencias desde una copia ZIP de PassWallet.</string>
     <string name="backup_import_action">Elegir ZIP de copia</string>
     <string name="backup_export_success">Copia exportada</string>
     <string name="backup_import_success">Copia importada</string>
@@ -158,10 +142,6 @@
     <string name="import_unavailable">No hay ninguna app para elegir un archivo</string>
     <string name="pass_expires_prefix">"caduca "</string>
     <string name="pass_expired_prefix">"caducó "</string>
-    <plurals name="passes_moved_to_topic">
-        <item quantity="one">Pase movido a %2$s</item>
-        <item quantity="other">%1$d pases movidos a %2$s</item>
-    </plurals>
 
     <string name="preference_grouping_title">Agrupar pases</string>
     <string name="preference_grouping_summary">Mostrar como pila superpuesta los pases que van juntos (p. ej. varias entradas para un evento)</string>
@@ -178,9 +158,25 @@
     <string name="pass_grouped">Pases agrupados</string>
     <string name="pass_group_removed">Pase quitado del grupo</string>
     <string name="pass_group_dissolved">Grupo deshecho</string>
-    <string name="move_group_to_new_topic">Mover grupo a categoría</string>
-    <plurals name="move_group_subtitle">
-        <item quantity="one">Elige dónde guardar este pase.</item>
-        <item quantity="other">Elige dónde guardar estos %d pases.</item>
+
+    <string name="archive_title">Archivo</string>
+    <string name="archive_empty">No hay pases archivados</string>
+    <string name="menu_archive">Archivar</string>
+    <string name="menu_restore">Restaurar</string>
+    <string name="menu_delete_permanently">Eliminar definitivamente</string>
+    <string name="empty_archive_label">Vaciar archivo</string>
+    <string name="empty_archive_dialog_title">¿Vaciar archivo?</string>
+    <string name="delete_passes_dialog_title">¿Eliminar definitivamente?</string>
+    <plurals name="delete_passes_dialog_message">
+        <item quantity="one">Se eliminará %1$d pase definitivamente. No podrás restaurarlo.</item>
+        <item quantity="other">Se eliminarán %1$d pases definitivamente. No podrás restaurarlos.</item>
+    </plurals>
+    <plurals name="passes_archived">
+        <item quantity="one">Pase archivado</item>
+        <item quantity="other">%d pases archivados</item>
+    </plurals>
+    <plurals name="passes_restored">
+        <item quantity="one">Pase restaurado</item>
+        <item quantity="other">%d pases restaurados</item>
     </plurals>
 </resources>

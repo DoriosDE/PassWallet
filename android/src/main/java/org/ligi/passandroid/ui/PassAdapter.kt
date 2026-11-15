@@ -92,7 +92,7 @@ class PassAdapter(
         root.setOnClickListener { openPass(pass) }
 
         root.setOnLongClickListener {
-            MoveToNewTopicUI(passListActivity, passStore, listOf(pass), groupingEnabled).show()
+            PassActionsUI(passListActivity, passStore, listOf(pass), groupingEnabled).show()
             true
         }
     }
@@ -119,7 +119,7 @@ class PassAdapter(
         )
         card.setOnClickListener { openPass(frontPass) }
         card.setOnLongClickListener {
-            MoveToNewTopicUI(passListActivity, passStore, group.passes, groupingEnabled).show()
+            PassActionsUI(passListActivity, passStore, group.passes, groupingEnabled).show()
             true
         }
     }
