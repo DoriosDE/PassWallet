@@ -118,6 +118,9 @@ class AndroidFileSystemPassStore(
             if (backfillGroupId(pathForID, result)) {
                 dirty = true
             }
+            if (backfillListAppearance(pathForID, language, result)) {
+                dirty = true
+            }
             if (dirty) {
                 save(result)
             }
@@ -135,6 +138,16 @@ class AndroidFileSystemPassStore(
         if (parsedTransitType == BoardingTransitType.GENERIC) return false
 
         pass.boardingTransitType = parsedTransitType
+        return true
+    }
+
+    private fun backfillListAppearance(pathForID: File, language: String, pass: Pass): Boolean {
+        if (pass.appearanceVersion >= AppleStylePassReader.APPEARANCE_VERSION) return false
+
+        if (!AppleStylePassReader.readListAppearance(pathForID, language, tracker, pass)) {
+            // custom / image / PDF passes have no pass.json - nothing to read, do not try again
+            pass.appearanceVersion = AppleStylePassReader.APPEARANCE_VERSION
+        }
         return true
     }
 

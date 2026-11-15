@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- A pass in the list: a compact wallet card - logo on the left, most important header field on the right. -->
 <com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/pass_card"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginStart="16dp"
-    android:layout_marginTop="14dp"
-    android:layout_marginEnd="16dp"
-    android:orientation="vertical"
+    android:layout_marginStart="@dimen/pass_card_side_margin"
+    android:layout_marginTop="@dimen/pass_card_spacing"
+    android:layout_marginEnd="@dimen/pass_card_side_margin"
     app:cardBackgroundColor="@color/card_view_background"
-    app:cardCornerRadius="18dp"
+    app:cardCornerRadius="@dimen/pass_card_corner_radius"
     app:cardElevation="0dp"
     app:strokeColor="@color/outline_variant"
     app:strokeWidth="1dp">
@@ -18,82 +18,87 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/pass_card_height"
+        android:orientation="horizontal"
+        android:paddingStart="18dp"
+        android:paddingTop="12dp"
+        android:paddingEnd="18dp"
+        android:paddingBottom="12dp">
+
+        <ImageView
+            android:id="@+id/passLogo"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/pass_card_logo_height"
+            android:adjustViewBounds="true"
+            android:importantForAccessibility="no"
+            android:maxWidth="@dimen/pass_card_logo_max_width"
+            android:scaleType="fitStart"
+            tools:src="@mipmap/ic_launcher" />
+
+        <TextView
+            android:id="@+id/passTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:ellipsize="end"
+            android:fontFamily="sans-serif-medium"
+            android:maxLines="2"
+            android:textSize="20sp"
+            tools:text="Ballorig Seelze" />
+
+        <TextView
+            android:id="@+id/groupBadge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:background="@drawable/bg_pass_group_badge"
+            android:drawablePadding="4dp"
+            android:fontFamily="sans-serif-medium"
+            android:gravity="center_vertical"
+            android:paddingStart="7dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="9dp"
+            android:paddingBottom="2dp"
+            android:textSize="12sp"
+            android:visibility="gone"
+            app:drawableStartCompat="@drawable/ic_pass_group_20"
+            tools:text="4"
+            tools:visibility="visible" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minWidth="12dp" />
 
         <LinearLayout
-            android:id="@+id/pass_top"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:gravity="end"
+            android:orientation="vertical">
 
-
-            <LinearLayout
-                android:layout_width="0dip"
+            <TextView
+                android:id="@+id/headerLabel"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical"
-                android:layout_weight="1"
-                android:orientation="vertical"
-                android:paddingStart="18dp"
-                android:paddingTop="18dp"
-                android:paddingEnd="12dp"
-                android:paddingBottom="18dp">
+                android:ellipsize="end"
+                android:fontFamily="sans-serif-medium"
+                android:maxLines="1"
+                android:maxWidth="@dimen/pass_card_header_max_width"
+                android:textAllCaps="true"
+                android:textSize="12sp"
+                tools:text="Autostadt Key" />
 
-                <TextView
-                    android:id="@+id/date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:textAppearanceSmall"
-                    android:textColor="?android:textColorSecondary"
-                    android:fontFamily="sans-serif-medium"
-                    android:letterSpacing="0.04"
-                    tools:text="12.10.2013 17:00" />
-
-                <TextView
-                    android:id="@+id/passTitle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="6dp"
-                    android:textAppearance="?android:textAppearanceMedium"
-                    android:textColor="?android:attr/textColorPrimary"
-                    android:textSize="20sp"
-                    android:fontFamily="sans-serif-medium"
-                    tools:text="Title" />
-
-                <TextView
-                    android:id="@+id/groupBadge"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/bg_pass_group_badge"
-                    android:drawablePadding="6dp"
-                    android:fontFamily="sans-serif-medium"
-                    android:gravity="center_vertical"
-                    android:paddingStart="10dp"
-                    android:paddingTop="4dp"
-                    android:paddingEnd="12dp"
-                    android:paddingBottom="4dp"
-                    android:textSize="13sp"
-                    android:visibility="gone"
-                    app:drawableStartCompat="@drawable/ic_pass_group_20"
-                    tools:text="3 passes"
-                    tools:visibility="visible" />
-
-            </LinearLayout>
-
-            <org.ligi.passandroid.ui.views.CategoryIndicatorViewWithIcon
-                android:id="@+id/categoryView"
-                android:layout_width="48dp"
-                android:layout_height="74dp"
-                android:layout_gravity="center"
-                android:layout_margin="12dp" />
+            <TextView
+                android:id="@+id/headerValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:maxWidth="@dimen/pass_card_header_max_width"
+                android:textSize="22sp"
+                tools:text="CLASSIC" />
         </LinearLayout>
-
-
-        <LinearLayout
-            android:id="@+id/passExtrasContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
