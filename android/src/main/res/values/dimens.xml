@@ -12,5 +12,5 @@
     <dimen name="pass_card_side_margin">16dp</dimen>
     <dimen name="pass_stack_stroke_width">1dp</dimen>
     <dimen name="pass_stack_edge_offset">8dp</dimen>
-    <dimen name="pass_stack_edge_inset">6dp</dimen>
+    <dimen name="pass_stack_edge_inset">3dp</dimen>
 </resources>
