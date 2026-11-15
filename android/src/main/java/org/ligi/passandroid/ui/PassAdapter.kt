@@ -2,12 +2,17 @@ package org.ligi.passandroid.ui
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Typeface
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.widget.TextViewCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import org.koin.core.component.KoinComponent
@@ -90,11 +95,11 @@ class PassAdapter(
 
     /**
      * A group is shown as a stack: only the front card (first pass) shows content, the other passes of the group
-     * are thin edges peeking out above it.
+     * are thin edges peeking out above it. The topmost edge carries the number of passes in the group.
      */
     private fun bindGroup(viewHolder: GroupViewHolder, group: PassListEntry.Group) {
         val frontPass = group.passes.first()
-        viewHolder.frontCard.bind(frontPass, passStore, groupSize = group.passes.size)
+        viewHolder.frontCard.bind(frontPass, passStore)
 
         bindStackEdges(viewHolder, group)
 
@@ -119,41 +124,67 @@ class PassAdapter(
         val resources = passListActivity.resources
         val topMargin = resources.getDimensionPixelSize(R.dimen.pass_card_spacing)
         val edgeOffset = resources.getDimensionPixelSize(R.dimen.pass_stack_edge_offset)
+        val badgeStrip = resources.getDimensionPixelSize(R.dimen.pass_stack_badge_strip)
         val edgeInset = resources.getDimensionPixelSize(R.dimen.pass_stack_edge_inset)
         val sideMargin = resources.getDimensionPixelSize(R.dimen.pass_card_side_margin)
 
-        // the pass right behind the front card is drawn last (closest), the farthest one sits on top and is narrowest
-        val behindPasses = group.passes.drop(1).take(MAX_STACK_EDGES)
-        behindPasses.asReversed().forEachIndexed { index, pass ->
+        // farthest pass first: it sits on top, is the narrowest and shows the count; the others are thin edges below it
+        val behindPasses = group.passes.drop(1).take(MAX_STACK_EDGES).asReversed()
+        var edgeTop = topMargin
+        behindPasses.forEachIndexed { index, pass ->
             val depth = behindPasses.size - index
-            val edge = createStackEdge(pass).apply {
+            val isTopEdge = index == 0
+            val edge = createStackEdge(pass, if (isTopEdge) group.passes.size else null).apply {
                 layoutParams = FrameLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     resources.getDimensionPixelSize(R.dimen.pass_card_height)
                 ).apply {
-                    this.topMargin = topMargin + index * edgeOffset
+                    this.topMargin = edgeTop
                     marginStart = sideMargin + depth * edgeInset
                     marginEnd = sideMargin + depth * edgeInset
                 }
             }
+            edgeTop += if (isTopEdge) badgeStrip else edgeOffset
             // add behind the front card - views added earlier are drawn first
             stack.addView(edge, index)
             viewHolder.stackEdges.add(edge)
         }
 
         val frontCard = viewHolder.frontCard.card
-        (frontCard.layoutParams as ViewGroup.MarginLayoutParams).topMargin = topMargin + behindPasses.size * edgeOffset
+        (frontCard.layoutParams as ViewGroup.MarginLayoutParams).topMargin = edgeTop
         frontCard.requestLayout()
     }
 
-    private fun createStackEdge(pass: Pass): View = MaterialCardView(passListActivity).apply {
-        // same shape as a full card - tickets get the notch on every card of the stack
-        PassListCardViewHolder.applyShape(this, PassListAppearance(pass).hasTicketNotch)
+    /**
+     * A card peeking out behind the front card. With [count] it shows the number of passes in the group
+     * in its visible strip.
+     */
+    private fun createStackEdge(pass: Pass, count: Int?): View = MaterialCardView(passListActivity).apply {
+        radius = resources.getDimension(R.dimen.pass_card_corner_radius)
         cardElevation = 0f
         strokeWidth = resources.getDimensionPixelSize(R.dimen.pass_stack_stroke_width)
         strokeColor = ContextCompat.getColor(context, R.color.outline_variant)
         setCardBackgroundColor(pass.accentColor)
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_NO
+
+        if (count != null) {
+            val color = PassListAppearance(pass).foregroundColor
+            addView(TextView(context).apply {
+                text = "$count"
+                textSize = 12f
+                typeface = Typeface.create("sans-serif-medium", Typeface.NORMAL)
+                setTextColor(color)
+                gravity = Gravity.CENTER
+                compoundDrawablePadding = resources.getDimensionPixelSize(R.dimen.pass_stack_badge_icon_padding)
+                setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_pass_group_14, 0, 0, 0)
+                TextViewCompat.setCompoundDrawableTintList(this, ColorStateList.valueOf(color))
+                layoutParams = FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    resources.getDimensionPixelSize(R.dimen.pass_stack_badge_strip),
+                    Gravity.TOP or Gravity.CENTER_HORIZONTAL
+                )
+            })
+        }
     }
 
     private fun titleOf(pass: Pass) = PassRenderers.forPass(pass).listTitle(pass).orEmpty()

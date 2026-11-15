@@ -38,11 +38,13 @@
         <ImageView
             android:id="@+id/passLogo"
             android:layout_width="wrap_content"
-            android:layout_height="@dimen/pass_card_logo_height"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
             android:adjustViewBounds="true"
             android:importantForAccessibility="no"
             android:maxWidth="@dimen/pass_card_logo_max_width"
-            android:scaleType="fitStart"
+            android:maxHeight="@dimen/pass_card_logo_height"
+            android:scaleType="fitCenter"
             tools:src="@mipmap/ic_launcher" />
 
         <TextView
@@ -57,25 +59,6 @@
             android:maxLines="2"
             android:textSize="20sp"
             tools:text="Ballorig Seelze" />
-
-        <TextView
-            android:id="@+id/groupBadge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:background="@drawable/bg_pass_group_badge"
-            android:drawablePadding="4dp"
-            android:fontFamily="sans-serif-medium"
-            android:gravity="center_vertical"
-            android:paddingStart="7dp"
-            android:paddingTop="2dp"
-            android:paddingEnd="9dp"
-            android:paddingBottom="2dp"
-            android:textSize="12sp"
-            android:visibility="gone"
-            app:drawableStartCompat="@drawable/ic_pass_group_20"
-            tools:text="4"
-            tools:visibility="visible" />
 
         </LinearLayout>
 

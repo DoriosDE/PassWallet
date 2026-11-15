@@ -5,7 +5,6 @@ import androidx.core.graphics.ColorUtils
 import org.ligi.kaxt.parseColor
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassField
-import org.ligi.passandroid.model.pass.PassType
 import org.threeten.bp.format.DateTimeFormatter
 import org.threeten.bp.format.FormatStyle
 
@@ -45,9 +44,6 @@ class PassListAppearance(private val pass: Pass) {
         headerField?.value?.cleaned() ?: pass.calendarTimespan?.from?.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM))
     }
 
-    /** event tickets and boarding passes get the punched ticket notch */
-    val hasTicketNotch: Boolean
-        get() = pass.type == PassType.EVENT || pass.type == PassType.BOARDING || pass.type == PassType.PKBOARDING
 
     companion object {
         fun readableForegroundFor(backgroundColor: Int) =
