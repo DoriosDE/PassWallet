@@ -2,6 +2,7 @@
 <resources>
     <string name="preference_key_sort" translatable="false">SORT</string>
     <string name="preference_key_autolight" translatable="false">AUTOLIGHT</string>
+    <string name="preference_key_grouping" translatable="false">GROUPING</string>
 
     <string name="authority_fileprovider" translatable="false">org.baumweg.passwallet.fileprovider</string>
 </resources>

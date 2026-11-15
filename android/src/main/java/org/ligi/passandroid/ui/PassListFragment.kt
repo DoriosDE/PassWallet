@@ -31,6 +31,7 @@ class PassListFragment : Fragment() {
 
         passStoreProjection = PassStoreProjection(passStore, arguments?.getString(BUNDLE_KEY_TOPIC)!!, settings.getSortOrder())
         adapter = PassAdapter(activity as AppCompatActivity, passStoreProjection)
+        adapter.refresh(settings.isGroupingEnabled())
 
         inflate.passRecyclerview.adapter = adapter
         inflate.passRecyclerview.layoutManager = LinearLayoutManager(activity)
@@ -57,7 +58,7 @@ class PassListFragment : Fragment() {
 
     private fun refreshPassList() {
         passStoreProjection.refresh(settings.getSortOrder())
-        adapter.notifyDataSetChanged()
+        adapter.refresh(settings.isGroupingEnabled())
     }
 
     companion object {

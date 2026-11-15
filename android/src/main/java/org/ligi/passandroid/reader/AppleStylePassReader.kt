@@ -15,6 +15,7 @@ import org.ligi.passandroid.model.ApplePassbookQuirkCorrector
 import org.ligi.passandroid.model.AppleStylePassTranslation
 import org.ligi.passandroid.model.PassBitmapDefinitions
 import org.ligi.passandroid.model.PassDefinitions
+import org.ligi.passandroid.model.PassGroups
 import org.ligi.passandroid.model.pass.*
 import org.threeten.bp.DateTimeException
 import org.threeten.bp.ZonedDateTime
@@ -34,6 +35,27 @@ object AppleStylePassReader {
         } catch (e: Exception) {
             Timber.i("could not read boarding transit type: $e")
             BoardingTransitType.GENERIC
+        }
+    }
+
+    /**
+     * Reads the automatic group id (passTypeIdentifier + groupingIdentifier) of an already imported pkpass.
+     * Returns an empty string when the pass has no grouping information, null when it could not be read.
+     */
+    fun readGroupId(passFile: File): String? {
+        val file = File(passFile, "pass.json")
+        if (!file.exists()) return null
+        return try {
+            val plainJsonString = AppleStylePassTranslation.readFileAsStringGuessEncoding(file)
+            readJSONSafely(plainJsonString)?.let { json ->
+                PassGroups.automaticGroupId(
+                    readJsonSafeAsOptional(json, "passTypeIdentifier"),
+                    readJsonSafeAsOptional(json, "groupingIdentifier")
+                ) ?: ""
+            }
+        } catch (e: Exception) {
+            Timber.i("could not read grouping identifier: $e")
+            null
         }
     }
 
@@ -140,6 +162,7 @@ object AppleStylePassReader {
         pass.authToken = readJsonSafeAsOptional(passJSON, "authenticationToken")
         pass.webServiceURL = readJsonSafeAsOptional(passJSON, "webServiceURL")
         pass.passIdent = readJsonSafeAsOptional(passJSON, "passTypeIdentifier")
+        pass.groupId = PassGroups.automaticGroupId(pass.passIdent, readJsonSafeAsOptional(passJSON, "groupingIdentifier"))
 
         val locations = ArrayList<PassLocation>()
         try {

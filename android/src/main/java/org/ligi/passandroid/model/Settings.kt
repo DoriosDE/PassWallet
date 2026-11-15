@@ -14,4 +14,6 @@ interface Settings {
     fun getStateDir(): File
 
     fun isAutomaticLightEnabled(): Boolean
+
+    fun isGroupingEnabled(): Boolean
 }

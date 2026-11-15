@@ -154,4 +154,33 @@
     <string name="import_pass">Importar</string>
     <string name="error_no_permission_msg">Hace falta permiso para importar el pase</string>
     <string name="error_no_permission_title">Error de permiso</string>
+
+    <string name="import_unavailable">No hay ninguna app para elegir un archivo</string>
+    <string name="pass_expires_prefix">"caduca "</string>
+    <string name="pass_expired_prefix">"caducó "</string>
+    <plurals name="passes_moved_to_topic">
+        <item quantity="one">Pase movido a %2$s</item>
+        <item quantity="other">%1$d pases movidos a %2$s</item>
+    </plurals>
+
+    <string name="preference_grouping_title">Agrupar pases</string>
+    <string name="preference_grouping_summary">Mostrar como pila superpuesta los pases que van juntos (p. ej. varias entradas para un evento)</string>
+    <plurals name="pass_group_count">
+        <item quantity="one">%d pase</item>
+        <item quantity="other">%d pases</item>
+    </plurals>
+    <string name="pass_group_content_description">Grupo %1$s, %2$s. Toca para abrir y desliza para cambiar entre los pases.</string>
+    <string name="pass_group_position">Pase %1$d de %2$d</string>
+    <string name="pass_group_with">Agrupar con otro pase</string>
+    <string name="pass_group_with_subtitle">Elige el pase o grupo con el que apilar este pase.</string>
+    <string name="pass_group_remove">Quitar del grupo</string>
+    <string name="pass_group_dissolve">Desagrupar pases</string>
+    <string name="pass_grouped">Pases agrupados</string>
+    <string name="pass_group_removed">Pase quitado del grupo</string>
+    <string name="pass_group_dissolved">Grupo deshecho</string>
+    <string name="move_group_to_new_topic">Mover grupo a categoría</string>
+    <plurals name="move_group_subtitle">
+        <item quantity="one">Elige dónde guardar este pase.</item>
+        <item quantity="other">Elige dónde guardar estos %d pases.</item>
+    </plurals>
 </resources>

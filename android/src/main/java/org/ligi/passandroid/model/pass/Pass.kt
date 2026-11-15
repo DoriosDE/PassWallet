@@ -42,6 +42,13 @@ interface Pass {
 
     val passIdent: String?
 
+    /**
+     * Identifies passes that belong together and are shown as one stack in the pass list.
+     * null = not decided yet (may be backfilled from the pkpass groupingIdentifier),
+     * empty = explicitly not grouped.
+     */
+    var groupId: String?
+
     val app: String?
 
     val validTimespans: List<PassImpl.TimeSpan>?

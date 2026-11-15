@@ -14,6 +14,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import org.ligi.kaxt.disableRotation
 import org.ligi.passandroid.R
+import org.ligi.passandroid.model.PassGroupFilter
 import org.ligi.passandroid.model.PassStoreProjection
 import org.ligi.passandroid.model.comparator.PassSortOrder
 import org.ligi.passandroid.model.pass.Pass
@@ -48,9 +49,14 @@ class PassViewActivity : PassViewActivityBase() {
             content = findViewById(R.id.pager),
         )
 
-        pagerAdapter = CollectionPagerAdapter(this, PassStoreProjection(passStore,
-                passStore.classifier.getTopic(currentPass, ""),
-                settings.getSortOrder()))
+        val topic = passStore.classifier.getTopic(currentPass, "")
+        // grouped passes: swiping only switches between the passes of the same group
+        val groupFilter = if (settings.isGroupingEnabled()) {
+            PassGroupFilter.forPass(currentPass, passStore.classifier.getPassListByTopic(topic))
+        } else {
+            PassGroupFilter.All
+        }
+        pagerAdapter = CollectionPagerAdapter(this, PassStoreProjection(passStore, topic, settings.getSortOrder(), groupFilter))
         viewPager = findViewById(R.id.pager)
         viewPager.adapter = pagerAdapter
         val initialPosition = pagerAdapter.getPos(currentPass)
@@ -64,6 +70,7 @@ class PassViewActivity : PassViewActivityBase() {
             override fun onPageSelected(pos: Int) {
                 currentPass = pagerAdapter.getPass(pos)
                 passStore.currentPass = currentPass
+                updateGroupPositionSubtitle()
             }
         })
     }
@@ -72,6 +79,20 @@ class PassViewActivity : PassViewActivityBase() {
         super.refresh()
 
         pagerAdapter.refresh(settings.getSortOrder())
+        updateGroupPositionSubtitle()
+    }
+
+    /**
+     * Shows "pass x of y" in the toolbar while looking at a group of passes.
+     */
+    private fun updateGroupPositionSubtitle() {
+        val actionBar = supportActionBar ?: return
+        val position = pagerAdapter.getPos(currentPass)
+        actionBar.subtitle = if (pagerAdapter.isGroup && position >= 0) {
+            getString(R.string.pass_group_position, position + 1, pagerAdapter.itemCount)
+        } else {
+            null
+        }
     }
 
     inner class CollectionPagerAdapter(
@@ -80,6 +101,9 @@ class PassViewActivity : PassViewActivityBase() {
     ) : FragmentStateAdapter(fa) {
 
         override fun getItemCount(): Int = passStoreProjection.passList.size
+
+        val isGroup: Boolean
+            get() = passStoreProjection.groupFilter is PassGroupFilter.OnlyGroup && itemCount > 1
 
         override fun createFragment(i: Int): Fragment {
 

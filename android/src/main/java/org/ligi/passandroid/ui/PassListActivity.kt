@@ -48,7 +48,7 @@ class PassListActivity : PassAndroidActivity() {
         try {
             importPassLauncher.launch(arrayOf("*/*"))
         } catch (e: ActivityNotFoundException) {
-            Snackbar.make(binding.fam, "Unavailable", Snackbar.LENGTH_LONG).show()
+            Snackbar.make(binding.fam, R.string.import_unavailable, Snackbar.LENGTH_LONG).show()
         }
 
     }

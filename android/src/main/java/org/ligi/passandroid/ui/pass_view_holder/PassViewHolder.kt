@@ -93,7 +93,10 @@ abstract class PassViewHolder(val view: CardView) : RecyclerView.ViewHolder(view
 
         pass.validTimespans.orEmpty().isNotEmpty() && pass.validTimespans!![0].to != null -> {
             val to = pass.validTimespans!![0].to
-            setDateTextFromDateAndPrefix(if (to!!.isAfter(ZonedDateTime.now())) "expires " else " expired ", to)
+            setDateTextFromDateAndPrefix(
+                view.context.getString(if (to!!.isAfter(ZonedDateTime.now())) R.string.pass_expires_prefix else R.string.pass_expired_prefix),
+                to
+            )
         }
         else -> null
     }

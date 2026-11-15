@@ -27,4 +27,6 @@ class AndroidSettings(val context: Context) : Settings {
 
     override fun isAutomaticLightEnabled() = sharedPreferences.getBoolean(context.getString(preference_key_autolight), true)
 
+    override fun isGroupingEnabled() = sharedPreferences.getBoolean(context.getString(R.string.preference_key_grouping), true)
+
 }

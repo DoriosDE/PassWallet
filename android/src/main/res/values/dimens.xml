@@ -3,4 +3,11 @@
     <dimen name="finger">48dp</dimen>
     <dimen name="rhythm">8dp</dimen>
     <dimen name="move_topic_row_height">52dp</dimen>
+    <dimen name="pass_stack_top_margin">14dp</dimen>
+    <dimen name="pass_stack_peek_offset">30dp</dimen>
+    <dimen name="pass_stack_peek_card_height">64dp</dimen>
+    <dimen name="pass_stack_side_margin">16dp</dimen>
+    <dimen name="pass_stack_peek_padding">18dp</dimen>
+    <dimen name="pass_stack_corner_radius">18dp</dimen>
+    <dimen name="pass_stack_stroke_width">1dp</dimen>
 </resources>

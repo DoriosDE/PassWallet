@@ -59,6 +59,25 @@
                     android:fontFamily="sans-serif-medium"
                     tools:text="Title" />
 
+                <TextView
+                    android:id="@+id/groupBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:background="@drawable/bg_pass_group_badge"
+                    android:drawablePadding="6dp"
+                    android:fontFamily="sans-serif-medium"
+                    android:gravity="center_vertical"
+                    android:paddingStart="10dp"
+                    android:paddingTop="4dp"
+                    android:paddingEnd="12dp"
+                    android:paddingBottom="4dp"
+                    android:textSize="13sp"
+                    android:visibility="gone"
+                    app:drawableStartCompat="@drawable/ic_pass_group_20"
+                    tools:text="3 passes"
+                    tools:visibility="visible" />
+
             </LinearLayout>
 
             <org.ligi.passandroid.ui.views.CategoryIndicatorViewWithIcon

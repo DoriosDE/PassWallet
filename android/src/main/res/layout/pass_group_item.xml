@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- A stack of passes that belong together: the other passes of the group peek out above the front card. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/group_stack"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <include
+        android:id="@+id/group_top_card"
+        layout="@layout/pass_list_item" />
+
+</FrameLayout>

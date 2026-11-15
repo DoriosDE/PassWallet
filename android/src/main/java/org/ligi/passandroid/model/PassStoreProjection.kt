@@ -4,7 +4,45 @@ import org.ligi.passandroid.model.comparator.PassSortOrder
 import org.ligi.passandroid.model.pass.Pass
 import java.util.*
 
-class PassStoreProjection(private val passStore: PassStore, private val topic: String, private var passSortOrder: PassSortOrder? = null) {
+/**
+ * Restricts a projection to parts of a topic depending on pass groups.
+ */
+sealed class PassGroupFilter {
+    /** every pass of the topic */
+    object All : PassGroupFilter()
+
+    /** only the members of one group */
+    data class OnlyGroup(val groupId: String) : PassGroupFilter()
+
+    /** only passes that are not stacked in a group (with at least two members in this topic) */
+    object OnlyUngrouped : PassGroupFilter()
+
+    fun apply(passes: List<Pass>): List<Pass> = when (this) {
+        All -> passes
+        is OnlyGroup -> passes.filter { it.groupId == groupId }
+        OnlyUngrouped -> PassGroups.group(passes).filterIsInstance<PassListEntry.Single>().map { it.pass }
+    }
+
+    companion object {
+        /**
+         * The filter used when looking at [pass] in the detail view: swiping only switches between the passes of its group,
+         * or - for passes outside of groups - between the other ungrouped passes.
+         */
+        fun forPass(pass: Pass, topicPasses: List<Pass>): PassGroupFilter {
+            val group = PassGroups.group(topicPasses)
+                .filterIsInstance<PassListEntry.Group>()
+                .firstOrNull { it.groupId == pass.groupId }
+            return if (group != null) OnlyGroup(group.groupId) else OnlyUngrouped
+        }
+    }
+}
+
+class PassStoreProjection(
+    private val passStore: PassStore,
+    private val topic: String,
+    private var passSortOrder: PassSortOrder? = null,
+    var groupFilter: PassGroupFilter = PassGroupFilter.All,
+) {
 
     var passList: List<Pass> = ArrayList()
         private set
@@ -20,6 +58,6 @@ class PassStoreProjection(private val passStore: PassStore, private val topic: S
             Collections.sort(newPassList, passSortOrder.toComparator())
         }
 
-        passList = newPassList
+        passList = groupFilter.apply(newPassList)
     }
 }

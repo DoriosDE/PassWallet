@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="menu_delete">Löschen</string>
+    <string name="menu_move_to_trash">In den Papierkorb</string>
+    <string name="menu_share">Teilen</string>
+    <string name="menu_print">Drucken</string>
+    <string name="menu_edit">Bearbeiten</string>
+    <string name="menu_light">Helligkeit</string>
+    <string name="barcode">Barcode</string>
+    <string name="boarding_pass">Bordkarte</string>
+    <string name="category_event">Veranstaltung</string>
+    <string name="category_coupon">Gutschein</string>
+    <string name="category_storecard">Kundenkarte</string>
+    <string name="category_generic">Allgemein</string>
+    <string name="invalid_passbook_title">Ungültiger Pass</string>
+    <string name="preparing_pass">Pass wird vorbereitet</string>
+    <string name="please_wait">Der Pass wird importiert – bitte einen Moment Geduld</string>
+    <string name="passbook_is_shared_subject">Ein Pass wurde mit dir geteilt</string>
+    <string name="passbook_share_chooser_title">Wie soll der Pass gesendet werden?</string>
+    <string name="more">MEHR</string>
+    <string name="less">WENIGER</string>
+    <string name="pass_details">DETAILS</string>
+    <string name="boarding_transit_icon">Verkehrsmittel</string>
+    <string name="fab_choice_create_pass">Pass erstellen</string>
+    <string name="new_pass_default_title">Eigener Pass</string>
+    <string name="empty_text_title">Hier wohnen deine Pässe</string>
+    <string name="empty_text_body">Importiere einen Pass aus einer Datei. Alles, was du importierst, ist auch offline verfügbar.</string>
+    <string name="downloading_new_pass_version">neue Pass-Version wird heruntergeladen</string>
+    <string name="unzip_pass_dialog_title">Pass wird geöffnet</string>
+    <string name="unzip_pass_dialog_message">Bitte warten…</string>
+    <string name="progress_dialog_title">Wird bearbeitet</string>
+    <string name="import_status_title">Pass wird importiert</string>
+    <string name="import_status_message">Die Datei wird geprüft und für PassWallet vorbereitet.</string>
+    <string name="import_error_file_message">PassWallet konnte diese Datei nicht lesen. Prüfe, ob es sich um einen gültigen Pass oder eine Sicherung handelt, und versuche es erneut.</string>
+    <string name="import_error_backup_message">Diese Datei ist eine PassWallet-Sicherung. Öffne Einstellungen → Sicherung → Sicherung importieren, um sie wiederherzustellen.</string>
+    <string name="import_error_generic_message">Der Import ist fehlgeschlagen: %s</string>
+    <string name="update_error_title">Aktualisierung fehlgeschlagen</string>
+    <string name="update_unavailable_title">Keine Aktualisierung verfügbar</string>
+    <string name="update_unavailable_message">Der Anbieter stellt für diesen Pass keine Aktualisierung mehr bereit. Serverantwort: %1$d.</string>
+    <string name="update_error_network_message">PassWallet konnte die neueste Version nicht herunterladen: %s</string>
+    <string name="update_error_invalid_message">Der heruntergeladene Pass konnte nicht importiert werden: %s</string>
+    <string name="action_update">aktualisieren</string>
+    <string name="pass_updated">Pass aktualisiert</string>
+    <string name="topic_trash">Papierkorb</string>
+    <string name="topic_new">Neu</string>
+    <string name="move_to_new_topic">In Kategorie verschieben</string>
+    <string name="move_topic_subtitle">Wähle, wo dieser Pass gespeichert werden soll.</string>
+    <string name="move_topic_new_subtitle">Gib der neuen Kategorie für diesen Pass einen Namen.</string>
+    <string name="emtytrash_label">Papierkorb leeren</string>
+    <string name="barcode_edit_hint_alternative_message">Alternativer Text</string>
+    <string name="barcode_edit_scan">Barcode scannen</string>
+    <string name="barcode_edit_message">Inhalt</string>
+    <string name="barcode_edit_type">Barcode-Typ</string>
+    <string name="barcode_edit_preview">Vorschau</string>
+    <string name="invalid_barcode_message">Ungültiger Inhalt</string>
+    <string name="scan_title">Code scannen</string>
+    <string name="scan_hint">QR- oder Barcode im Rahmen platzieren</string>
+    <string name="scan_flash">Blitz</string>
+    <string name="scan_read_image">Bild einlesen</string>
+    <string name="scan_rotate_camera">Kamera wechseln</string>
+    <string name="scan_image_failed">In diesem Bild wurde kein QR- oder Barcode gefunden.</string>
+    <string name="camera_permission_required">Zum Scannen von Barcodes wird die Kameraberechtigung benötigt.</string>
+    <string name="categories_voucher">Gutschein</string>
+    <string name="edit_time">Datum &amp; Uhrzeit</string>
+    <string name="edit_time_date_title">Datum wählen</string>
+    <string name="edit_time_time_title">Uhrzeit wählen</string>
+    <string name="edit_location">Ort</string>
+    <string name="edit_location_dialog_title">Ort bearbeiten</string>
+    <string name="edit_location_single_subtitle">Eigene Pässe haben einen Ort. Wählst du einen anderen, wird der aktuelle ersetzt.</string>
+    <string name="location_search_hint">Ort oder Adresse suchen</string>
+    <string name="search_location">Ort suchen</string>
+    <string name="location_search_empty">Gib zuerst einen Ort oder eine Adresse ein</string>
+    <string name="location_search_failed">Ortssuche fehlgeschlagen</string>
+    <string name="location_no_results">Keine Ergebnisse</string>
+    <string name="location_select_result">Wähle ein Ergebnis und speichere dann</string>
+    <string name="location_result_selected">Ort ausgewählt. Zum Übernehmen speichern.</string>
+    <string name="location_search_attribution">Suche über OpenStreetMap / Nominatim</string>
+    <string name="location_manual_coordinates">Koordinaten manuell eingeben</string>
+    <string name="location_name">Name</string>
+    <string name="location_latitude">Breitengrad</string>
+    <string name="location_longitude">Längengrad</string>
+    <string name="location_coordinates_format">%1$.6f, %2$.6f</string>
+    <string name="location_save">Speichern</string>
+    <string name="remove_location">Ort entfernen</string>
+    <string name="invalid_location_coordinates">Ungültige Koordinaten</string>
+    <string name="add_front_field">Feld auf Vorderseite hinzufügen</string>
+    <string name="add_back_fields">Feld auf Rückseite hinzufügen</string>
+    <string name="change_color_dialog_title">Farbe wählen</string>
+    <string name="select_category_dialog_title">Kategorie wählen</string>
+    <string name="select_icon">Symbol wählen</string>
+    <string name="select_logo">Kartenlogo wählen</string>
+    <string name="pass_appearance_title">Pass anpassen</string>
+    <string name="pass_appearance_subtitle">Kategorie, Farbe, Symbol und Kartenlogo anpassen.</string>
+    <string name="select_category_subtitle">Wähle die Darstellung, die am besten zu diesem Pass passt.</string>
+    <string name="select_color_subtitle">Wähle eine Schnellfarbe oder passe sie manuell an.</string>
+    <string name="color_presets">Schnellfarben</string>
+    <string name="custom_color">Eigene Farbe</string>
+    <string name="add_footer_image">Fußzeile</string>
+    <string name="add_logo_image">Kartenlogo</string>
+    <string name="add_header_image">Kopfzeile</string>
+    <string name="add_barcode">Barcode</string>
+    <string name="edit_barcode_dialog_title">Barcode bearbeiten</string>
+    <string name="pass_moved_to_trash">Pass in den Papierkorb verschoben</string>
+    <plurals name="empty_trash_dialog_message">
+        <item quantity="one">Dadurch wird %1$d Pass endgültig aus dem Papierkorb gelöscht. Er kann nicht wiederhergestellt werden.</item>
+        <item quantity="other">Dadurch werden %1$d Pässe endgültig aus dem Papierkorb gelöscht. Sie können nicht wiederhergestellt werden.</item>
+    </plurals>
+    <string name="empty_trash_dialog_title">Papierkorb leeren?</string>
+    <string name="new_topic_input_hint">Name der neuen Kategorie</string>
+
+    <string name="create_new_topic">Neue Kategorie erstellen</string>
+    <string name="cannot_be_empty">darf nicht leer sein</string>
+    <string name="pass_title_hint">Titel des Passes</string>
+    <string name="edit_field_label_hint">Bezeichnung</string>
+    <string name="edit_field_value_hint">Wert</string>
+    <string name="type">Typ</string>
+    <string name="undo">Rückgängig</string>
+
+    <string name="sort_order_date_asc">Datum aufsteigend</string>
+    <string name="sort_order_date_desc">Datum absteigend</string>
+    <string name="sort_order_date_type">Typ</string>
+    <string name="sort_order_date_temporaldistance">Zeitlicher Abstand</string>
+
+    <string name="preference_autolight_title">Automatische Helligkeit</string>
+    <string name="preference_autolight_summary">Bildschirmhelligkeit erhöhen, wenn ein Barcode angezeigt wird?</string>
+
+    <string name="preference_sort_title">Sortierung</string>
+    <string name="preference_sort_summary">Wie sollen die Pässe sortiert werden?</string>
+    <string name="sort_order_sheet_subtitle">Wähle, wie die Pässe auf dem Startbildschirm aufgelistet werden.</string>
+    <string name="selected">Ausgewählt</string>
+
+    <string name="image_import">Bild-Import</string>
+    <string name="pdf_import">PDF-Import</string>
+
+    <string name="field_source">Quelle</string>
+    <string name="field_note">Hinweis</string>
+    <string name="field_advice_label">Tipp</string>
+    <string name="field_advice_text">Frage deinen Anbieter nach einem esPass oder Passbook</string>
+
+    <string name="field_source_image">Bild</string>
+    <string name="field_note_image">Aus einem Bild importiert – kein echter Pass</string>
+
+    <string name="field_source_pdf">PDF</string>
+    <string name="field_note_pdf">Aus einer PDF importiert – kein echter Pass</string>
+    <string name="nav_settings">Einstellungen</string>
+    <string name="preference_backup_title">Sicherung</string>
+    <string name="preference_backup_summary">PassWallet-Sicherung importieren oder exportieren</string>
+    <string name="backup_title">Sicherung</string>
+
+    <string name="backup_export_title">Sicherung exportieren</string>
+    <string name="backup_export_summary">Alle Pässe, Kategorien und Einstellungen in einer ZIP-Datei speichern.</string>
+    <string name="backup_export_action">ZIP-Sicherung erstellen</string>
+    <string name="backup_import_title">Sicherung importieren</string>
+    <string name="backup_import_summary">Pässe, Kategorien und Einstellungen aus einer PassWallet-ZIP-Sicherung wiederherstellen.</string>
+    <string name="backup_import_action">ZIP-Sicherung auswählen</string>
+    <string name="backup_export_success">Sicherung exportiert</string>
+    <string name="backup_import_success">Sicherung importiert</string>
+    <string name="backup_export_error">Sicherung konnte nicht exportiert werden: %s</string>
+    <string name="backup_import_error">Sicherung konnte nicht importiert werden: %s</string>
+    <string name="launcher_shortcut">Verknüpfung auf dem Startbildschirm</string>
+    <string name="import_pass">Importieren</string>
+
+    <string name="error_no_permission_msg">Zum Importieren des Passes wird eine Berechtigung benötigt</string>
+    <string name="error_no_permission_title">Berechtigungsfehler</string>
+
+    <string name="import_unavailable">Keine App zur Dateiauswahl verfügbar</string>
+    <string name="pass_expires_prefix">"läuft ab: "</string>
+    <string name="pass_expired_prefix">"abgelaufen: "</string>
+    <plurals name="passes_moved_to_topic">
+        <item quantity="one">Pass nach %2$s verschoben</item>
+        <item quantity="other">%1$d Pässe nach %2$s verschoben</item>
+    </plurals>
+
+    <string name="preference_grouping_title">Pässe gruppieren</string>
+    <string name="preference_grouping_summary">Zusammengehörige Pässe (z. B. mehrere Tickets für eine Veranstaltung) als überlappenden Stapel anzeigen</string>
+    <plurals name="pass_group_count">
+        <item quantity="one">%d Pass</item>
+        <item quantity="other">%d Pässe</item>
+    </plurals>
+    <string name="pass_group_content_description">Gruppe %1$s, %2$s. Tippen zum Öffnen, dann wischen, um zwischen den Pässen zu wechseln.</string>
+    <string name="pass_group_position">Pass %1$d von %2$d</string>
+    <string name="pass_group_with">Mit anderem Pass gruppieren</string>
+    <string name="pass_group_with_subtitle">Wähle den Pass oder die Gruppe, mit der dieser Pass gestapelt werden soll.</string>
+    <string name="pass_group_remove">Aus Gruppe entfernen</string>
+    <string name="pass_group_dissolve">Gruppierung aufheben</string>
+    <string name="pass_grouped">Pässe gruppiert</string>
+    <string name="pass_group_removed">Pass aus Gruppe entfernt</string>
+    <string name="pass_group_dissolved">Gruppe aufgelöst</string>
+    <string name="move_group_to_new_topic">Gruppe in Kategorie verschieben</string>
+    <plurals name="move_group_subtitle">
+        <item quantity="one">Wähle, wo dieser Pass gespeichert werden soll.</item>
+        <item quantity="other">Wähle, wo diese %d Pässe gespeichert werden sollen.</item>
+    </plurals>
+</resources>

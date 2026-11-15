@@ -166,5 +166,35 @@
     <string name="error_no_permission_msg">Need permission to import pass</string>
     <string name="error_no_permission_title">Permission Error</string>
 
+    <string name="import_unavailable">No app available to pick a file</string>
+    <string name="pass_expires_prefix">"expires "</string>
+    <string name="pass_expired_prefix">"expired "</string>
+    <plurals name="passes_moved_to_topic">
+        <item quantity="one">Pass moved to %2$s</item>
+        <item quantity="other">%1$d passes moved to %2$s</item>
+    </plurals>
+
+    <string name="preference_grouping_title">Group passes</string>
+    <string name="preference_grouping_summary">Show passes that belong together (e.g. several tickets for one event) as an overlapping stack</string>
+    <plurals name="pass_group_count">
+        <item quantity="one">%d pass</item>
+        <item quantity="other">%d passes</item>
+    </plurals>
+    <string name="pass_group_header" translatable="false">%1$s · %2$s</string>
+    <string name="pass_group_content_description">Group %1$s, %2$s. Tap to open, then swipe to switch between the passes.</string>
+    <string name="pass_group_position">Pass %1$d of %2$d</string>
+    <string name="pass_group_with">Group with another pass</string>
+    <string name="pass_group_with_subtitle">Choose the pass or group this pass should be stacked with.</string>
+    <string name="pass_group_remove">Remove from group</string>
+    <string name="pass_group_dissolve">Ungroup passes</string>
+    <string name="pass_grouped">Passes grouped</string>
+    <string name="pass_group_removed">Pass removed from group</string>
+    <string name="pass_group_dissolved">Group dissolved</string>
+    <string name="move_group_to_new_topic">Move group to topic</string>
+    <plurals name="move_group_subtitle">
+        <item quantity="one">Choose where to save this pass.</item>
+        <item quantity="other">Choose where to save these %d passes.</item>
+    </plurals>
+
 
 </resources>

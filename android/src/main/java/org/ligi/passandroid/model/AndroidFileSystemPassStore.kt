@@ -115,6 +115,9 @@ class AndroidFileSystemPassStore(
             if (backfillVisualType(result)) {
                 dirty = true
             }
+            if (backfillGroupId(pathForID, result)) {
+                dirty = true
+            }
             if (dirty) {
                 save(result)
             }
@@ -132,6 +135,13 @@ class AndroidFileSystemPassStore(
         if (parsedTransitType == BoardingTransitType.GENERIC) return false
 
         pass.boardingTransitType = parsedTransitType
+        return true
+    }
+
+    private fun backfillGroupId(pathForID: File, pass: Pass): Boolean {
+        if (pass.groupId != null) return false
+
+        pass.groupId = AppleStylePassReader.readGroupId(pathForID) ?: ""
         return true
     }
 
