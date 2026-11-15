@@ -28,9 +28,9 @@ class PassListAppearance(private val pass: Pass) {
     /** the logo text of the pass, if it defines one */
     val logoText: String? get() = pass.logoText?.trim()?.takeIf { it.isNotEmpty() }
 
-    /** text on the left when there is no logo image: logo text, otherwise the title */
+    /** text on the left when there is no logo image: the title (the logo text belongs to the logo only) */
     val fallbackText: String by lazy {
-        logoText ?: PassRenderers.forPass(pass).listTitle(pass)?.trim().orEmpty()
+        PassRenderers.forPass(pass).listTitle(pass)?.trim().orEmpty()
     }
 
     private val headerField: PassField? by lazy {

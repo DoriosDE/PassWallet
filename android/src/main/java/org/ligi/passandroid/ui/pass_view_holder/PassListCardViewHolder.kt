@@ -42,7 +42,7 @@ class PassListCardViewHolder(val card: MaterialCardView) : RecyclerView.ViewHold
         logo.setImageBitmap(logoBitmap)
         logo.visibility = if (logoBitmap != null) View.VISIBLE else View.GONE
 
-        // next to a logo image only the pass' own logo text is shown, without logo image the logo text or title
+        // next to a logo image the pass' own logo text is shown, without logo image the title
         val leftText = if (logoBitmap != null) appearance.logoText else appearance.fallbackText
         title.text = leftText
         title.visibility = if (leftText.isNullOrEmpty()) View.GONE else View.VISIBLE
