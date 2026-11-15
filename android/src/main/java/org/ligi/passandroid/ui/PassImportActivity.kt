@@ -5,6 +5,7 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.View.GONE
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -17,14 +18,17 @@ import org.ligi.passandroid.R
 import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.backup.BackupArchive
 import org.ligi.passandroid.databinding.ActivityImportBinding
+import org.ligi.passandroid.functions.autoGroupImportedPasses
 import org.ligi.passandroid.functions.fromURI
 import org.ligi.passandroid.model.PassStore
+import org.ligi.passandroid.model.Settings
 
 class PassImportActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityImportBinding
     val tracker: Tracker by inject()
     val passStore: PassStore by inject()
+    val settings: Settings by inject()
 
     private fun importUri(): Uri? {
         intent.data?.let { return it }
@@ -67,7 +71,14 @@ class PassImportActivity : AppCompatActivity() {
                         if (isFinishing) {
                             // finish with no UI/Dialogs
                             // let's do it silently TODO check if we need to jump to a service here as the activity is dying
-                            val spec = UnzipPassController.InputStreamUnzipControllerSpec(fromURI, application, passStore, null, null)
+                            val spec = UnzipPassController.InputStreamUnzipControllerSpec(fromURI, application, passStore, object : UnzipPassController.SuccessCallback {
+                                override fun call(uuids: List<String>) {
+                                    uuids.forEach { id ->
+                                        passStore.getPassbookForId(id)?.let { passStore.classifier.moveToTopic(it, PassArchive.ACTIVE) }
+                                    }
+                                    autoGroupImportedPasses(passStore, settings, uuids)
+                                }
+                            }, null)
                             UnzipPassController.processInputStream(spec)
                         } else {
                             UnzipPassDialog.show(fromURI, this@PassImportActivity, passStore) { importedIds ->
@@ -75,6 +86,15 @@ class PassImportActivity : AppCompatActivity() {
                                     passStore.getPassbookForId(id)?.let { pass ->
                                         passStore.classifier.moveToTopic(pass, PassArchive.ACTIVE)
                                     }
+                                }
+
+                                val groupedCount = autoGroupImportedPasses(passStore, settings, importedIds)
+                                if (groupedCount > 0) {
+                                    Toast.makeText(
+                                        this@PassImportActivity,
+                                        resources.getQuantityString(R.plurals.passes_auto_grouped, groupedCount, groupedCount),
+                                        Toast.LENGTH_LONG
+                                    ).show()
                                 }
 
                                 if (importedIds.size == 1) {

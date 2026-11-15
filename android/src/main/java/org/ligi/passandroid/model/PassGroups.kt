@@ -16,6 +16,9 @@ object PassGroups {
     private const val AUTOMATIC_PREFIX = "pk:"
     private const val MANUAL_PREFIX = "manual:"
 
+    /** marks a pass the user explicitly took out of a group - it is never grouped automatically again */
+    const val USER_UNGROUPED = "none"
+
     /**
      * Passbook passes declare that they belong together via the same passTypeIdentifier and groupingIdentifier
      * (e.g. several tickets for the same event or the legs of a journey).
@@ -27,7 +30,7 @@ object PassGroups {
 
     fun newManualGroupId() = MANUAL_PREFIX + UUID.randomUUID().toString()
 
-    fun isGrouped(pass: Pass) = !pass.groupId.isNullOrEmpty()
+    fun isGrouped(pass: Pass) = !pass.groupId.isNullOrEmpty() && pass.groupId != USER_UNGROUPED
 
     /**
      * Collapses passes with the same group id into one entry. The (already sorted) order is kept:
@@ -60,7 +63,7 @@ object PassGroups {
      * Returns the passes that were modified and need to be saved.
      */
     fun join(pass: Pass, target: Pass): List<Pass> {
-        val existingGroupId = target.groupId?.takeIf { it.isNotEmpty() }
+        val existingGroupId = target.groupId?.takeIf { isGrouped(target) }
         return if (existingGroupId != null) {
             pass.groupId = existingGroupId
             listOf(pass)
@@ -73,11 +76,48 @@ object PassGroups {
     }
 
     /**
-     * Removes the given passes from their groups. An empty group id marks them as explicitly ungrouped
-     * so the automatic Passbook grouping is not applied again.
+     * Removes the given passes from their groups and marks them as explicitly ungrouped
+     * so neither the Passbook grouping nor the import matching groups them again.
      */
     fun ungroup(passes: List<Pass>): List<Pass> {
-        passes.forEach { it.groupId = "" }
+        passes.forEach { it.groupId = USER_UNGROUPED }
         return passes
+    }
+
+    /**
+     * Two passes belong together when they come from the same issuer (passTypeIdentifier), have the same type and
+     * description and are for the same day - e.g. several tickets for one event or the boarding passes of one journey.
+     * Passes without issuer or description (custom, image or PDF passes) never match.
+     */
+    fun belongTogether(a: Pass, b: Pass): Boolean {
+        if (a.id == b.id) return false
+        val issuer = a.passIdent?.takeIf { it.isNotBlank() } ?: return false
+        val description = a.description?.trim()?.takeIf { it.isNotEmpty() } ?: return false
+        return issuer == b.passIdent &&
+                a.type == b.type &&
+                description.equals(b.description?.trim(), ignoreCase = true) &&
+                a.calendarTimespan?.from?.toLocalDate() == b.calendarTimespan?.from?.toLocalDate()
+    }
+
+    /**
+     * Automatically groups freshly imported [passes] with a matching pass from [candidates] (and with each other).
+     * Passes that are already grouped or were ungrouped by the user are left alone.
+     * Matches that are already in a group are preferred, so a new ticket joins an existing stack.
+     *
+     * Returns the passes that were changed and need to be saved.
+     */
+    fun autoGroup(passes: List<Pass>, candidates: List<Pass>): List<Pass> {
+        val changed = LinkedHashSet<Pass>()
+        val allCandidates = (candidates + passes).distinctBy { it.id }
+
+        passes.forEach { pass ->
+            if (isGrouped(pass) || pass.groupId == USER_UNGROUPED) return@forEach
+
+            val matches = allCandidates.filter { belongTogether(pass, it) && it.groupId != USER_UNGROUPED }
+            val target = matches.firstOrNull { isGrouped(it) } ?: matches.firstOrNull() ?: return@forEach
+            changed.addAll(join(pass, target))
+        }
+
+        return changed.toList()
     }
 }

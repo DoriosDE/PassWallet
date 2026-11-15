@@ -21,6 +21,7 @@ import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.ligi.passandroid.model.InputStreamWithSource
 import org.ligi.passandroid.model.PassArchive
+import org.ligi.passandroid.model.PassGroups
 import org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_ICON
 import org.ligi.passandroid.model.State
 import org.ligi.passandroid.model.pass.Pass
@@ -265,9 +266,13 @@ open class PassViewActivityBase : PassAndroidActivity() {
                     return@Runnable
                 }
                 dlg.dismissSafely()
+                val previousGroupId = currentPass.groupId
                 if (currentPass.id != uuid) {
                     passStore.deletePassWithId(currentPass.id)
                 }
+                // the update replaced the files on disk - drop the cached old version so the new one is read
+                @Suppress("UNCHECKED_CAST")
+                (passStore.passMap as? MutableMap<String, Pass>)?.remove(uuid)
                 val newPass = passStore.getPassbookForId(uuid)
                 if (newPass == null) {
                     showImportErrorDialog(
@@ -275,6 +280,11 @@ open class PassViewActivityBase : PassAndroidActivity() {
                         message = getString(R.string.update_error_invalid_message, "Updated pass was not saved"),
                     )
                     return@Runnable
+                }
+                // an update replaces the stored pass - keep it in the group it belonged to
+                if (!PassGroups.isGrouped(newPass) && previousGroupId != null) {
+                    newPass.groupId = previousGroupId
+                    passStore.save(newPass)
                 }
                 passStore.currentPass = newPass
                 currentPass = newPass

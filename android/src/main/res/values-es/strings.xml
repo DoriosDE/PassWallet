@@ -144,7 +144,7 @@
     <string name="pass_expired_prefix">"caducó "</string>
 
     <string name="preference_grouping_title">Agrupar pases</string>
-    <string name="preference_grouping_summary">Mostrar como pila superpuesta los pases que van juntos (p. ej. varias entradas para un evento)</string>
+    <string name="preference_grouping_summary">Mostrar como pila superpuesta los pases que van juntos (p. ej. varias entradas para un evento). Los pases importados se añaden automáticamente a una pila coincidente.</string>
     <plurals name="pass_group_count">
         <item quantity="one">%d pase</item>
         <item quantity="other">%d pases</item>
@@ -178,5 +178,9 @@
     <plurals name="passes_restored">
         <item quantity="one">Pase restaurado</item>
         <item quantity="other">%d pases restaurados</item>
+    </plurals>
+    <plurals name="passes_auto_grouped">
+        <item quantity="one">Pase añadido a un grupo coincidente</item>
+        <item quantity="other">%d pases añadidos a grupos coincidentes</item>
     </plurals>
 </resources>

@@ -155,7 +155,7 @@
     <string name="pass_expired_prefix">"expired "</string>
 
     <string name="preference_grouping_title">Group passes</string>
-    <string name="preference_grouping_summary">Show passes that belong together (e.g. several tickets for one event) as an overlapping stack</string>
+    <string name="preference_grouping_summary">Show passes that belong together (e.g. several tickets for one event) as an overlapping stack. Newly imported passes are added to a matching stack automatically.</string>
     <plurals name="pass_group_count">
         <item quantity="one">%d pass</item>
         <item quantity="other">%d passes</item>
@@ -190,5 +190,9 @@
     <plurals name="passes_restored">
         <item quantity="one">Pass restored</item>
         <item quantity="other">%d passes restored</item>
+    </plurals>
+    <plurals name="passes_auto_grouped">
+        <item quantity="one">Pass added to a matching group</item>
+        <item quantity="other">%d passes added to matching groups</item>
     </plurals>
 </resources>

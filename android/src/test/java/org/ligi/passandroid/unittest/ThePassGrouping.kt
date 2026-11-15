@@ -85,7 +85,7 @@ class ThePassGrouping {
 
         PassGroups.ungroup(listOf(a))
 
-        assertThat(a.groupId).isEmpty()
+        assertThat(a.groupId).isEqualTo(PassGroups.USER_UNGROUPED)
         assertThat(PassGroups.isGrouped(a)).isFalse()
     }
 }

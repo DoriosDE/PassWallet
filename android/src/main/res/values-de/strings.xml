@@ -152,7 +152,7 @@
     <string name="pass_expired_prefix">"abgelaufen: "</string>
 
     <string name="preference_grouping_title">Pässe gruppieren</string>
-    <string name="preference_grouping_summary">Zusammengehörige Pässe (z. B. mehrere Tickets für eine Veranstaltung) als überlappenden Stapel anzeigen</string>
+    <string name="preference_grouping_summary">Zusammengehörige Pässe (z. B. mehrere Tickets für eine Veranstaltung) als überlappenden Stapel anzeigen. Neu importierte Pässe werden automatisch einem passenden Stapel zugeordnet.</string>
     <plurals name="pass_group_count">
         <item quantity="one">%d Pass</item>
         <item quantity="other">%d Pässe</item>
@@ -186,5 +186,9 @@
     <plurals name="passes_restored">
         <item quantity="one">Pass wiederhergestellt</item>
         <item quantity="other">%d Pässe wiederhergestellt</item>
+    </plurals>
+    <plurals name="passes_auto_grouped">
+        <item quantity="one">Pass zu passender Gruppe hinzugefügt</item>
+        <item quantity="other">%d Pässe zu passenden Gruppen hinzugefügt</item>
     </plurals>
 </resources>
