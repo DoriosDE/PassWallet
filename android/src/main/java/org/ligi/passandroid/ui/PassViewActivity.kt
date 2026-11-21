@@ -21,6 +21,7 @@ import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassType
 import org.ligi.passandroid.model.pass.PassVisualClassifier
 import org.ligi.passandroid.model.pass.PassVisualType
+import org.ligi.passandroid.update.PassUpdater
 
 class PassViewActivity : PassViewActivityBase() {
     private lateinit var pagerAdapter: CollectionPagerAdapter
@@ -152,7 +153,7 @@ class PassViewActivity : PassViewActivityBase() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        menu.findItem(R.id.menu_update).isVisible = mightPassBeAbleToUpdate(currentPass)
+        menu.findItem(R.id.menu_update).isVisible = PassUpdater.canUpdate(currentPass)
         menu.findItem(R.id.install_shortcut).isVisible = ShortcutManagerCompat.isRequestPinShortcutSupported(this)
         return super.onPrepareOptionsMenu(menu)
     }

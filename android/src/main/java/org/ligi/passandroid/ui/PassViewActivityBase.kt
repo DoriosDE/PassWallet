@@ -13,20 +13,14 @@ import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.scale
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.google.android.material.snackbar.Snackbar
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.ligi.passandroid.R
-import java.util.concurrent.TimeUnit
-import org.ligi.passandroid.model.InputStreamWithSource
-import org.ligi.passandroid.model.applyUpdate
 import org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_ICON
 import org.ligi.passandroid.model.pass.Pass
-import java.io.IOException
+import org.ligi.passandroid.update.PassUpdater
 
 @SuppressLint("Registered")
 open class PassViewActivityBase : PassAndroidActivity() {
@@ -157,13 +151,6 @@ open class PassViewActivityBase : PassAndroidActivity() {
         ShortcutManagerCompat.requestPinShortcut(this, shortcutInfo, null)
     }
 
-    private sealed class UpdateOutcome {
-        /** the update was imported and taken over - [updatedPass] is null when that failed */
-        class Imported(val updatedPass: Pass?, val errorText: String?) : UpdateOutcome()
-        class Unavailable(val statusCode: Int) : UpdateOutcome()
-        class NetworkError(val error: IOException) : UpdateOutcome()
-    }
-
     /** downloads the latest version of the pass from its provider and replaces the stored one */
     private fun updatePass() {
         val pass = currentPass
@@ -172,7 +159,7 @@ open class PassViewActivityBase : PassAndroidActivity() {
             dialog.show()
             val outcome = try {
                 // the stored pass is changed - finish that even when the screen is closed meanwhile
-                withContext(NonCancellable) { downloadAndApplyUpdate(pass) }
+                withContext(NonCancellable) { PassUpdater(this@PassViewActivityBase, passStore).update(pass) }
             } finally {
                 dialog.dismissSafely()
             }
@@ -180,54 +167,17 @@ open class PassViewActivityBase : PassAndroidActivity() {
         }
     }
 
-    private suspend fun downloadAndApplyUpdate(pass: Pass): UpdateOutcome = withContext(Dispatchers.IO) {
-        val client = OkHttpClient.Builder()
-            .connectTimeout(10, TimeUnit.SECONDS)
-            .readTimeout(20, TimeUnit.SECONDS)
-            .writeTimeout(10, TimeUnit.SECONDS)
-            .build()
-
-        val url = pass.webServiceURL + "/v1/passes/" + pass.passIdent + "/" + pass.serial
-        val request = Request.Builder()
-            .url(url)
-            .addHeader("Authorization", "ApplePass " + pass.authToken)
-            .build()
-
-        try {
-            client.newCall(request).execute().use { response ->
-                when (val result = interpretPassUpdateResponse(response)) {
-                    is PassUpdateResult.Available -> {
-                        val imported = PassImportController.import(
-                            this@PassViewActivityBase,
-                            passStore,
-                            InputStreamWithSource(url, result.body.byteStream()),
-                            overwrite = true,
-                        )
-                        // the pass store is used by the screens on the main thread - take the update over there
-                        val updatedPass = withContext(Dispatchers.Main) {
-                            imported.passIds.firstOrNull()?.let { passStore.applyUpdate(pass, it) }
-                        }
-                        UpdateOutcome.Imported(updatedPass, imported.errorText.takeIf { it.isNotEmpty() })
-                    }
-                    is PassUpdateResult.Unavailable -> UpdateOutcome.Unavailable(result.statusCode)
-                }
-            }
-        } catch (e: IOException) {
-            UpdateOutcome.NetworkError(e)
-        }
-    }
-
-    private fun showUpdateOutcome(outcome: UpdateOutcome) {
+    private fun showUpdateOutcome(outcome: PassUpdater.Outcome) {
         if (isFinishing) return
         when (outcome) {
-            is UpdateOutcome.Unavailable -> showImportErrorDialog(
+            is PassUpdater.Outcome.Unavailable -> showImportErrorDialog(
                 title = getString(R.string.update_unavailable_title),
                 message = getString(R.string.update_unavailable_message, outcome.statusCode),
             )
-            is UpdateOutcome.NetworkError -> showUpdateError(
+            is PassUpdater.Outcome.NetworkError -> showUpdateError(
                 getString(R.string.update_error_network_message, outcome.error.localizedMessage ?: outcome.error.javaClass.simpleName)
             )
-            is UpdateOutcome.Imported -> {
+            is PassUpdater.Outcome.Imported -> {
                 outcome.updatedPass?.let { updatedPass ->
                     passStore.currentPass = updatedPass
                     currentPass = updatedPass
@@ -261,9 +211,5 @@ open class PassViewActivityBase : PassAndroidActivity() {
     companion object {
 
         const val EXTRA_KEY_UUID = "uuid"
-
-        fun mightPassBeAbleToUpdate(pass: Pass?): Boolean {
-            return pass?.webServiceURL != null && pass.passIdent != null && pass.serial != null
-        }
     }
 }

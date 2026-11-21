@@ -1,4 +1,4 @@
-package org.ligi.passandroid.ui
+package org.ligi.passandroid.update
 
 import okhttp3.Protocol
 import okhttp3.Request
@@ -6,20 +6,20 @@ import okhttp3.Response
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class PassUpdateResultTest {
+class TheUpdateResponse {
 
     @Test
     fun httpNotFoundIsAHandledUnavailableUpdate() {
-        val result = interpretPassUpdateResponse(responseWithCode(404))
+        val result = UpdateResponse.of(responseWithCode(404))
 
-        assertEquals(PassUpdateResult.Unavailable(404), result)
+        assertEquals(UpdateResponse.Unavailable(404), result)
     }
 
     @Test
     fun emptySuccessfulResponseIsAHandledUnavailableUpdate() {
-        val result = interpretPassUpdateResponse(responseWithCode(204))
+        val result = UpdateResponse.of(responseWithCode(204))
 
-        assertEquals(PassUpdateResult.Unavailable(204), result)
+        assertEquals(UpdateResponse.Unavailable(204), result)
     }
 
     private fun responseWithCode(code: Int): Response {

@@ -1,5 +1,7 @@
-package org.ligi.passandroid.model
+package org.ligi.passandroid.update
 
+import org.ligi.passandroid.model.PassGroups
+import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
 
 /**

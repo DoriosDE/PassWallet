@@ -12,7 +12,7 @@ import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.PassVisualType
-import org.ligi.passandroid.model.applyUpdate
+import org.ligi.passandroid.update.applyUpdate
 import java.io.File
 
 /**
