@@ -102,7 +102,6 @@ class PassListActivity : PassAndroidActivity() {
         }
 
         passStore.syncPassStoreWithClassifier(PassArchive.ACTIVE)
-        migrateLegacyTopics()
 
         refresh()
 
@@ -223,14 +222,6 @@ class PassListActivity : PassAndroidActivity() {
         startActivity(Intent(this, PassListActivity::class.java).putExtra(EXTRA_ARCHIVE, true))
     }
 
-    /**
-     * Categories, tabs and the trash were replaced by groups and the archive - convert existing data once.
-     */
-    private fun migrateLegacyTopics() {
-        val changedPasses = PassArchive.migrateLegacyTopics(passStore.classifier.topicByIdMap) { passStore.getPassbookForId(it) }
-        changedPasses.forEach { passStore.save(it) }
-        passStore.classifier.processDataChange()
-    }
 
     companion object {
         const val EXTRA_ARCHIVE = "archive"
