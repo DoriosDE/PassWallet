@@ -29,7 +29,7 @@ class ThePassArchive {
 
     @Test
     fun passesAreActiveUnlessArchived() {
-        val tested = archive("a" to "new", "b" to "archive")
+        val tested = archive("a" to "active", "b" to "archived")
 
         assertThat(tested.stateOf(passes.getValue("a"))).isEqualTo(ArchiveState.ACTIVE)
         assertThat(tested.stateOf(passes.getValue("b"))).isEqualTo(ArchiveState.ARCHIVED)
@@ -38,7 +38,7 @@ class ThePassArchive {
 
     @Test
     fun listsPassesByState() {
-        val tested = archive("a" to "new", "b" to "archive", "c" to "new")
+        val tested = archive("a" to "active", "b" to "archived", "c" to "active")
 
         assertThat(tested.passesIn(ArchiveState.ACTIVE).map { it.id }).containsOnly("a", "c")
         assertThat(tested.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("b")
@@ -46,7 +46,7 @@ class ThePassArchive {
 
     @Test
     fun setsTheStateOfSeveralPassesAtOnce() {
-        val tested = archive("a" to "new", "b" to "new", "c" to "new")
+        val tested = archive("a" to "active", "b" to "active", "c" to "active")
 
         tested.setState(listOf(passes.getValue("a"), passes.getValue("b")), ArchiveState.ARCHIVED)
 
@@ -56,7 +56,7 @@ class ThePassArchive {
 
     @Test
     fun knowsWhichPassesItHoldsAndForgetsRemovedOnes() {
-        val tested = archive("a" to "new", "b" to "archive")
+        val tested = archive("a" to "active", "b" to "archived")
 
         tested.removePass("a")
 
@@ -64,8 +64,8 @@ class ThePassArchive {
     }
 
     @Test
-    fun leftoverValuesFromOldVersionsCountAsActive() {
-        val tested = archive("a" to "trash", "b" to "Concerts", "c" to "archive")
+    fun unknownValuesCountAsActive() {
+        val tested = archive("a" to "", "b" to "something else", "c" to "archived")
 
         assertThat(tested.passesIn(ArchiveState.ACTIVE).map { it.id }).containsOnly("a", "b")
         assertThat(tested.isArchived(passes.getValue("c"))).isTrue()
@@ -73,7 +73,7 @@ class ThePassArchive {
 
     @Test
     fun syncForgetsGonePassesAndAddsNewOnesAsActive() {
-        val tested = archive("a" to "archive", "gone" to "new")
+        val tested = archive("a" to "archived", "gone" to "active")
 
         tested.syncWith(listOf("a", "b"))
 
@@ -85,7 +85,7 @@ class ThePassArchive {
 
     @Test
     fun syncWithoutChangesDoesNotAnnounceAnything() {
-        val tested = archive("a" to "archive", "b" to "new")
+        val tested = archive("a" to "archived", "b" to "active")
 
         tested.syncWith(listOf("a", "b"))
 
@@ -94,7 +94,7 @@ class ThePassArchive {
 
     @Test
     fun setsTheStateOfASinglePass() {
-        val tested = archive("a" to "new")
+        val tested = archive("a" to "active")
 
         tested.setState(passes.getValue("a"), ArchiveState.ARCHIVED)
 

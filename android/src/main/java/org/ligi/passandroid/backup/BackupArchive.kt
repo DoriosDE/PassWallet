@@ -1,5 +1,6 @@
 package org.ligi.passandroid.backup
 
+import org.ligi.passandroid.model.AndroidFileSystemPassStore.Companion.ARCHIVE_STATE_FILE
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.InputStream
@@ -17,7 +18,6 @@ object BackupArchive {
     private const val MANIFEST_ENTRY = "manifest.json"
     private const val PASSES_PREFIX = "passes/"
     private const val PREFERENCES_ENTRY = "preferences.json"
-    private const val CLASSIFIER_STATE = "classifier_state.json"
     private const val MAX_BACKUP_TOTAL_BYTES = 100L * 1024L * 1024L
     private const val MAX_BACKUP_ENTRY_BYTES = 25L * 1024L * 1024L
     private const val MAX_BACKUP_ENTRIES = 1_024
@@ -117,9 +117,9 @@ object BackupArchive {
                     }
             }
 
-            val classifierState = File(stateDir, CLASSIFIER_STATE)
-            if (classifierState.exists()) {
-                zip.writeFileEntry(classifierState, "state/$CLASSIFIER_STATE")
+            val archiveState = File(stateDir, ARCHIVE_STATE_FILE)
+            if (archiveState.exists()) {
+                zip.writeFileEntry(archiveState, "state/$ARCHIVE_STATE_FILE")
             }
 
             zip.writeTextEntry(PREFERENCES_ENTRY, encodePreferences(preferences))
@@ -149,8 +149,8 @@ object BackupArchive {
                             val relative = entry.name.removePrefix("passes/")
                             totalBytes += zip.copyEntryToSafeFile(passesDir, relative, MAX_BACKUP_ENTRY_BYTES)
                         }
-                        entry.name == "state/$CLASSIFIER_STATE" -> {
-                            totalBytes += zip.copyEntryToSafeFile(stateDir, CLASSIFIER_STATE, MAX_BACKUP_ENTRY_BYTES)
+                        entry.name == "state/$ARCHIVE_STATE_FILE" -> {
+                            totalBytes += zip.copyEntryToSafeFile(stateDir, ARCHIVE_STATE_FILE, MAX_BACKUP_ENTRY_BYTES)
                         }
                         entry.name == PREFERENCES_ENTRY -> {
                             val preferencesJson = zip.readEntryTextWithLimit(MAX_PREFERENCES_BYTES)

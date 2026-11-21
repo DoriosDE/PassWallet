@@ -51,7 +51,7 @@ class AndroidFileSystemPassStore(
     override var currentPass: Pass? = null
 
     override val archive: PassArchive by lazy {
-        val archiveStateFile = File(settings.getStateDir(), "classifier_state.json")
+        val archiveStateFile = File(settings.getStateDir(), ARCHIVE_STATE_FILE)
         FileBackedPassArchive(archiveStateFile, this, moshi)
     }
 
@@ -205,5 +205,10 @@ class AndroidFileSystemPassStore(
     override fun syncArchiveWithStorage() {
         val existingPassIds = path.listFiles()?.map { it.name }?.filter { getPassbookForId(it) != null }.orEmpty()
         archive.syncWith(existingPassIds)
+    }
+
+    companion object {
+        /** archive state of all passes, below [Settings.getStateDir] - also part of backups */
+        const val ARCHIVE_STATE_FILE = "archive_state.json"
     }
 }

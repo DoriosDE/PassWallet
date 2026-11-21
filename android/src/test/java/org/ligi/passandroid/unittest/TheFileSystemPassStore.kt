@@ -95,7 +95,7 @@ class TheFileSystemPassStore {
         val backup = newStore()
         backup.save(pass("both", "Backup version"))
         backup.save(pass("restored", "Restored"))
-        File(settings.getStateDir(), "classifier_state.json")
+        File(settings.getStateDir(), "archive_state.json")
             .writeText("""{"both":"${ArchiveState.ARCHIVED.storedValue}","restored":"${ArchiveState.ARCHIVED.storedValue}"}""")
 
         store.reloadAll()
@@ -112,7 +112,7 @@ class TheFileSystemPassStore {
         val archived = pass("archived", "Archived")
         store.save(archived)
         store.archive.setState(archived, ArchiveState.ARCHIVED)
-        File(settings.getStateDir(), "classifier_state.json").writeText("[1, 2, 3]")
+        File(settings.getStateDir(), "archive_state.json").writeText("[1, 2, 3]")
 
         store.reloadAll()
 
@@ -120,12 +120,12 @@ class TheFileSystemPassStore {
     }
 
     @Test
-    fun readsTheArchiveStateOfExistingInstallationsAndBackups() {
+    fun readsTheStoredArchiveState() {
         val store = newStore()
         store.save(pass("archived", "Archived"))
         store.save(pass("active", "Active"))
         settings.getStateDir().mkdirs()
-        File(settings.getStateDir(), "classifier_state.json").writeText("""{"archived":"archive","active":"new"}""")
+        File(settings.getStateDir(), "archive_state.json").writeText("""{"archived":"archived","active":"active"}""")
 
         val restarted = newStore()
         restarted.syncArchiveWithStorage()

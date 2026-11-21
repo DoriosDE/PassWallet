@@ -27,7 +27,7 @@ class TheBackupArchive {
         File(passDir, "main.json").writeText("{\"id\":\"pass-1\"}")
         val stateDir = File(root, "state")
         stateDir.mkdirs()
-        File(stateDir, "classifier_state.json").writeText("{\"pass-1\":\"tickets\"}")
+        File(stateDir, "archive_state.json").writeText("{\"pass-1\":\"tickets\"}")
         val output = ByteArrayOutputStream()
 
         BackupArchive.exportBackup(
@@ -43,7 +43,7 @@ class TheBackupArchive {
         assertThat(entries.keys).contains(
             "manifest.json",
             "passes/pass-1/main.json",
-            "state/classifier_state.json",
+            "state/archive_state.json",
             "preferences.json",
         )
         assertThat(entries["manifest.json"]).contains("\"app\":\"PassWallet\"")
@@ -59,7 +59,7 @@ class TheBackupArchive {
         File(sourcePass, "main.json").writeText("pass-data")
         val sourceState = File(sourceRoot, "state")
         sourceState.mkdirs()
-        File(sourceState, "classifier_state.json").writeText("state-data")
+        File(sourceState, "archive_state.json").writeText("state-data")
         val archive = ByteArrayOutputStream()
         BackupArchive.exportBackup(
             passesDir = sourcePasses,
@@ -80,7 +80,7 @@ class TheBackupArchive {
         )
 
         assertThat(File(targetRoot, "passes/pass-1/main.json").readText()).isEqualTo("pass-data")
-        assertThat(File(targetRoot, "state/classifier_state.json").readText()).isEqualTo("state-data")
+        assertThat(File(targetRoot, "state/archive_state.json").readText()).isEqualTo("state-data")
         assertThat(restoredPreferences).containsEntry("nightmode", "auto")
     }
 
@@ -133,7 +133,7 @@ class TheBackupArchive {
             "passes/pass-1/main.json" to "{}",
             "passes/pass-1/logo.png" to "png",
             "passes/pass-2/pass.json" to "{}",
-            "state/classifier_state.json" to "{}",
+            "state/archive_state.json" to "{}",
             "preferences.json" to "{}",
         )
 
