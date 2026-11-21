@@ -6,7 +6,7 @@ import org.ligi.passandroid.injections.FixedPassListPassStore
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.Settings
-import org.ligi.passandroid.model.comparator.PassSortOrder
+import org.ligi.passandroid.model.PassSortOrder
 import org.ligi.passandroid.model.pass.BarCode
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassBarCodeFormat

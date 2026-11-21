@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.preference.PreferenceManager
 import org.ligi.passandroid.R
 import org.ligi.passandroid.R.string.preference_key_autolight
-import org.ligi.passandroid.model.comparator.PassSortOrder
 import java.io.File
 
 class AndroidSettings(val context: Context) : Settings {
@@ -13,10 +12,7 @@ class AndroidSettings(val context: Context) : Settings {
 
     override fun getSortOrder(): PassSortOrder {
         val key = context.getString(R.string.preference_key_sort)
-        val stringValue = sharedPreferences.getString(key, "0")
-        val id = Integer.valueOf(stringValue!!)
-
-        return PassSortOrder.values().first { it.int == id }
+        return PassSortOrder.fromPreferenceValue(sharedPreferences.getString(key, null)?.toIntOrNull())
     }
 
     override fun doTraceDroidEmailSend() = true

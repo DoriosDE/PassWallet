@@ -10,9 +10,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.model.AndroidSettings
-import org.ligi.passandroid.model.comparator.PassByTimeComparator
-import org.ligi.passandroid.model.comparator.PassByTypeFirstAndTimeSecondComparator
-import org.ligi.passandroid.model.comparator.PassTemporalDistanceComparator
+import org.ligi.passandroid.model.PassSortOrder
 import org.ligi.passandroid.ui.PreferenceActivity
 import org.ligi.trulesk.TruleskActivityRule
 
@@ -52,11 +50,11 @@ class ThePreferenceActivity {
             onView(withText(R.string.preference_sort_title)).perform(click())
             onView(withText(sortOrder)).perform(click())
 
-            assertThat(androidSettings.getSortOrder().toComparator()).isInstanceOf(when (sortOrder) {
-                resources.getString(R.string.sort_order_date_asc) -> PassByTimeComparator::class.java
-                resources.getString(R.string.sort_order_date_desc) -> PassByTimeComparator::class.java
-                resources.getString(R.string.sort_order_date_type) -> PassByTypeFirstAndTimeSecondComparator::class.java
-                resources.getString(R.string.sort_order_date_temporaldistance) -> PassTemporalDistanceComparator::class.java
+            assertThat(androidSettings.getSortOrder()).isEqualTo(when (sortOrder) {
+                resources.getString(R.string.sort_order_date_asc) -> PassSortOrder.DATE_ASC
+                resources.getString(R.string.sort_order_date_desc) -> PassSortOrder.DATE_DESC
+                resources.getString(R.string.sort_order_date_type) -> PassSortOrder.TYPE
+                resources.getString(R.string.sort_order_date_temporaldistance) -> PassSortOrder.DATE_DIFF
                 else -> throw RuntimeException("unexpected sort order")
             })
         }

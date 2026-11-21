@@ -16,7 +16,7 @@ import org.ligi.kaxt.disableRotation
 import org.ligi.passandroid.R
 import org.ligi.passandroid.model.PassGroupFilter
 import org.ligi.passandroid.model.PassStoreProjection
-import org.ligi.passandroid.model.comparator.PassSortOrder
+import org.ligi.passandroid.model.PassSortOrder
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassType
 import org.ligi.passandroid.model.pass.PassVisualClassifier

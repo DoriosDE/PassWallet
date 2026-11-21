@@ -1,6 +1,5 @@
 package org.ligi.passandroid.model
 
-import org.ligi.passandroid.model.comparator.PassSortOrder
 import java.io.File
 
 interface Settings {

@@ -5,7 +5,7 @@ import org.ligi.passandroid.json_adapter.PassWalletMoshi
 import org.ligi.passandroid.model.FileSystemPassStore
 import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.Settings
-import org.ligi.passandroid.model.comparator.PassSortOrder
+import org.ligi.passandroid.model.PassSortOrder
 import org.ligi.passandroid.model.pass.PassImpl
 import org.mockito.Mockito.mock
 import java.io.File

@@ -10,7 +10,7 @@ import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.PassStoreProjection
 import org.ligi.passandroid.model.PassStoreChange
-import org.ligi.passandroid.model.comparator.PassSortOrder
+import org.ligi.passandroid.model.PassSortOrder
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.model.pass.PassType
@@ -46,30 +46,42 @@ class ThePassSorting {
 
     @Test
     fun testDESC() {
-        Collections.sort(passList, PassSortOrder.DATE_DESC.toComparator())
+        Collections.sort(passList, PassSortOrder.DATE_DESC.comparator())
 
         assertThat(passList).containsExactly(pass4, pass5, pass2, pass3, pass1)
     }
 
     @Test
     fun testASC() {
-        Collections.sort(passList, PassSortOrder.DATE_ASC.toComparator())
+        Collections.sort(passList, PassSortOrder.DATE_ASC.comparator())
 
         assertThat(passList).containsExactly(pass1, pass3, pass2, pass5, pass4)
     }
 
     @Test
     fun testDIFF() {
-        Collections.sort(passList, PassSortOrder.DATE_DIFF.toComparator())
+        Collections.sort(passList, PassSortOrder.DATE_DIFF.comparator())
 
         assertThat(passList).containsExactly(pass3, pass2, pass5, pass1, pass4)
     }
 
     @Test
     fun testTYPE() {
-        Collections.sort(passList, PassSortOrder.TYPE.toComparator())
+        Collections.sort(passList, PassSortOrder.TYPE.comparator())
 
         assertThat(passList).containsExactly(pass1, pass3, pass4, pass2, pass5)
+    }
+
+    @Test
+    fun readsTheStoredSortOrder() {
+        assertThat(PassSortOrder.entries.map { PassSortOrder.fromPreferenceValue(it.preferenceValue) })
+            .containsExactlyElementsOf(PassSortOrder.entries)
+    }
+
+    @Test
+    fun fallsBackToNewestFirstForUnknownStoredValues() {
+        assertThat(PassSortOrder.fromPreferenceValue(42)).isEqualTo(PassSortOrder.DATE_DESC)
+        assertThat(PassSortOrder.fromPreferenceValue(null)).isEqualTo(PassSortOrder.DATE_DESC)
     }
 
     @Test

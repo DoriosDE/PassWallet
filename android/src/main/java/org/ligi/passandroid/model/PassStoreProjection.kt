@@ -1,8 +1,6 @@
 package org.ligi.passandroid.model
 
-import org.ligi.passandroid.model.comparator.PassSortOrder
 import org.ligi.passandroid.model.pass.Pass
-import java.util.*
 
 /**
  * Restricts a projection to parts of a list depending on pass groups.
@@ -44,7 +42,7 @@ class PassStoreProjection(
     var groupFilter: PassGroupFilter = PassGroupFilter.All,
 ) {
 
-    var passList: List<Pass> = ArrayList()
+    var passList: List<Pass> = emptyList()
         private set
 
     init {
@@ -53,11 +51,8 @@ class PassStoreProjection(
 
     fun refresh(passSortOrder: PassSortOrder? = this.passSortOrder) {
         this.passSortOrder = passSortOrder
-        val newPassList = passStore.archive.passesIn(state)
-        if (passSortOrder != null) {
-            Collections.sort(newPassList, passSortOrder.toComparator())
-        }
-
-        passList = groupFilter.apply(newPassList)
+        val passes = passStore.archive.passesIn(state)
+        val sorted = if (passSortOrder != null) passes.sortedWith(passSortOrder.comparator()) else passes
+        passList = groupFilter.apply(sorted)
     }
 }
