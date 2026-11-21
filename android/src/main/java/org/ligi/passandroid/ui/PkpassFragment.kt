@@ -1,11 +1,6 @@
 package org.ligi.passandroid.ui
 
-import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.Color
-import android.os.Bundle
-import android.text.util.Linkify
-import android.view.LayoutInflater
 import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
@@ -16,64 +11,30 @@ import android.widget.RelativeLayout
 import android.widget.LinearLayout
 import androidx.cardview.widget.CardView
 import androidx.core.graphics.ColorUtils
-import androidx.core.text.parseAsHtml
 import androidx.core.text.util.LinkifyCompat
-import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import org.koin.android.ext.android.inject
 import org.ligi.passandroid.R
-import org.ligi.passandroid.model.PassBitmapDefinitions
-import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.BoardingTransitType
-import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassType
 import org.ligi.passandroid.model.pass.PassVisualClassifier
 import org.ligi.passandroid.model.pass.PassVisualType
 import org.ligi.passandroid.ui.rendering.BoardingTransitIcon
 import org.ligi.passandroid.ui.rendering.PassRenderers
 
-private const val LINKIFY_MASK = Linkify.WEB_URLS or Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS
 private val CREDENTIAL_PURPLE = Color.rgb(102, 51, 153)
 
-class PassViewPKFragment : Fragment() {
+/** the page in pkpass layout: header, primary, secondary and auxiliary fields - for events, boarding passes, store cards and credentials */
+class PkpassFragment : PassPageFragment() {
 
-    internal val passStore: PassStore by inject()
-    lateinit var pass: Pass
-
-    private fun processImage(view: ImageView, name: String, pass: Pass) {
-        processBitmapImage(view, name, pass.getBitmap(passStore, name))
-    }
-
-    private fun processBitmapImage(view: ImageView, name: String, bitmap: Bitmap?) {
-        if (bitmap != null && bitmap.width > 300) {
-            view.setOnClickListener {
-                val intent = Intent(view.context, TouchImageActivity::class.java)
-                intent.putExtra("IMAGE", name)
-                startActivity(intent)
-            }
-        } else {
-            view.setOnClickListener(null)
-        }
-        view.showBitmapOrHide(bitmap)
+    override fun extrasLayout() = if (ensureCredentialVisualType()) {
+        R.layout.pkpass_view_credential_data
+    } else {
+        R.layout.pkpass_view_extra_data
     }
 
     override fun onResume() {
         super.onResume()
 
         val root = requireView()
-        val backFields = root.findViewById<TextView>(R.id.back_fields)
-        val moreTextView = root.findViewById<TextView>(R.id.moreTextView)
-
-        moreTextView.setOnClickListener {
-            if (backFields.isVisible) {
-                backFields.visibility = View.GONE
-                moreTextView.setText(if (pass.type == PassType.LOYALTY) R.string.pass_details else R.string.more)
-            } else {
-                backFields.visibility = View.VISIBLE
-                moreTextView.setText(R.string.less)
-            }
-        }
-
         val fieldMap : Map<String, ViewGroup> = mapOf(
             "primaryFields" to root.findViewById(R.id.primary_field_container),
             "auxiliaryFields" to root.findViewById(R.id.auxiliary_field_container),
@@ -95,24 +56,8 @@ class PassViewPKFragment : Fragment() {
         val frontValueColor = if (isCredential) CREDENTIAL_PURPLE else foregroundColor
         val frontLabelColor = if (isCredential) CREDENTIAL_PURPLE else labelColor
 
-        val openFullscreenBarcode = View.OnClickListener { view ->
-            passStore.currentPass = pass
-            val intent = Intent(view.context, FullscreenBarcodeActivity::class.java)
-            intent.putExtra(PassViewActivityBase.EXTRA_KEY_UUID, pass.id)
-            startActivity(intent)
-        }
-        root.findViewById<View>(R.id.barcode_img).setOnClickListener(openFullscreenBarcode)
-        root.findViewById<View>(R.id.barcode_panel).setOnClickListener(openFullscreenBarcode)
-
-        BarcodePanel(requireView(), pass.barCode, requireActivity())
-
-        val explicitLogoBitmap = pass.getBitmap(passStore, PassBitmapDefinitions.BITMAP_LOGO)
-        val logoBitmap = explicitLogoBitmap ?: pass.takeIconAsDetailLogoIfManualSimplePass()
-        val logoBitmapName = if (explicitLogoBitmap == null && logoBitmap != null) PassBitmapDefinitions.BITMAP_ICON else PassBitmapDefinitions.BITMAP_LOGO
-        processBitmapImage(root.findViewById(R.id.logo_img_view), logoBitmapName, logoBitmap)
-        processImage(root.findViewById(R.id.footer_img_view), PassBitmapDefinitions.BITMAP_FOOTER, pass)
-        processImage(root.findViewById(R.id.thumbnail_img_view), PassBitmapDefinitions.BITMAP_THUMBNAIL, pass)
-        processImage(root.findViewById(R.id.strip_img_view), PassBitmapDefinitions.BITMAP_STRIP, pass)
+        showBarcode(root)
+        showPictures(root)
         if (isCredential) {
             applyCredentialLayout(root)
         } else if (isStoreCard) {
@@ -217,15 +162,7 @@ class PassViewPKFragment : Fragment() {
             foregroundColor = foregroundColor
         )
 
-        if (backStrBuilder.isNotEmpty()) {
-            backFields.text = "$backStrBuilder".parseAsHtml()
-            moreTextView.visibility = View.VISIBLE
-            moreTextView.setText(if (isStoreCard) R.string.pass_details else R.string.more)
-        } else {
-            moreTextView.visibility = View.GONE
-        }
-
-        LinkifyCompat.addLinks(backFields, LINKIFY_MASK)
+        showBackFields(root, "$backStrBuilder", if (isStoreCard) R.string.pass_details else R.string.more)
 
         applyPkPassColors(root, pass.accentColor, foregroundColor, isCredential)
     }
@@ -315,25 +252,6 @@ class PassViewPKFragment : Fragment() {
         root.findViewById<LinearLayout>(R.id.auxiliary_field_container).setPadding(0, 0, 0, dp(2))
     }
 
-    private fun Pass.takeIconAsDetailLogoIfManualSimplePass(): Bitmap? {
-        if (app != "passandroid") return null
-        if (getBitmap(passStore, PassBitmapDefinitions.BITMAP_LOGO) != null) return null
-        if (getBitmap(passStore, PassBitmapDefinitions.BITMAP_STRIP) != null) return null
-        if (getBitmap(passStore, PassBitmapDefinitions.BITMAP_THUMBNAIL) != null) return null
-        if (getBitmap(passStore, PassBitmapDefinitions.BITMAP_FOOTER) != null) return null
-        if (barCode == null) return null
-        if (fields.count { !it.hide } > 2) return null
-        return getBitmap(passStore, PassBitmapDefinitions.BITMAP_ICON)
-    }
-
-    private fun dp(value: Int): Int {
-        return (value * resources.displayMetrics.density).toInt()
-    }
-
-    private fun readableForegroundFor(backgroundColor: Int): Int {
-        return if (ColorUtils.calculateLuminance(backgroundColor) > 0.55) Color.BLACK else Color.WHITE
-    }
-
     private fun applyPkPassColors(root: View, backgroundColor: Int, foregroundColor: Int, isCredential: Boolean) {
         val cardBackground = if (isCredential) Color.WHITE else backgroundColor
         val textColor = if (isCredential) CREDENTIAL_PURPLE else foregroundColor
@@ -341,33 +259,5 @@ class PassViewPKFragment : Fragment() {
         root.findViewById<TextView>(R.id.moreTextView).setTextColor(textColor)
         root.findViewById<TextView>(R.id.back_fields).setTextColor(textColor)
         root.findViewById<TextView>(R.id.barcode_alt_text).setTextColor(textColor)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?): View {
-
-        val rootView = inflater.inflate(R.layout.activity_pass_view_page, container, false)
-        arguments?.takeIf { it.containsKey(PassViewActivityBase.EXTRA_KEY_UUID) }?.apply {
-            val uuid = getString(PassViewActivityBase.EXTRA_KEY_UUID)
-            pass = if (uuid != null) {
-                passStore.getPass(uuid) ?: passStore.currentPass
-            } else {
-                passStore.currentPass
-            } ?: return rootView
-        }
-        return rootView
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val passExtrasContainer = view.findViewById<LinearLayout>(R.id.passExtrasContainer)
-        val passExtrasLayout = if (ensureCredentialVisualType()) {
-            R.layout.pkpass_view_credential_data
-        } else {
-            R.layout.pkpass_view_extra_data
-        }
-        val passExtrasView = layoutInflater.inflate(passExtrasLayout, passExtrasContainer, false)
-        passExtrasContainer.addView(passExtrasView)
     }
 }

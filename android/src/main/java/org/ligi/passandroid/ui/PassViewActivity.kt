@@ -7,7 +7,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.WindowManager
 import androidx.core.content.pm.ShortcutManagerCompat
-import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -18,9 +17,6 @@ import org.ligi.passandroid.model.PassGroupFilter
 import org.ligi.passandroid.model.PassStoreProjection
 import org.ligi.passandroid.model.PassSortOrder
 import org.ligi.passandroid.model.pass.Pass
-import org.ligi.passandroid.model.pass.PassType
-import org.ligi.passandroid.model.pass.PassVisualClassifier
-import org.ligi.passandroid.model.pass.PassVisualType
 import org.ligi.passandroid.update.PassUpdater
 
 class PassViewActivity : PassViewActivityBase() {
@@ -105,30 +101,7 @@ class PassViewActivity : PassViewActivityBase() {
         val isGroup: Boolean
             get() = passStoreProjection.groupFilter is PassGroupFilter.OnlyGroup && itemCount > 1
 
-        override fun createFragment(i: Int): Fragment {
-
-            val pass = getPass(i)
-            val visualType = PassVisualClassifier.classify(pass)
-            if (visualType == PassVisualType.CREDENTIAL) {
-                pass.visualType = PassVisualType.CREDENTIAL
-            }
-
-            val fragment =
-                if (pass.visualType == PassVisualType.CREDENTIAL) {
-                    PassViewPKFragment()
-                } else {
-                    when (pass.type) {
-                        PassType.EVENT,
-                        PassType.BOARDING,
-                        PassType.PKBOARDING,
-                        PassType.LOYALTY -> PassViewPKFragment()
-                        else -> PassViewFragment()
-                    }
-                }
-
-            fragment.arguments = bundleOf(EXTRA_KEY_UUID to pass.id)
-            return fragment
-        }
+        override fun createFragment(i: Int): Fragment = PassPageFragment.forPass(getPass(i))
 
         fun getPass(i: Int): Pass {
             return passStoreProjection.passList[i]
