@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import okio.BufferedSink;
+import okio.BufferedSource;
 import okio.Okio;
 import timber.log.Timber;
 
@@ -16,7 +17,7 @@ public class FileBackedPassClassifier extends PassClassifier {
     private final File backed_file;
 
     public FileBackedPassClassifier(final File backed_file, final PassStore passStore, final Moshi moshi) {
-        super(loadMap(backed_file, moshi), passStore);
+        super(readStoredState(backed_file, getAdapter(moshi)), passStore);
 
         this.backed_file = backed_file;
         adapter = getAdapter(moshi);
@@ -26,18 +27,32 @@ public class FileBackedPassClassifier extends PassClassifier {
         return moshi.adapter(Map.class);
     }
 
+    /**
+     * Reads the stored state. A missing, unreadable or malformed file results in an empty state.
+     */
     @SuppressWarnings("unchecked")
-    private static Map<String, String> loadMap(final File backed_file, final Moshi moshi) {
-
+    private static Map<String, String> readStoredState(final File backed_file, final JsonAdapter<Map> adapter) {
         if (backed_file.exists()) {
-            try {
-                return (Map<String, String>) getAdapter(moshi).fromJson(Okio.buffer(Okio.source(backed_file)));
-            } catch (IOException e) {
+            try (BufferedSource source = Okio.buffer(Okio.source(backed_file))) {
+                final Map<String, String> stored = (Map<String, String>) adapter.fromJson(source);
+                if (stored != null) {
+                    return stored;
+                }
+            } catch (IOException | RuntimeException e) {
                 Timber.w(e, "could not read classifier state");
             }
         }
 
         return new HashMap<>();
+    }
+
+    /**
+     * Takes over the stored state of every pass mentioned in the file (e.g. after a backup was restored);
+     * passes not mentioned keep their current state.
+     */
+    @Override
+    public void mergeFromStorage() {
+        getTopicByIdMap().putAll(readStoredState(backed_file, adapter));
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

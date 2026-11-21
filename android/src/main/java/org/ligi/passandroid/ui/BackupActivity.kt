@@ -30,7 +30,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import androidx.lifecycle.lifecycleScope
 import org.koin.android.ext.android.inject
-import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.BuildConfig
 import org.ligi.passandroid.R
 import org.ligi.passandroid.backup.BackupArchive
@@ -331,9 +330,7 @@ class BackupActivity : AppCompatActivity() {
                 }
             }
             result.onSuccess {
-                (passStore.passMap as? MutableMap<*, *>)?.clear()
-                passStore.syncPassStoreWithClassifier(PassArchive.ACTIVE)
-                passStore.notifyChange()
+                passStore.reloadAll()
                 Toast.makeText(this@BackupActivity, R.string.backup_import_success, Toast.LENGTH_LONG).show()
                 startActivity(Intent(this@BackupActivity, PassListActivity::class.java).apply {
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)

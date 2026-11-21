@@ -270,10 +270,8 @@ open class PassViewActivityBase : PassAndroidActivity() {
                 if (currentPass.id != uuid) {
                     passStore.deletePassWithId(currentPass.id)
                 }
-                // the update replaced the files on disk - drop the cached old version so the new one is read
-                @Suppress("UNCHECKED_CAST")
-                (passStore.passMap as? MutableMap<String, Pass>)?.remove(uuid)
-                val newPass = passStore.getPassbookForId(uuid)
+                // the update replaced the files on disk - read the new version
+                val newPass = passStore.reload(uuid)
                 if (newPass == null) {
                     showImportErrorDialog(
                         title = getString(R.string.update_error_title),

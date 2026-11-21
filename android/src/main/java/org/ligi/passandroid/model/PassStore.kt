@@ -12,11 +12,22 @@ interface PassStore {
 
     fun getPassbookForId(id: String): Pass?
 
+    /**
+     * Reads the pass again from storage, e.g. after its files were replaced by an update.
+     * Returns null (and forgets the pass) when it no longer exists.
+     */
+    fun reload(id: String): Pass?
+
+    /**
+     * Reads all passes again from storage, e.g. after a backup was restored into the passes directory.
+     * Passes whose archive state is stored get that state, all others keep theirs; new passes become active.
+     * Notifies listeners about the change.
+     */
+    fun reloadAll()
+
     fun deletePassWithId(id: String): Boolean
 
     fun getPathForID(id: String): File
-
-    val passMap: Map<String, Pass>
 
     var currentPass: Pass?
 

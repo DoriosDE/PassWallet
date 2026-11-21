@@ -85,7 +85,6 @@ class ThePassSorting {
 
     private class ProjectionTestPassStore(private val passesById: Map<String, Pass>) : PassStore {
         override val updateChannel: SharedFlow<PassStoreUpdateEvent> = MutableSharedFlow()
-        override val passMap: Map<String, Pass> = passesById
         override var currentPass: Pass? = null
         override val classifier = PassClassifier(
             passesById.keys.associateWith { TOPIC }.toMutableMap(),
@@ -94,6 +93,8 @@ class ThePassSorting {
 
         override fun save(pass: Pass) = Unit
         override fun getPassbookForId(id: String): Pass? = passesById[id]
+        override fun reload(id: String): Pass? = passesById[id]
+        override fun reloadAll() = Unit
         override fun deletePassWithId(id: String): Boolean = false
         override fun getPathForID(id: String): File = File(id)
         override fun notifyChange() = Unit

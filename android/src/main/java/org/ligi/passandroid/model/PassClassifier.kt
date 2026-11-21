@@ -13,6 +13,12 @@ open class PassClassifier(val topicByIdMap: MutableMap<String, String>, private 
         passStore.notifyChange()
     }
 
+    /**
+     * Takes over the stored state of the passes found in storage, keeping the state of all other passes.
+     * Nothing to do for a purely in-memory classifier.
+     */
+    open fun mergeFromStorage() = Unit
+
     fun moveToTopic(pass: Pass, newTopic: String) {
         topicByIdMap[pass.id] = newTopic
 

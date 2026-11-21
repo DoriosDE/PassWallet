@@ -45,7 +45,8 @@ class AndroidFileSystemPassStore(
 
     private val path: File = settings.getPassesDir()
 
-    override val passMap = HashMap<String, Pass>()
+    /** passes read so far - files are only read once, see [reload] / [reloadAll] after changes on disk */
+    private val passMap = HashMap<String, Pass>()
 
     override var currentPass: Pass? = null
 
@@ -169,6 +170,18 @@ class AndroidFileSystemPassStore(
 
     override fun getPassbookForId(id: String): Pass? {
         return passMap[id] ?: readPass(id)
+    }
+
+    override fun reload(id: String): Pass? {
+        passMap.remove(id)
+        return readPass(id)
+    }
+
+    override fun reloadAll() {
+        passMap.clear()
+        classifier.mergeFromStorage()
+        syncPassStoreWithClassifier(PassArchive.ACTIVE)
+        notifyChange()
     }
 
     override fun deletePassWithId(id: String): Boolean {

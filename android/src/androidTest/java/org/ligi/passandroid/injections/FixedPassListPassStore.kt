@@ -28,7 +28,7 @@ class FixedPassListPassStore(private var passes: List<Pass>) : PassStore {
 
     override var currentPass: Pass? = null
 
-    override val passMap: HashMap<String, Pass> by lazy {
+    private val passMap: HashMap<String, Pass> by lazy {
         return@lazy createHashMap()
     }
 
@@ -43,6 +43,10 @@ class FixedPassListPassStore(private var passes: List<Pass>) : PassStore {
         return passMap[id]
     }
 
+
+    override fun reload(id: String): Pass? = passMap[id]
+
+    override fun reloadAll() = Unit
 
     override fun deletePassWithId(id: String): Boolean {
         return false
