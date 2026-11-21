@@ -34,6 +34,9 @@ interface PassStore {
     /** notifies listeners when the pass was deleted */
     fun delete(id: String): Boolean
 
+    /** the directory holding one sub directory per pass */
+    val directory: File
+
     /** the directory with the files of the pass (main.json, pictures, original pass files) */
     fun directoryOf(id: String): File
 

@@ -35,7 +35,7 @@ class FileSystemPassStore(
     )
     override val changes = mutableChanges.asSharedFlow()
 
-    private val path: File = settings.getPassesDir()
+    override val directory: File = settings.getPassesDir()
 
     /** passes read so far - files are only read once, see [reload] / [reloadAll] after changes on disk */
     private val passMap = HashMap<String, Pass>()
@@ -149,7 +149,7 @@ class FileSystemPassStore(
     }
 
     override fun directoryOf(id: String): File {
-        return File(path, id)
+        return File(directory, id)
     }
 
     private fun notifyChange() {
@@ -157,7 +157,7 @@ class FileSystemPassStore(
     }
 
     override fun syncArchiveWithStorage() {
-        val existingPassIds = path.listFiles()?.map { it.name }?.filter { getPass(it) != null }.orEmpty()
+        val existingPassIds = directory.listFiles()?.map { it.name }?.filter { getPass(it) != null }.orEmpty()
         archive.syncWith(existingPassIds)
     }
 

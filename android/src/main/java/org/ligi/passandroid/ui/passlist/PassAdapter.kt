@@ -10,8 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.ligi.passandroid.R
 import org.ligi.passandroid.databinding.PassGroupItemBinding
 import org.ligi.passandroid.model.PassGroups
@@ -27,10 +25,9 @@ import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
 class PassAdapter(
         private val passListActivity: AppCompatActivity,
+        private val passStore: PassStore,
         private val passStoreProjection: PassStoreProjection
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>(), KoinComponent {
-
-    private val passStore: PassStore by inject()
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var entries: List<PassListEntry> = emptyList()
 

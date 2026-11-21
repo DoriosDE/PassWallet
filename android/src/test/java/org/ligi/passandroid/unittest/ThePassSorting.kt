@@ -107,6 +107,7 @@ class ThePassSorting {
         override fun reload(id: String): Pass? = passesById[id]
         override fun reloadAll() = Unit
         override fun delete(id: String): Boolean = false
+        override val directory: File = File("")
         override fun directoryOf(id: String): File = File(id)
         override fun syncArchiveWithStorage() = Unit
     }

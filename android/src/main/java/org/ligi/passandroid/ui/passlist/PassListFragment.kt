@@ -31,7 +31,7 @@ class PassListFragment : Fragment() {
         val inflate = PassRecyclerBinding.inflate(layoutInflater, container, false)
 
         passStoreProjection = PassStoreProjection(passStore, ArchiveState.valueOf(arguments?.getString(BUNDLE_KEY_STATE)!!), settings.getSortOrder())
-        adapter = PassAdapter(activity as AppCompatActivity, passStoreProjection)
+        adapter = PassAdapter(activity as AppCompatActivity, passStore, passStoreProjection)
         adapter.refresh(settings.isGroupingEnabled())
 
         inflate.passRecyclerview.adapter = adapter

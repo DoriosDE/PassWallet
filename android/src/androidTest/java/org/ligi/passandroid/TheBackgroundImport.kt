@@ -21,6 +21,7 @@ class TheBackgroundImport {
                 instrumentation.targetContext,
                 mock(PassStore::class.java),
                 ImportInput("none", inputStream),
+                passesDir = instrumentation.targetContext.cacheDir,
             )
         }
 

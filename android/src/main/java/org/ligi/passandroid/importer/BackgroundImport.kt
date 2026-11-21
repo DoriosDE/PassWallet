@@ -3,19 +3,14 @@ package org.ligi.passandroid.importer
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.ligi.passandroid.model.PassStore
-import org.ligi.passandroid.model.Settings
 import java.io.File
 
 /**
  * Connects the screens to the [PassImporter]: imports in the background and returns the result
  * with translated error messages.
  */
-object BackgroundImport : KoinComponent {
-
-    private val settings: Settings by inject()
+object BackgroundImport {
 
     /** imported pass ids and the (translated) problems found on the way */
     data class Outcome(val passIds: List<String>, val errorMessages: List<String>) {
@@ -25,14 +20,14 @@ object BackgroundImport : KoinComponent {
 
     /**
      * @param overwrite true when updating a pass: an existing pass with the same id is replaced
-     * @param passesDir where the passes are stored - only tests use another directory
+     * @param passesDir where the passes are stored - only tests use another one than the store's
      */
     suspend fun run(
         context: Context,
         passStore: PassStore,
         input: ImportInput,
         overwrite: Boolean = false,
-        passesDir: File = settings.getPassesDir(),
+        passesDir: File = passStore.directory,
     ): Outcome = withContext(Dispatchers.IO) {
         val importer = PassImporter(
             passesDir = passesDir,

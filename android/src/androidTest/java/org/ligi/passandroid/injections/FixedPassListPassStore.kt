@@ -49,6 +49,8 @@ class FixedPassListPassStore(private var passes: List<Pass>) : PassStore {
         return false
     }
 
+    override val directory: File = File("")
+
     override fun directoryOf(id: String): File {
         return File("")
     }

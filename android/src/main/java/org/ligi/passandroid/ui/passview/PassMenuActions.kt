@@ -4,12 +4,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.view.MenuItem
 import android.widget.Toast
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.ligi.passandroid.R
 import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassStore
-import org.ligi.passandroid.model.Settings
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.printing.printPass
 import org.ligi.passandroid.share.sharePass
@@ -17,10 +14,8 @@ import org.ligi.passandroid.ui.edit.PassEditActivity
 import org.ligi.passandroid.ui.passlist.confirmAndDeletePasses
 import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
-class PassMenuActions(val activity: AppCompatActivity, val pass: Pass) : KoinComponent {
-
-    val passStore: PassStore by inject()
-    val settings: Settings by inject()
+/** the actions of the pass menu (archive, restore, delete, share, edit, print) for [pass] */
+class PassMenuActions(private val activity: AppCompatActivity, private val passStore: PassStore, private val pass: Pass) {
 
     fun process(item: MenuItem): Boolean {
         when (item.itemId) {

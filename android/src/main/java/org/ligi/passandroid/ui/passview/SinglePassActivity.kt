@@ -111,7 +111,7 @@ open class SinglePassActivity : PassWalletActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (PassMenuActions(this, currentPass).process(item)) {
+        if (PassMenuActions(this, passStore, currentPass).process(item)) {
             return true
         }
 
