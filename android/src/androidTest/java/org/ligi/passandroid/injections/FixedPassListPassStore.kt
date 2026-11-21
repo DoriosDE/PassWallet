@@ -66,10 +66,6 @@ class FixedPassListPassStore(private var passes: List<Pass>) : PassStore {
         // no effect in this impl
     }
 
-    override fun notifyChange() {
-        // no effect in this impl
-    }
-
     override fun syncArchiveWithStorage() {
         // no effect in this impl
     }

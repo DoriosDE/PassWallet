@@ -19,6 +19,5 @@ fun autoGroupImportedPasses(passStore: PassStore, settings: Settings, importedId
     if (changed.isEmpty()) return 0
 
     changed.forEach { passStore.save(it) }
-    passStore.notifyChange()
     return importedPasses.count { it in changed }
 }

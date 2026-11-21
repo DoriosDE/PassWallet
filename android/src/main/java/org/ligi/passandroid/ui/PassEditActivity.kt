@@ -190,7 +190,6 @@ class PassEditActivity : AppCompatActivity() {
     override fun onPause() {
         if (::currentPass.isInitialized) {
             passStore.save(currentPass)
-            passStore.notifyChange()
         }
         super.onPause()
     }

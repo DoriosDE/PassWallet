@@ -17,9 +17,11 @@ class FileBackedPassArchive private constructor(
     private val stateFile: File,
     passStore: PassStore,
     private val adapter: JsonAdapter<Map<String, String>>,
-) : PassArchive(readStoredState(stateFile, adapter), passStore) {
+    onChange: () -> Unit,
+) : PassArchive(readStoredState(stateFile, adapter), passStore, onChange) {
 
-    constructor(stateFile: File, passStore: PassStore, moshi: Moshi) : this(stateFile, passStore, stateAdapter(moshi))
+    constructor(stateFile: File, passStore: PassStore, moshi: Moshi, onChange: () -> Unit = {}) :
+        this(stateFile, passStore, stateAdapter(moshi), onChange)
 
     /**
      * Takes over the stored state of every pass mentioned in the file (e.g. after a backup was restored);

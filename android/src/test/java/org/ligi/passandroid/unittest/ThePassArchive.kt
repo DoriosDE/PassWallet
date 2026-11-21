@@ -9,9 +9,6 @@ import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassImpl
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.mock
-import org.mockito.Mockito.never
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
 import org.mockito.Mockito.`when`
 
 /**
@@ -25,7 +22,9 @@ class ThePassArchive {
         `when`(getPassbookForId(anyString())).thenAnswer { passes[it.arguments[0]] }
     }
 
-    private fun archive(vararg stored: Pair<String, String>) = PassArchive(mutableMapOf(*stored), passStore)
+    private var changes = 0
+
+    private fun archive(vararg stored: Pair<String, String>) = PassArchive(mutableMapOf(*stored), passStore) { changes++ }
 
     @Test
     fun passesAreActiveUnlessArchived() {
@@ -80,7 +79,7 @@ class ThePassArchive {
         assertThat(tested.knownPassIds).containsOnly("a", "b")
         assertThat(tested.isArchived(passes.getValue("a"))).isTrue()
         assertThat(tested.stateOf(passes.getValue("b"))).isEqualTo(ArchiveState.ACTIVE)
-        verify(passStore, times(1)).notifyChange()
+        assertThat(changes).isEqualTo(1)
     }
 
     @Test
@@ -89,7 +88,7 @@ class ThePassArchive {
 
         tested.syncWith(listOf("a", "b"))
 
-        verify(passStore, never()).notifyChange()
+        assertThat(changes).isZero()
     }
 
     @Test

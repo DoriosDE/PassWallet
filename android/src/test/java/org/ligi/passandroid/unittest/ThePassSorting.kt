@@ -98,7 +98,6 @@ class ThePassSorting {
         override fun reloadAll() = Unit
         override fun deletePassWithId(id: String): Boolean = false
         override fun getPathForID(id: String): File = File(id)
-        override fun notifyChange() = Unit
         override fun syncArchiveWithStorage() = Unit
     }
 }

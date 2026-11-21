@@ -47,10 +47,16 @@ class AndroidFileSystemPassStore(
 
     override val archive: PassArchive by lazy {
         val archiveStateFile = File(settings.getStateDir(), ARCHIVE_STATE_FILE)
-        FileBackedPassArchive(archiveStateFile, this, moshi)
+        FileBackedPassArchive(archiveStateFile, this, moshi, ::notifyChange)
     }
 
     override fun save(pass: Pass) {
+        write(pass)
+        notifyChange()
+    }
+
+    /** writes main.json of the pass - without announcing it, e.g. when a pass is only brought up to date while read */
+    private fun write(pass: Pass) {
         val jsonAdapter = moshi.adapter(PassImpl::class.java)
 
         val pathForID = getPathForID(pass.id)
@@ -104,7 +110,7 @@ class AndroidFileSystemPassStore(
                 dirty = true
             }
             if (dirty) {
-                save(result)
+                write(result)
             }
             passMap[id] = result
         }
@@ -151,7 +157,7 @@ class AndroidFileSystemPassStore(
         return File(path, id)
     }
 
-    override fun notifyChange() {
+    private fun notifyChange() {
         mutableUpdateChannel.tryEmit(PassStoreUpdateEvent)
     }
 

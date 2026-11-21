@@ -122,7 +122,6 @@ internal class PassActionsUI(
             }
             container.addView(createRow(icon, R.color.accent, label) {
                 PassGroups.join(pass, target).forEach { passStore.save(it) }
-                passStore.notifyChange()
                 context.showPassListSnackbar(context.getString(R.string.pass_grouped))
                 dialog.dismiss()
             })
@@ -132,14 +131,12 @@ internal class PassActionsUI(
     private fun ungroup(passesToUngroup: List<Pass>, messageRes: Int) {
         val previousGroupings = passesToUngroup.associateWith { it.grouping }
         PassGroups.ungroup(passesToUngroup).forEach { passStore.save(it) }
-        passStore.notifyChange()
 
         context.showPassListSnackbar(context.getString(messageRes)) {
             previousGroupings.forEach { (pass, grouping) ->
                 pass.grouping = grouping
                 passStore.save(pass)
             }
-            passStore.notifyChange()
         }
     }
 
@@ -147,7 +144,6 @@ internal class PassActionsUI(
         val dialog = BottomSheetDialog(context, R.style.PassWallet_TransparentBottomSheetDialog)
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_pass_actions, FrameLayout(context), false)
         dialog.setContentView(view)
-        dialog.setOnCancelListener { passStore.notifyChange() }
         dialog.show()
         makeBottomSheetChromeTransparent(dialog)
 

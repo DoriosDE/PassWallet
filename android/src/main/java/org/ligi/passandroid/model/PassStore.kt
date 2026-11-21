@@ -8,6 +8,7 @@ interface PassStore {
 
     val updateChannel: SharedFlow<PassStoreUpdateEvent>
 
+    /** writes the pass and notifies listeners about the change */
     fun save(pass: Pass)
 
     fun getPassbookForId(id: String): Pass?
@@ -25,15 +26,15 @@ interface PassStore {
      */
     fun reloadAll()
 
+    /** notifies listeners when the pass was deleted */
     fun deletePassWithId(id: String): Boolean
 
     fun getPathForID(id: String): File
 
     var currentPass: Pass?
 
+    /** notifies listeners of the store when the archive state of passes changes */
     val archive: PassArchive
-
-    fun notifyChange()
 
     /** matches the archive state with the passes in storage: unknown passes become active, gone passes are forgotten */
     fun syncArchiveWithStorage()

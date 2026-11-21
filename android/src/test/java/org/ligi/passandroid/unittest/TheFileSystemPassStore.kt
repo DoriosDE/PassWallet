@@ -1,11 +1,17 @@
 package org.ligi.passandroid.unittest
 
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.yield
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassGrouping
+import org.ligi.passandroid.model.PassStore
+import org.ligi.passandroid.model.pass.PassVisualType
 import org.ligi.passandroid.model.applyUpdate
 import java.io.File
 
@@ -23,6 +29,52 @@ class TheFileSystemPassStore {
     private fun newStore() = directory.newStore()
 
     private fun pass(id: String, description: String) = TestPassDirectory.pass(id, description)
+
+    /** how many change notifications [store] sends while [action] runs - several quick ones may be merged into one */
+    private fun countNotifications(store: PassStore, action: () -> Unit): Int = runBlocking {
+        var count = 0
+        val collector = launch(start = CoroutineStart.UNDISPATCHED) { store.updateChannel.collect { count++ } }
+        action()
+        yield()
+        collector.cancel()
+        count
+    }
+
+    @Test
+    fun savingAPassNotifiesListeners() {
+        val store = newStore()
+
+        assertThat(countNotifications(store) { store.save(pass("p1", "Concert")) }).isEqualTo(1)
+    }
+
+    @Test
+    fun changingTheArchiveStateNotifiesListeners() {
+        val store = newStore()
+        val saved = pass("p1", "Concert")
+        store.save(saved)
+
+        assertThat(countNotifications(store) { store.archive.setState(saved, ArchiveState.ARCHIVED) }).isEqualTo(1)
+    }
+
+    @Test
+    fun deletingAPassNotifiesListeners() {
+        val store = newStore()
+        store.save(pass("p1", "Concert"))
+
+        assertThat(countNotifications(store) { store.deletePassWithId("p1") }).isEqualTo(1)
+    }
+
+    @Test
+    fun readingAPassThatIsBroughtUpToDateNotifiesNobody() {
+        newStore().save(pass("p1", "Concert").apply { visualType = PassVisualType.CREDENTIAL })
+        val store = newStore()
+
+        val notifications = countNotifications(store) {
+            assertThat(store.getPassbookForId("p1")!!.visualType).isEqualTo(PassVisualType.DEFAULT)
+        }
+
+        assertThat(notifications).isZero()
+    }
 
     @Test
     fun savedPassSurvivesRestartWithGroupAndArchiveState() {

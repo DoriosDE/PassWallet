@@ -4,13 +4,19 @@ import org.ligi.passandroid.model.pass.Pass
 
 /**
  * Knows for every pass whether it is active or archived ([ArchiveState]).
+ *
+ * @param onChange called after every change of the archive state
  */
-open class PassArchive(protected val stateById: MutableMap<String, String>, private val passStore: PassStore) {
+open class PassArchive(
+    protected val stateById: MutableMap<String, String>,
+    private val passStore: PassStore,
+    private val onChange: () -> Unit = {},
+) {
 
     /** persists and announces a change - overridden to also write the state file */
     protected open fun processDataChange() {
         stateById.values.removeAll { it.isEmpty() }
-        passStore.notifyChange()
+        onChange()
     }
 
     /**
