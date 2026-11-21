@@ -180,7 +180,7 @@ class AndroidFileSystemPassStore(
     override fun reloadAll() {
         passMap.clear()
         classifier.mergeFromStorage()
-        syncPassStoreWithClassifier(PassArchive.ACTIVE)
+        syncPassStoreWithClassifier()
         notifyChange()
     }
 
@@ -202,16 +202,8 @@ class AndroidFileSystemPassStore(
         mutableUpdateChannel.tryEmit(PassStoreUpdateEvent)
     }
 
-    override fun syncPassStoreWithClassifier(defaultTopic: String) {
-        val keysToRemove = classifier.topicByIdMap.keys.filter { getPassbookForId(it) == null }
-
-        for (key in keysToRemove) {
-            classifier.topicByIdMap.remove(key)
-        }
-
-        val allPasses = path.listFiles()
-        allPasses?.forEach {
-            classifier.getTopic(it.name, defaultTopic)
-        }
+    override fun syncPassStoreWithClassifier() {
+        val existingPassIds = path.listFiles()?.map { it.name }?.filter { getPassbookForId(it) != null }.orEmpty()
+        classifier.syncWith(existingPassIds)
     }
 }

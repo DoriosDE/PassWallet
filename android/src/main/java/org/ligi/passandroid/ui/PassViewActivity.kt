@@ -49,14 +49,14 @@ class PassViewActivity : PassViewActivityBase() {
             content = findViewById(R.id.pager),
         )
 
-        val topic = passStore.classifier.getTopic(currentPass, "")
+        val state = passStore.classifier.stateOf(currentPass)
         // grouped passes: swiping only switches between the passes of the same group
         val groupFilter = if (settings.isGroupingEnabled()) {
-            PassGroupFilter.forPass(currentPass, passStore.classifier.getPassListByTopic(topic))
+            PassGroupFilter.forPass(currentPass, passStore.classifier.passesIn(state))
         } else {
             PassGroupFilter.All
         }
-        pagerAdapter = CollectionPagerAdapter(this, PassStoreProjection(passStore, topic, settings.getSortOrder(), groupFilter))
+        pagerAdapter = CollectionPagerAdapter(this, PassStoreProjection(passStore, state, settings.getSortOrder(), groupFilter))
         viewPager = findViewById(R.id.pager)
         viewPager.adapter = pagerAdapter
         val initialPosition = pagerAdapter.getPos(currentPass)

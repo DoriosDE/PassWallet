@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
-import org.ligi.passandroid.model.PassArchive
+import org.ligi.passandroid.model.ArchiveState
 import java.io.File
 
 /**
@@ -27,7 +27,7 @@ class TheFileSystemPassStore {
         val store = newStore()
         val saved = pass("p1", "Concert")
         store.save(saved)
-        store.classifier.moveToTopic(saved, PassArchive.ARCHIVE)
+        store.classifier.setState(saved, ArchiveState.ARCHIVED)
 
         val restarted = newStore()
         val loaded = restarted.getPassbookForId("p1")
@@ -35,7 +35,7 @@ class TheFileSystemPassStore {
         assertThat(loaded).isNotNull
         assertThat(loaded!!.description).isEqualTo("Concert")
         assertThat(loaded.groupId).isEqualTo("manual:group")
-        assertThat(PassArchive.isArchived(restarted.classifier, loaded)).isTrue()
+        assertThat(restarted.classifier.isArchived(loaded)).isTrue()
     }
 
     @Test
@@ -45,16 +45,16 @@ class TheFileSystemPassStore {
         val deleted = pass("deleted", "Deleted")
         store.save(kept)
         store.save(deleted)
-        store.classifier.moveToTopic(kept, PassArchive.ARCHIVE)
-        store.classifier.moveToTopic(deleted, PassArchive.ARCHIVE)
+        store.classifier.setState(kept, ArchiveState.ARCHIVED)
+        store.classifier.setState(deleted, ArchiveState.ARCHIVED)
 
         assertThat(store.deletePassWithId("deleted")).isTrue()
 
         assertThat(store.getPassbookForId("deleted")).isNull()
-        assertThat(store.classifier.getPassListByTopic(PassArchive.ARCHIVE).map { it.id }).containsExactly("kept")
+        assertThat(store.classifier.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("kept")
         val restarted = newStore()
         assertThat(restarted.getPassbookForId("deleted")).isNull()
-        assertThat(restarted.classifier.getPassListByTopic(PassArchive.ARCHIVE).map { it.id }).containsExactly("kept")
+        assertThat(restarted.classifier.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("kept")
     }
 
     @Test
@@ -87,8 +87,8 @@ class TheFileSystemPassStore {
         val both = pass("both", "Device version")
         store.save(deviceOnly)
         store.save(both)
-        store.classifier.moveToTopic(deviceOnly, PassArchive.ARCHIVE)
-        store.classifier.moveToTopic(both, PassArchive.ACTIVE)
+        store.classifier.setState(deviceOnly, ArchiveState.ARCHIVED)
+        store.classifier.setState(both, ArchiveState.ACTIVE)
 
         // a backup import copies its passes and its archive state over the existing files
         File(settings.getPassesDir(), "both").deleteRecursively()
@@ -96,14 +96,14 @@ class TheFileSystemPassStore {
         backup.save(pass("both", "Backup version"))
         backup.save(pass("restored", "Restored"))
         File(settings.getStateDir(), "classifier_state.json")
-            .writeText("""{"both":"${PassArchive.ARCHIVE}","restored":"${PassArchive.ARCHIVE}"}""")
+            .writeText("""{"both":"${ArchiveState.ARCHIVED.storedValue}","restored":"${ArchiveState.ARCHIVED.storedValue}"}""")
 
         store.reloadAll()
 
         assertThat(store.getPassbookForId("both")!!.description).isEqualTo("Backup version")
-        assertThat(store.classifier.getPassListByTopic(PassArchive.ARCHIVE).map { it.id })
+        assertThat(store.classifier.passesIn(ArchiveState.ARCHIVED).map { it.id })
             .containsOnly("device-only", "both", "restored")
-        assertThat(store.classifier.getPassListByTopic(PassArchive.ACTIVE)).isEmpty()
+        assertThat(store.classifier.passesIn(ArchiveState.ACTIVE)).isEmpty()
     }
 
     @Test
@@ -111,11 +111,26 @@ class TheFileSystemPassStore {
         val store = newStore()
         val archived = pass("archived", "Archived")
         store.save(archived)
-        store.classifier.moveToTopic(archived, PassArchive.ARCHIVE)
+        store.classifier.setState(archived, ArchiveState.ARCHIVED)
         File(settings.getStateDir(), "classifier_state.json").writeText("[1, 2, 3]")
 
         store.reloadAll()
 
-        assertThat(store.classifier.getPassListByTopic(PassArchive.ARCHIVE).map { it.id }).containsExactly("archived")
+        assertThat(store.classifier.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("archived")
+    }
+
+    @Test
+    fun readsTheArchiveStateOfExistingInstallationsAndBackups() {
+        val store = newStore()
+        store.save(pass("archived", "Archived"))
+        store.save(pass("active", "Active"))
+        settings.getStateDir().mkdirs()
+        File(settings.getStateDir(), "classifier_state.json").writeText("""{"archived":"archive","active":"new"}""")
+
+        val restarted = newStore()
+        restarted.syncPassStoreWithClassifier()
+
+        assertThat(restarted.classifier.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("archived")
+        assertThat(restarted.classifier.passesIn(ArchiveState.ACTIVE).map { it.id }).containsExactly("active")
     }
 }

@@ -52,7 +52,7 @@ public class FileBackedPassClassifier extends PassClassifier {
      */
     @Override
     public void mergeFromStorage() {
-        getTopicByIdMap().putAll(readStoredState(backed_file, adapter));
+        getStateById().putAll(readStoredState(backed_file, adapter));
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -74,7 +74,7 @@ public class FileBackedPassClassifier extends PassClassifier {
     }
 
     @Override
-    public void processDataChange() {
+    protected void processDataChange() {
         super.processDataChange();
 
         // write
@@ -83,7 +83,7 @@ public class FileBackedPassClassifier extends PassClassifier {
 
             if (buffer != null) {
                 try {
-                    adapter.toJson(buffer, getTopicByIdMap());
+                    adapter.toJson(buffer, getStateById());
                     buffer.close();
                 } catch (IOException e) {
                     Timber.w(e, "could not close classifier state writer");

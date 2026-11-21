@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
 import org.ligi.kaxt.startActivityFromClass
-import org.ligi.passandroid.model.PassArchive
+import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.R
 import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.backup.BackupArchive
@@ -73,20 +73,14 @@ class PassImportActivity : AppCompatActivity() {
                             // let's do it silently TODO check if we need to jump to a service here as the activity is dying
                             val spec = UnzipPassController.InputStreamUnzipControllerSpec(fromURI, application, passStore, object : UnzipPassController.SuccessCallback {
                                 override fun call(uuids: List<String>) {
-                                    uuids.forEach { id ->
-                                        passStore.getPassbookForId(id)?.let { passStore.classifier.moveToTopic(it, PassArchive.ACTIVE) }
-                                    }
+                                    passStore.classifier.setState(uuids.mapNotNull { passStore.getPassbookForId(it) }, ArchiveState.ACTIVE)
                                     autoGroupImportedPasses(passStore, settings, uuids)
                                 }
                             }, null)
                             UnzipPassController.processInputStream(spec)
                         } else {
                             UnzipPassDialog.show(fromURI, this@PassImportActivity, passStore) { importedIds ->
-                                importedIds.forEach { id ->
-                                    passStore.getPassbookForId(id)?.let { pass ->
-                                        passStore.classifier.moveToTopic(pass, PassArchive.ACTIVE)
-                                    }
-                                }
+                                passStore.classifier.setState(importedIds.mapNotNull { passStore.getPassbookForId(it) }, ArchiveState.ACTIVE)
 
                                 val groupedCount = autoGroupImportedPasses(passStore, settings, importedIds)
                                 if (groupedCount > 0) {

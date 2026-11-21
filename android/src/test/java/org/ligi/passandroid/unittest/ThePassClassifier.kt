@@ -2,71 +2,102 @@ package org.ligi.passandroid.unittest
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassClassifier
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassImpl
 import org.mockito.ArgumentMatchers.anyString
-import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
-import java.util.*
+import org.mockito.Mockito.never
+import org.mockito.Mockito.times
+import org.mockito.Mockito.verify
+import org.mockito.Mockito.`when`
 
-const val ID_1 = "ID1"
-const val TOPIC_1 = "topic1"
-const val DEFAULT_TOPIC = "defaut_topic"
-
+/**
+ * The archive state of passes, tested in memory.
+ */
 class ThePassClassifier {
-    private val mockedPassStore by lazy {
-        mock(PassStore::class.java).apply {
-            `when`<Pass>(getPassbookForId(anyString())).thenReturn(mock(Pass::class.java))
-        }
+
+    private val passes = listOf("a", "b", "c").associateWith { PassImpl(it) as Pass }
+
+    private val passStore = mock(PassStore::class.java).apply {
+        `when`(getPassbookForId(anyString())).thenAnswer { passes[it.arguments[0]] }
+    }
+
+    private fun classifier(vararg stored: Pair<String, String>) = PassClassifier(mutableMapOf(*stored), passStore)
+
+    @Test
+    fun passesAreActiveUnlessArchived() {
+        val tested = classifier("a" to "new", "b" to "archive")
+
+        assertThat(tested.stateOf(passes.getValue("a"))).isEqualTo(ArchiveState.ACTIVE)
+        assertThat(tested.stateOf(passes.getValue("b"))).isEqualTo(ArchiveState.ARCHIVED)
+        assertThat(tested.stateOf(passes.getValue("c"))).isEqualTo(ArchiveState.ACTIVE)
     }
 
     @Test
-    fun testThatPassIsInactiveByDefault() {
-        val tested = PassClassifier(HashMap(), mockedPassStore)
+    fun listsPassesByState() {
+        val tested = classifier("a" to "new", "b" to "archive", "c" to "new")
 
-        assertThat(tested.getTopic(getPassWithId(ID_1), DEFAULT_TOPIC) == DEFAULT_TOPIC)
+        assertThat(tested.passesIn(ArchiveState.ACTIVE).map { it.id }).containsOnly("a", "c")
+        assertThat(tested.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("b")
     }
 
     @Test
-    fun testThatOnlyNonDefaultTopicInTopicListWhenOnePassWithNonDefaultTopic() {
-        val tested = PassClassifier(mutableMapOf(ID_1 to TOPIC_1), mockedPassStore)
+    fun setsTheStateOfSeveralPassesAtOnce() {
+        val tested = classifier("a" to "new", "b" to "new", "c" to "new")
 
-        assertThat(tested.getTopics()).containsExactly(TOPIC_1)
+        tested.setState(listOf(passes.getValue("a"), passes.getValue("b")), ArchiveState.ARCHIVED)
+
+        assertThat(tested.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsOnly("a", "b")
+        assertThat(tested.passesIn(ArchiveState.ACTIVE).map { it.id }).containsExactly("c")
     }
 
     @Test
-    fun testThatAfterMovingFromOnlyOneTopicToDefaultTopicOnly() {
-        val tested = PassClassifier(mutableMapOf(ID_1 to TOPIC_1), mockedPassStore)
+    fun knowsWhichPassesItHoldsAndForgetsRemovedOnes() {
+        val tested = classifier("a" to "new", "b" to "archive")
 
-        tested.moveToTopic(getPassWithId(ID_1), DEFAULT_TOPIC)
-        assertThat(tested.getTopics()).containsExactly(DEFAULT_TOPIC)
-    }
+        tested.removePass("a")
 
-
-    @Test
-    fun testThatTopicIsGoneAfterMove() {
-        val tested = PassClassifier(mutableMapOf(ID_1 to TOPIC_1), mockedPassStore)
-
-        tested.moveToTopic(getPassWithId(ID_1), DEFAULT_TOPIC)
-        assertThat(tested.getTopics()).containsExactly(DEFAULT_TOPIC)
+        assertThat(tested.knownPassIds).containsExactly("b")
     }
 
     @Test
-    fun testThatPassIsInTopicAsExpected() {
-        val tested = PassClassifier(mutableMapOf(ID_1 to TOPIC_1), mockedPassStore)
+    fun leftoverValuesFromOldVersionsCountAsActive() {
+        val tested = classifier("a" to "trash", "b" to "Concerts", "c" to "archive")
 
-        assertThat(tested.getTopic(getPassWithId(ID_1), DEFAULT_TOPIC) == DEFAULT_TOPIC)
+        assertThat(tested.passesIn(ArchiveState.ACTIVE).map { it.id }).containsOnly("a", "b")
+        assertThat(tested.isArchived(passes.getValue("c"))).isTrue()
     }
 
     @Test
-    fun testHasNoTopicsByDefault() {
-        val tested = PassClassifier(HashMap(), mockedPassStore)
+    fun syncForgetsGonePassesAndAddsNewOnesAsActive() {
+        val tested = classifier("a" to "archive", "gone" to "new")
 
-        assertThat(tested.getTopics()).isEmpty()
+        tested.syncWith(listOf("a", "b"))
+
+        assertThat(tested.knownPassIds).containsOnly("a", "b")
+        assertThat(tested.isArchived(passes.getValue("a"))).isTrue()
+        assertThat(tested.stateOf(passes.getValue("b"))).isEqualTo(ArchiveState.ACTIVE)
+        verify(passStore, times(1)).notifyChange()
     }
 
-    private fun getPassWithId(id: String) = PassImpl(id)
+    @Test
+    fun syncWithoutChangesDoesNotAnnounceAnything() {
+        val tested = classifier("a" to "archive", "b" to "new")
 
+        tested.syncWith(listOf("a", "b"))
+
+        verify(passStore, never()).notifyChange()
+    }
+
+    @Test
+    fun setsTheStateOfASinglePass() {
+        val tested = classifier("a" to "new")
+
+        tested.setState(passes.getValue("a"), ArchiveState.ARCHIVED)
+
+        assertThat(tested.isArchived(passes.getValue("a"))).isTrue()
+    }
 }

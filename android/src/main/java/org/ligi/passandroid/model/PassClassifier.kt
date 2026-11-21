@@ -2,14 +2,14 @@ package org.ligi.passandroid.model
 
 import org.ligi.passandroid.model.pass.Pass
 
-open class PassClassifier(val topicByIdMap: MutableMap<String, String>, private val passStore: PassStore) {
+/**
+ * Knows for every pass whether it is active or archived ([ArchiveState]).
+ */
+open class PassClassifier(protected val stateById: MutableMap<String, String>, private val passStore: PassStore) {
 
-    open fun processDataChange() {
-        val passIdsWithoutTopic = topicByIdMap.filterValues { it.isEmpty() }.keys.toList()
-
-        passIdsWithoutTopic.forEach {
-            topicByIdMap.remove(it)
-        }
+    /** persists and announces a change - overridden to also write the state file */
+    protected open fun processDataChange() {
+        stateById.values.removeAll { it.isEmpty() }
         passStore.notifyChange()
     }
 
@@ -19,48 +19,41 @@ open class PassClassifier(val topicByIdMap: MutableMap<String, String>, private 
      */
     open fun mergeFromStorage() = Unit
 
-    fun moveToTopic(pass: Pass, newTopic: String) {
-        topicByIdMap[pass.id] = newTopic
+    /** ids of all passes the archive knows about */
+    val knownPassIds: Set<String> get() = stateById.keys.toSet()
 
+    fun stateOf(pass: Pass): ArchiveState = ArchiveState.fromStoredValue(stateById[pass.id])
+
+    fun isArchived(pass: Pass) = stateOf(pass) == ArchiveState.ARCHIVED
+
+    fun passesIn(state: ArchiveState): List<Pass> = stateById
+        .filterValues { ArchiveState.fromStoredValue(it) == state }
+        .keys
+        .mapNotNull { passStore.getPassbookForId(it) }
+
+    /** moves the passes to [state] - written and announced once for all of them */
+    fun setState(passes: Collection<Pass>, state: ArchiveState) {
+        passes.forEach { stateById[it.id] = state.storedValue }
         processDataChange()
     }
 
-    fun getTopics(): Set<String> {
-        return topicByIdMap.values.toSet()
-    }
+    fun setState(pass: Pass, state: ArchiveState) = setState(listOf(pass), state)
 
-    fun getPassListByTopic(topic: String): List<Pass> {
-        return topicByIdMap.filter { it.value == topic }.map { passStore.getPassbookForId(it.key) }.filterNotNull()
-    }
-
-    fun getTopic(pass: Pass, default: String): String {
-        return getTopic(pass.id, default)
-    }
-
-    fun getTopic(id: String, default: String): String {
-        val s = topicByIdMap[id]
-        if (s != null) {
-            return s
-        }
-
-        if (default.isNotEmpty()) {
-            topicByIdMap[id] = default
+    /**
+     * Matches the archive with the passes that exist: forgets passes that are gone,
+     * new passes become active. Only writes and announces something when that changed anything.
+     */
+    fun syncWith(existingPassIds: Collection<String>) {
+        val removedAny = stateById.keys.retainAll(existingPassIds.toSet())
+        val newPassIds = existingPassIds.filterNot { it in stateById }
+        newPassIds.forEach { stateById[it] = ArchiveState.ACTIVE.storedValue }
+        if (removedAny || newPassIds.isNotEmpty()) {
             processDataChange()
         }
-        return default
     }
 
     fun removePass(id: String) {
-        topicByIdMap.remove(id)
+        stateById.remove(id)
         processDataChange()
     }
-
-    /*
-    useful offsets are -1 and 1 to find the topic right and left from the pass
-     */
-    fun getTopicWithOffset(pass: Pass, offset: Int): String? {
-        val indexOf = getTopics().indexOf(getTopic(pass, ""))
-        return getTopics().elementAtOrNull(indexOf + offset)
-    }
-
 }

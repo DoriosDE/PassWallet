@@ -12,7 +12,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
-import org.ligi.passandroid.model.PassArchive
+import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.ui.PassListActivity
 import org.ligi.trulesk.TruleskIntentRule
 
@@ -29,7 +29,8 @@ class ThePassListLongPress {
 
         onView(withText(R.string.menu_archive)).perform(click())
 
-        assertThat(TestApp.passStore.classifier.getTopics()).containsExactly(PassArchive.ARCHIVE)
+        assertThat(TestApp.passStore.classifier.passesIn(ArchiveState.ARCHIVED)).hasSize(1)
+        assertThat(TestApp.passStore.classifier.passesIn(ArchiveState.ACTIVE)).isEmpty()
     }
 
     @Test

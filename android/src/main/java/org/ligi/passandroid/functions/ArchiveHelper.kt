@@ -4,7 +4,7 @@ import android.app.Activity
 import android.view.View
 import com.google.android.material.snackbar.Snackbar
 import org.ligi.passandroid.R
-import org.ligi.passandroid.model.PassArchive
+import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassClassifier
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
@@ -17,11 +17,8 @@ fun Activity.showPassListSnackbar(message: CharSequence, undo: (() -> Unit)? = n
     }.show()
 }
 
-fun setArchived(passClassifier: PassClassifier, passes: List<Pass>, archived: Boolean) {
-    val state = if (archived) PassArchive.ARCHIVE else PassArchive.ACTIVE
-    passes.forEach { passClassifier.topicByIdMap[it.id] = state }
-    passClassifier.processDataChange()
-}
+fun setArchived(passClassifier: PassClassifier, passes: List<Pass>, archived: Boolean) =
+    passClassifier.setState(passes, if (archived) ArchiveState.ARCHIVED else ArchiveState.ACTIVE)
 
 fun archiveWithUndoSnackbar(passClassifier: PassClassifier, passes: List<Pass>, activity: Activity) {
     setArchived(passClassifier, passes, true)

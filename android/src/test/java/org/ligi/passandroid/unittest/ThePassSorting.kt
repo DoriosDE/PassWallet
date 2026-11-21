@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
+import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassClassifier
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.PassStoreProjection
@@ -74,7 +75,7 @@ class ThePassSorting {
     @Test
     fun testProjectionRefreshCanApplyChangedSortOrder() {
         val passStore = ProjectionTestPassStore(passList.associateBy { it.id })
-        val projection = PassStoreProjection(passStore, ProjectionTestPassStore.TOPIC, PassSortOrder.DATE_ASC)
+        val projection = PassStoreProjection(passStore, ArchiveState.ACTIVE, PassSortOrder.DATE_ASC)
 
         assertThat(projection.passList).containsExactly(pass1, pass3, pass2, pass5, pass4)
 
@@ -87,7 +88,7 @@ class ThePassSorting {
         override val updateChannel: SharedFlow<PassStoreUpdateEvent> = MutableSharedFlow()
         override var currentPass: Pass? = null
         override val classifier = PassClassifier(
-            passesById.keys.associateWith { TOPIC }.toMutableMap(),
+            passesById.keys.associateWith { ArchiveState.ACTIVE.storedValue }.toMutableMap(),
             this,
         )
 
@@ -98,10 +99,6 @@ class ThePassSorting {
         override fun deletePassWithId(id: String): Boolean = false
         override fun getPathForID(id: String): File = File(id)
         override fun notifyChange() = Unit
-        override fun syncPassStoreWithClassifier(defaultTopic: String) = Unit
-
-        companion object {
-            const val TOPIC = "topic"
-        }
+        override fun syncPassStoreWithClassifier() = Unit
     }
 }

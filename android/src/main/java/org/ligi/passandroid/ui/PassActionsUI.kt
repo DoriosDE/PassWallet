@@ -22,7 +22,7 @@ import org.ligi.passandroid.functions.archiveWithUndoSnackbar
 import org.ligi.passandroid.functions.confirmAndDeletePasses
 import org.ligi.passandroid.functions.restoreWithUndoSnackbar
 import org.ligi.passandroid.functions.showPassListSnackbar
-import org.ligi.passandroid.model.PassArchive
+import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassGroups
 import org.ligi.passandroid.model.PassListEntry
 import org.ligi.passandroid.model.PassStore
@@ -42,7 +42,7 @@ internal class PassActionsUI(
 
     private val pass = passes.first()
     private val isGroup = passes.size > 1
-    private val archived = PassArchive.isArchived(passStore.classifier, pass)
+    private val archived = passStore.classifier.isArchived(pass)
 
     fun show() {
         val (dialog, container) = createSheet(
@@ -99,8 +99,7 @@ internal class PassActionsUI(
      * Passes already in the same group are left out.
      */
     private fun groupCandidates(): List<Pass> {
-        val topic = passStore.classifier.getTopic(pass, PassArchive.ACTIVE)
-        return passStore.classifier.getPassListByTopic(topic).filter { candidate ->
+        return passStore.classifier.passesIn(passStore.classifier.stateOf(pass)).filter { candidate ->
             candidate.id != pass.id && !(PassGroups.isGrouped(pass) && candidate.groupId == pass.groupId)
         }
     }

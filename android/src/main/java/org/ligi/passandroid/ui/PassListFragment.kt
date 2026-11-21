@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
 import org.ligi.passandroid.databinding.PassRecyclerBinding
+import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.PassStoreProjection
 import org.ligi.passandroid.model.Settings
@@ -29,7 +30,7 @@ class PassListFragment : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val inflate = PassRecyclerBinding.inflate(layoutInflater, container, false)
 
-        passStoreProjection = PassStoreProjection(passStore, arguments?.getString(BUNDLE_KEY_TOPIC)!!, settings.getSortOrder())
+        passStoreProjection = PassStoreProjection(passStore, ArchiveState.valueOf(arguments?.getString(BUNDLE_KEY_STATE)!!), settings.getSortOrder())
         adapter = PassAdapter(activity as AppCompatActivity, passStoreProjection)
         adapter.refresh(settings.isGroupingEnabled())
 
@@ -62,10 +63,10 @@ class PassListFragment : Fragment() {
     }
 
     companion object {
-        private const val BUNDLE_KEY_TOPIC = "topic"
+        private const val BUNDLE_KEY_STATE = "archive_state"
 
-        fun newInstance(topic: String) = PassListFragment().apply {
-            arguments = bundleOf(BUNDLE_KEY_TOPIC to topic)
+        fun newInstance(state: ArchiveState) = PassListFragment().apply {
+            arguments = bundleOf(BUNDLE_KEY_STATE to state.name)
         }
     }
 }

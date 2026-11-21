@@ -35,5 +35,6 @@ interface PassStore {
 
     fun notifyChange()
 
-    fun syncPassStoreWithClassifier(defaultTopic: String)
+    /** matches the archive state with the passes in storage: unknown passes become active, gone passes are forgotten */
+    fun syncPassStoreWithClassifier()
 }

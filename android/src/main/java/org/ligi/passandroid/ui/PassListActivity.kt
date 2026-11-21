@@ -23,7 +23,7 @@ import org.ligi.kaxt.startActivityFromClass
 import org.ligi.passandroid.R
 import org.ligi.passandroid.databinding.PassListBinding
 import org.ligi.passandroid.functions.createAndAddEmptyPass
-import org.ligi.passandroid.model.PassArchive
+import org.ligi.passandroid.model.ArchiveState
 import org.ligi.tracedroid.TraceDroid
 import org.ligi.tracedroid.sending.sendTraceDroidStackTracesIfExist
 
@@ -34,7 +34,7 @@ class PassListActivity : PassAndroidActivity() {
 
     /** the same screen shows either the active passes or - when started via [showArchive] - the archive */
     private val isArchive by lazy { intent.getBooleanExtra(EXTRA_ARCHIVE, false) }
-    private val listState get() = if (isArchive) PassArchive.ARCHIVE else PassArchive.ACTIVE
+    private val listState get() = if (isArchive) ArchiveState.ARCHIVED else ArchiveState.ACTIVE
     private val importPassLauncher = registerForActivityResult(ActivityResultContracts.OpenDocument()) { uri ->
         uri?.let {
             startActivity(Intent(this, PassImportActivity::class.java).setData(it))
@@ -101,7 +101,7 @@ class PassListActivity : PassAndroidActivity() {
             }
         }
 
-        passStore.syncPassStoreWithClassifier(PassArchive.ACTIVE)
+        passStore.syncPassStoreWithClassifier()
 
         refresh()
 
@@ -111,7 +111,7 @@ class PassListActivity : PassAndroidActivity() {
             setFabMenuExpanded(false)
             startActivityFromClass(PassEditActivity::class.java)
 
-            passStore.classifier.moveToTopic(pass, PassArchive.ACTIVE)
+            passStore.classifier.setState(pass, ArchiveState.ACTIVE)
         }
 
         binding.fabActionImport.setOnClickListener {
@@ -141,7 +141,7 @@ class PassListActivity : PassAndroidActivity() {
         binding.emptyView.visibility = if (currentPasses().isEmpty()) VISIBLE else GONE
     }
 
-    private fun currentPasses() = passStore.classifier.getPassListByTopic(listState)
+    private fun currentPasses() = passStore.classifier.passesIn(listState)
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.menu_settings -> {

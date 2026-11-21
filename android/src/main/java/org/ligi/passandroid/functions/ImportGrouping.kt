@@ -1,6 +1,6 @@
 package org.ligi.passandroid.functions
 
-import org.ligi.passandroid.model.PassArchive
+import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassGroups
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.Settings
@@ -13,7 +13,7 @@ fun autoGroupImportedPasses(passStore: PassStore, settings: Settings, importedId
     if (!settings.isGroupingEnabled()) return 0
 
     val importedPasses = importedIds.distinct().mapNotNull { passStore.getPassbookForId(it) }
-    val activePasses = passStore.classifier.getPassListByTopic(PassArchive.ACTIVE)
+    val activePasses = passStore.classifier.passesIn(ArchiveState.ACTIVE)
 
     val changed = PassGroups.autoGroup(importedPasses, activePasses)
     if (changed.isEmpty()) return 0
