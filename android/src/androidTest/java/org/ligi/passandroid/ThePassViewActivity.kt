@@ -15,7 +15,7 @@ import org.ligi.passandroid.model.pass.BarCode
 import org.ligi.passandroid.model.pass.PassBarCodeFormat
 import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.model.pass.PassLocation
-import org.ligi.passandroid.ui.PassViewActivity
+import org.ligi.passandroid.ui.passview.PassViewActivity
 import org.ligi.trulesk.TruleskActivityRule
 import java.util.ArrayList
 

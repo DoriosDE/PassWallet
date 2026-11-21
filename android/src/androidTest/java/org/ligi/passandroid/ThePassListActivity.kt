@@ -9,7 +9,7 @@ import org.junit.Test
 import org.ligi.passandroid.R.id.pass_recyclerview
 import org.ligi.passandroid.functions.expand
 import org.ligi.passandroid.functions.isCollapsed
-import org.ligi.passandroid.ui.PassListActivity
+import org.ligi.passandroid.ui.passlist.PassListActivity
 import org.ligi.trulesk.TruleskActivityRule
 
 class ThePassListActivity {

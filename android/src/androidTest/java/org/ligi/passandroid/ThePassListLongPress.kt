@@ -13,7 +13,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.model.ArchiveState
-import org.ligi.passandroid.ui.PassListActivity
+import org.ligi.passandroid.ui.passlist.PassListActivity
 import org.ligi.trulesk.TruleskIntentRule
 
 class ThePassListLongPress {

@@ -19,7 +19,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.model.pass.PassType.COUPON
 import org.ligi.passandroid.model.pass.PassType.EVENT
-import org.ligi.passandroid.ui.PassEditActivity
+import org.ligi.passandroid.ui.edit.PassEditActivity
 import org.ligi.trulesk.TruleskIntentRule
 
 @TargetApi(14)

@@ -16,7 +16,7 @@ import org.ligi.passandroid.model.pass.BarCode
 import org.ligi.passandroid.model.pass.PassBarCodeFormat
 import org.ligi.passandroid.model.pass.PassBarCodeFormat.*
 import org.ligi.passandroid.model.pass.PassImpl
-import org.ligi.passandroid.ui.FullscreenBarcodeActivity
+import org.ligi.passandroid.ui.passview.FullscreenBarcodeActivity
 import org.ligi.trulesk.TruleskIntentRule
 import java.util.*
 

@@ -36,30 +36,36 @@
         </provider>
 
         <activity
+            android:name=".ui.passlist.PassListActivity"
+            android:exported="false"
+            android:theme="@style/AppThemeNoActionbar" />
+
+        <!-- keeps the old name of the launcher activity, so icons on home screens stay valid -->
+        <activity-alias
             android:name=".ui.PassListActivity"
             android:exported="true"
-            android:theme="@style/AppThemeNoActionbar">
+            android:targetActivity=".ui.passlist.PassListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity>
+        </activity-alias>
 
         <activity
-            android:name=".ui.PreferenceActivity"
+            android:name=".ui.settings.PreferenceActivity"
             android:theme="@style/AppThemeNoActionbar" />
 
         <activity
-            android:name=".ui.BackupActivity"
+            android:name=".ui.backup.BackupActivity"
             android:theme="@style/AppThemeNoActionbar" />
 
         <activity
-            android:name=".ui.PassEditActivity"
+            android:name=".ui.edit.PassEditActivity"
             android:theme="@style/AppThemeNoActionbar" />
 
         <activity
-            android:name=".ui.PassImportActivity"
+            android:name=".ui.passimport.PassImportActivity"
             android:exported="true"
             tools:ignore="ExportedActivity">
 
@@ -184,24 +190,30 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.TouchImageActivity" />
+        <activity android:name=".ui.passview.TouchImageActivity" />
 
         <activity
-            android:name=".ui.PassViewActivity"
+            android:name=".ui.passview.PassViewActivity"
             android:exported="false"
-            android:parentActivityName=".ui.PassListActivity"
+            android:parentActivityName=".ui.passlist.PassListActivity"
             android:theme="@style/AppThemeNoActionbar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".ui.PassListActivity" />
+                android:value=".ui.passlist.PassListActivity" />
         </activity>
+
+        <!-- keeps the old name of the pass view, so pass shortcuts pinned to home screens stay valid -->
+        <activity-alias
+            android:name=".ui.PassViewActivity"
+            android:exported="false"
+            android:targetActivity=".ui.passview.PassViewActivity" />
 
         <activity
             android:name=".ui.scan.ScanBarcodeActivity"
             android:theme="@style/AppThemeNoActionbar" />
 
         <activity
-            android:name=".ui.FullscreenBarcodeActivity"
+            android:name=".ui.passview.FullscreenBarcodeActivity"
             android:theme="@style/PassWallet.FullscreenBlack" />
     </application>
 

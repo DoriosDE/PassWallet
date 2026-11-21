@@ -11,7 +11,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.model.AndroidSettings
 import org.ligi.passandroid.model.PassSortOrder
-import org.ligi.passandroid.ui.PreferenceActivity
+import org.ligi.passandroid.ui.settings.PreferenceActivity
 import org.ligi.trulesk.TruleskActivityRule
 
 class ThePreferenceActivity {

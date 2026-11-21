@@ -21,7 +21,7 @@ import org.junit.runner.RunWith
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.PassBarCodeFormat
 import org.ligi.passandroid.model.pass.PassImpl
-import org.ligi.passandroid.ui.PassEditActivity
+import org.ligi.passandroid.ui.edit.PassEditActivity
 import org.ligi.trulesk.TruleskActivityRule
 
 @RunWith(AndroidJUnit4::class)

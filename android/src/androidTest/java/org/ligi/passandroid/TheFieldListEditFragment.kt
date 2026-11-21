@@ -10,7 +10,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.model.pass.PassField
 import org.ligi.passandroid.model.pass.PassImpl
-import org.ligi.passandroid.ui.PassEditActivity
+import org.ligi.passandroid.ui.edit.PassEditActivity
 import org.ligi.trulesk.TruleskIntentRule
 import java.util.*
 

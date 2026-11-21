@@ -1,7 +1,7 @@
 package org.ligi.passandroid.unittest
 
 import android.content.Context
-import org.ligi.passandroid.json_adapter.PassWalletMoshi
+import org.ligi.passandroid.json.PassWalletMoshi
 import org.ligi.passandroid.model.FileSystemPassStore
 import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.Settings

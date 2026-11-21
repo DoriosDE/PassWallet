@@ -8,8 +8,8 @@ import androidx.test.espresso.intent.matcher.IntentMatchers.hasComponent
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import org.junit.Rule
 import org.junit.Test
-import org.ligi.passandroid.ui.PassListActivity
-import org.ligi.passandroid.ui.PreferenceActivity
+import org.ligi.passandroid.ui.passlist.PassListActivity
+import org.ligi.passandroid.ui.settings.PreferenceActivity
 import org.ligi.trulesk.TruleskIntentRule
 
 @TargetApi(14)
