@@ -8,13 +8,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.R.id.emptyView
 import org.ligi.passandroid.ui.passlist.PassListActivity
-import org.ligi.trulesk.TruleskIntentRule
+import org.ligi.passandroid.rules.TestIntentRule
 
 
 class TheEmptyPassList {
 
     @get:Rule
-    var rule = TruleskIntentRule(PassListActivity::class.java) {
+    var rule = TestIntentRule(PassListActivity::class.java) {
         TestApp.emptyPassStore()
     }
 

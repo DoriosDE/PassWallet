@@ -17,7 +17,7 @@ import org.ligi.passandroid.model.pass.PassBarCodeFormat
 import org.ligi.passandroid.model.pass.PassBarCodeFormat.*
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.ui.passview.FullscreenBarcodeActivity
-import org.ligi.trulesk.TruleskIntentRule
+import org.ligi.passandroid.rules.TestIntentRule
 import java.util.*
 
 private const val BARCODE_MESSAGE = "2323"
@@ -25,7 +25,7 @@ private const val BARCODE_MESSAGE = "2323"
 class TheFullscreenBarcodeActivity {
 
     @get:Rule
-    var rule = TruleskIntentRule(FullscreenBarcodeActivity::class.java, false)
+    var rule = TestIntentRule(FullscreenBarcodeActivity::class.java, false)
 
     @Test
     fun testPDF417BarcodeIsShown() {

@@ -12,7 +12,6 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SdkSuppress
-import com.linkedin.android.testbutler.TestButler
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -22,13 +21,17 @@ import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.PassBarCodeFormat
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.ui.edit.PassEditActivity
-import org.ligi.trulesk.TruleskActivityRule
+import androidx.test.rule.GrantPermissionRule
+import org.ligi.passandroid.rules.TestActivityRule
 
 @RunWith(AndroidJUnit4::class)
 class TheBarCodeEditing {
 
     @get:Rule
-    val rule = TruleskActivityRule(PassEditActivity::class.java, false)
+    val cameraPermission: GrantPermissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA)
+
+    @get:Rule
+    val rule = TestActivityRule(PassEditActivity::class.java, false)
 
     val passStore: PassStore = TestApp.passStore
 
@@ -38,10 +41,6 @@ class TheBarCodeEditing {
         currentPass = TestApp.populatePassStoreWithSinglePass()
 
         setupPass(currentPass)
-
-        TestButler.grantPermission(ApplicationProvider.getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-        TestButler.grantPermission(ApplicationProvider.getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-        TestButler.grantPermission(ApplicationProvider.getApplicationContext(), Manifest.permission.CAMERA)
 
         rule.launchActivity(TestApp.intentFor(PassEditActivity::class.java, currentPass))
         closeSoftKeyboard()

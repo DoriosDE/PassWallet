@@ -3,12 +3,12 @@ package org.ligi.passandroid
 import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.ui.settings.PreferenceActivity
-import org.ligi.trulesk.TruleskActivityRule
+import org.ligi.passandroid.rules.TestActivityRule
 
 class TheHelpActivity {
 
     @get:Rule
-    val rule = TruleskActivityRule(PreferenceActivity::class.java)
+    val rule = TestActivityRule(PreferenceActivity::class.java)
 
     @Test
     fun testSettingsActivityStarts() {

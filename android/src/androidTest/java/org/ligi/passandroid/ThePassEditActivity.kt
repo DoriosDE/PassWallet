@@ -13,14 +13,13 @@ import androidx.test.espresso.intent.Intents.intending
 import androidx.test.espresso.intent.matcher.IntentMatchers.hasAction
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.platform.app.InstrumentationRegistry
-import com.linkedin.android.testbutler.TestButler
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.model.pass.PassType.COUPON
 import org.ligi.passandroid.model.pass.PassType.EVENT
 import org.ligi.passandroid.ui.edit.PassEditActivity
-import org.ligi.trulesk.TruleskIntentRule
+import org.ligi.passandroid.rules.TestIntentRule
 import org.junit.Before
 import org.ligi.passandroid.model.pass.Pass
 
@@ -32,10 +31,7 @@ class ThePassEditActivity {
     private lateinit var pass: Pass
 
     @get:Rule
-    var rule = TruleskIntentRule(PassEditActivity::class.java, false) {
-        TestButler.grantPermission(InstrumentationRegistry.getInstrumentation().targetContext, Manifest.permission.READ_EXTERNAL_STORAGE)
-        TestButler.grantPermission(InstrumentationRegistry.getInstrumentation().targetContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-    }
+    var rule = TestIntentRule(PassEditActivity::class.java, false)
 
     @Before
     fun before() {

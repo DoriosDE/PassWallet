@@ -10,13 +10,13 @@ import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.ui.passlist.PassListActivity
 import org.ligi.passandroid.ui.settings.PreferenceActivity
-import org.ligi.trulesk.TruleskIntentRule
+import org.ligi.passandroid.rules.TestIntentRule
 
 @TargetApi(14)
 class TheNavigationDrawer {
 
     @get:Rule
-    var rule = TruleskIntentRule(PassListActivity::class.java)
+    var rule = TestIntentRule(PassListActivity::class.java)
 
     @Test
     fun testSettingsOpensFromToolbar() {

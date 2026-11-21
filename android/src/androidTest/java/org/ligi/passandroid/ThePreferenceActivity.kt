@@ -5,22 +5,18 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.linkedin.android.testbutler.TestButler
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.AndroidSettings
 import org.ligi.passandroid.model.PassSortOrder
 import org.ligi.passandroid.ui.settings.PreferenceActivity
-import org.ligi.trulesk.TruleskActivityRule
+import org.ligi.passandroid.rules.TestActivityRule
 
 class ThePreferenceActivity {
 
     @get:Rule
-    val rule = TruleskActivityRule(PreferenceActivity::class.java) {
-        TestButler.grantPermission(ApplicationProvider.getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-        TestButler.grantPermission(ApplicationProvider.getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION)
-    }
+    val rule = TestActivityRule(PreferenceActivity::class.java)
 
     private val androidSettings by lazy { AndroidSettings(rule.activity) }
 

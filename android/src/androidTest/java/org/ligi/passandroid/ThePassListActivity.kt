@@ -10,12 +10,12 @@ import org.ligi.passandroid.R.id.pass_recyclerview
 import org.ligi.passandroid.functions.expand
 import org.ligi.passandroid.functions.isCollapsed
 import org.ligi.passandroid.ui.passlist.PassListActivity
-import org.ligi.trulesk.TruleskActivityRule
+import org.ligi.passandroid.rules.TestActivityRule
 
 class ThePassListActivity {
 
     @get:Rule
-    var rule = TruleskActivityRule(PassListActivity::class.java) {
+    var rule = TestActivityRule(PassListActivity::class.java) {
         TestApp.populatePassStoreWithSinglePass()
     }
 

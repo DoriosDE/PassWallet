@@ -11,14 +11,14 @@ import org.junit.Test
 import org.ligi.passandroid.model.pass.PassField
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.ui.edit.PassEditActivity
-import org.ligi.trulesk.TruleskIntentRule
+import org.ligi.passandroid.rules.TestIntentRule
 import java.util.*
 import org.junit.Before
 
 class TheFieldListEditFragment {
 
     @get:Rule
-    val rule = TruleskIntentRule(PassEditActivity::class.java, false)
+    val rule = TestIntentRule(PassEditActivity::class.java, false)
 
     @Before
     fun before() {

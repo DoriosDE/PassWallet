@@ -14,12 +14,12 @@ import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.ui.passlist.PassListActivity
-import org.ligi.trulesk.TruleskIntentRule
+import org.ligi.passandroid.rules.TestIntentRule
 
 class ThePassListLongPress {
 
     @get:Rule
-    val rule = TruleskIntentRule(PassListActivity::class.java) {
+    val rule = TestIntentRule(PassListActivity::class.java) {
         TestApp.populatePassStoreWithSinglePass()
     }
 

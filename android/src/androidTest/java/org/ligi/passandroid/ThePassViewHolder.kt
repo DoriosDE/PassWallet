@@ -7,12 +7,12 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.ui.passlist.PassListActivity
-import org.ligi.trulesk.TruleskActivityRule
+import org.ligi.passandroid.rules.TestActivityRule
 
 class ThePassViewHolder {
 
     @get:Rule
-    var rule = TruleskActivityRule(PassListActivity::class.java, false)
+    var rule = TestActivityRule(PassListActivity::class.java, false)
 
     @Test
     fun passCardStillRendersWithoutExtraActionButtons() {
