@@ -11,7 +11,8 @@ import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.Settings
 import org.ligi.passandroid.model.pass.Pass
-import org.ligi.passandroid.printing.doPrint
+import org.ligi.passandroid.printing.printPass
+import org.ligi.passandroid.share.sharePass
 
 class PassMenuOptions(val activity: AppCompatActivity, val pass: Pass) : KoinComponent {
 
@@ -41,7 +42,7 @@ class PassMenuOptions(val activity: AppCompatActivity, val pass: Pass) : KoinCom
             }
 
             R.id.menu_share -> {
-                PassExportTaskAndShare(activity, passStore.directoryOf(pass.id)).execute()
+                activity.sharePass(passStore.directoryOf(pass.id))
                 return true
             }
 
@@ -55,7 +56,7 @@ class PassMenuOptions(val activity: AppCompatActivity, val pass: Pass) : KoinCom
             }
 
             R.id.menu_print -> {
-                doPrint(activity, pass)
+                printPass(activity, pass)
                 return true
             }
         }
