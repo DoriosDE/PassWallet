@@ -46,8 +46,41 @@ class TheBackupArchive {
             "state/archive_state.json",
             "preferences.json",
         )
-        assertThat(entries["manifest.json"]).contains("\"app\":\"PassWallet\"")
-        assertThat(entries["preferences.json"]).contains("\"sort\":\"0\"")
+        assertThat(BackupArchive.readSummary(ByteArrayInputStream(output.toByteArray()))?.app).isEqualTo("PassWallet")
+        assertThat(BackupArchive.decodePreferences(entries.getValue("preferences.json")))
+            .isEqualTo(mapOf("sort" to "0", "autolight" to true))
+    }
+
+    @Test
+    fun preferencesKeepTheirTypes() {
+        val preferences = mapOf(
+            "text" to "a \"quoted\"\nvalue",
+            "flag" to false,
+            "count" to 42,
+            "big" to 9_000_000_000L,
+            "ratio" to 0.75f,
+        )
+
+        assertThat(BackupArchive.decodePreferences(BackupArchive.encodePreferences(preferences))).isEqualTo(preferences)
+    }
+
+    @Test
+    fun preferencesOfOtherTypesAreLeftOut() {
+        val encoded = BackupArchive.encodePreferences(mapOf("set" to setOf("a"), "none" to null, "kept" to "yes"))
+
+        assertThat(BackupArchive.decodePreferences(encoded)).isEqualTo(mapOf("kept" to "yes"))
+    }
+
+    @Test
+    fun brokenOrUnknownPreferencesAreSkipped() {
+        val json = """[
+            {"key":"kept","type":"int","value":"7"},
+            {"key":"unknownType","type":"date","value":"2026-01-01"},
+            {"key":"brokenNumber","type":"long","value":"many"}
+        ]"""
+
+        assertThat(BackupArchive.decodePreferences(json)).isEqualTo(mapOf("kept" to 7))
+        assertThat(BackupArchive.decodePreferences("not json")).isEmpty()
     }
 
     @Test

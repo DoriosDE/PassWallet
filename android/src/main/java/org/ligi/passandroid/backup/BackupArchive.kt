@@ -1,6 +1,12 @@
 package org.ligi.passandroid.backup
 
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
+import com.squareup.moshi.JsonDataException
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.Types
 import org.ligi.passandroid.model.FileSystemPassStore.Companion.ARCHIVE_STATE_FILE
+import java.io.IOException
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.InputStream
@@ -15,6 +21,7 @@ import java.util.zip.ZipOutputStream
 
 object BackupArchive {
 
+    private const val BACKUP_APP = "PassWallet"
     private const val MANIFEST_ENTRY = "manifest.json"
     private const val PASSES_PREFIX = "passes/"
     private const val PREFERENCES_ENTRY = "preferences.json"
@@ -23,13 +30,25 @@ object BackupArchive {
     private const val MAX_BACKUP_ENTRIES = 1_024
     private const val MAX_PREFERENCES_BYTES = 256L * 1024L
 
+    /** the manifest of a backup: which app and version wrote it, and when */
+    @JsonClass(generateAdapter = true)
     data class Summary(
         val format: Int,
         val app: String,
-        val packageName: String?,
+        @Json(name = "package") val packageName: String?,
         val appVersionName: String?,
         val appVersionCode: Int?,
         val createdAt: String?,
+    )
+
+    /** one preference with its type, so it is restored as exactly that type */
+    @JsonClass(generateAdapter = true)
+    internal data class StoredPreference(val key: String, val type: String, val value: String)
+
+    private val moshi = Moshi.Builder().build()
+    private val summaryAdapter = moshi.adapter(Summary::class.java)
+    private val preferencesAdapter = moshi.adapter<List<StoredPreference>>(
+        Types.newParameterizedType(List::class.java, StoredPreference::class.java)
     )
 
     fun readSummary(inputStream: InputStream): Summary? {
@@ -76,24 +95,19 @@ object BackupArchive {
 
     fun looksLikePassWalletBackup(inputStream: InputStream): Boolean {
         return try {
-            readSummary(inputStream)?.app == "PassWallet"
+            readSummary(inputStream)?.app == BACKUP_APP
         } catch (_: Exception) {
             false
         }
     }
 
-    private fun parseManifest(json: String): Summary? {
-        val values = decodePreferences(json)
-        val app = values["app"] as? String ?: return null
-        val format = values["format"] as? Int ?: return null
-        return Summary(
-            format = format,
-            app = app,
-            packageName = values["package"] as? String,
-            appVersionName = values["appVersionName"] as? String,
-            appVersionCode = values["appVersionCode"] as? Int,
-            createdAt = values["createdAt"] as? String,
-        )
+    /** the manifest in [json] - null when it is not a backup manifest (e.g. the manifest of a pkpass file) */
+    private fun parseManifest(json: String): Summary? = try {
+        summaryAdapter.fromJson(json)
+    } catch (_: JsonDataException) {
+        null
+    } catch (_: IOException) {
+        null
     }
 
     fun exportBackup(
@@ -171,18 +185,16 @@ object BackupArchive {
         }
     }
 
-    private fun buildManifest(appVersionName: String, appVersionCode: Int): String {
-        return """
-            {
-              "format":1,
-              "app":"PassWallet",
-              "package":"org.baumweg.passwallet",
-              "appVersionName":"${escapeJson(appVersionName)}",
-              "appVersionCode":$appVersionCode,
-              "createdAt":"${escapeJson(nowIsoUtc())}"
-            }
-        """.trimIndent()
-    }
+    private fun buildManifest(appVersionName: String, appVersionCode: Int): String = summaryAdapter.indent("  ").toJson(
+        Summary(
+            format = 1,
+            app = BACKUP_APP,
+            packageName = "org.baumweg.passwallet",
+            appVersionName = appVersionName,
+            appVersionCode = appVersionCode,
+            createdAt = nowIsoUtc(),
+        )
+    )
 
     private fun nowIsoUtc(): String {
         val formatter = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'", Locale.US)
@@ -190,37 +202,44 @@ object BackupArchive {
         return formatter.format(Date())
     }
 
-    private fun encodePreferences(preferences: Map<String, Any?>): String {
-        val entries = preferences.entries
-            .filter { it.value is String || it.value is Boolean || it.value is Int || it.value is Long || it.value is Float }
+    /** the preferences of the types SharedPreferences can store - others (e.g. string sets) are left out */
+    internal fun encodePreferences(preferences: Map<String, Any?>): String {
+        val stored = preferences.entries
             .sortedBy { it.key }
-            .joinToString(",\n") { (key, value) ->
-                val encodedValue = when (value) {
-                    is String -> "\"${escapeJson(value)}\""
-                    is Boolean, is Int, is Long, is Float -> value.toString()
-                    else -> "null"
+            .mapNotNull { (key, value) ->
+                val type = when (value) {
+                    is String -> "string"
+                    is Boolean -> "boolean"
+                    is Int -> "int"
+                    is Long -> "long"
+                    is Float -> "float"
+                    else -> return@mapNotNull null
                 }
-                "  \"${escapeJson(key)}\":$encodedValue"
+                StoredPreference(key, type, value.toString())
             }
-        return "{\n$entries\n}"
+        return preferencesAdapter.indent("  ").toJson(stored)
     }
 
-    private fun decodePreferences(json: String): Map<String, Any> {
-        val result = mutableMapOf<String, Any>()
-        val regex = Regex("\\\"((?:\\\\.|[^\\\"])*)\\\"\\s*:\\s*(\\\"(?:\\\\.|[^\\\"])*\\\"|true|false|-?\\d+(?:\\.\\d+)?)")
-        regex.findAll(json).forEach { match ->
-            val key = unescapeJson(match.groupValues[1])
-            val rawValue = match.groupValues[2]
-            val value: Any = when {
-                rawValue == "true" -> true
-                rawValue == "false" -> false
-                rawValue.startsWith("\"") -> unescapeJson(rawValue.removeSurrounding("\""))
-                rawValue.contains('.') -> rawValue.toFloat()
-                else -> rawValue.toIntOrNull() ?: rawValue
-            }
-            result[key] = value
+    /** the preferences in [json] with their original types - entries of unknown type or with broken values are skipped */
+    internal fun decodePreferences(json: String): Map<String, Any> {
+        val stored = try {
+            preferencesAdapter.fromJson(json).orEmpty()
+        } catch (_: JsonDataException) {
+            emptyList()
+        } catch (_: IOException) {
+            emptyList()
         }
-        return result
+        return stored.mapNotNull { preference ->
+            val value: Any? = when (preference.type) {
+                "string" -> preference.value
+                "boolean" -> preference.value.toBooleanStrictOrNull()
+                "int" -> preference.value.toIntOrNull()
+                "long" -> preference.value.toLongOrNull()
+                "float" -> preference.value.toFloatOrNull()
+                else -> null
+            }
+            value?.let { preference.key to it }
+        }.toMap()
     }
 
     private fun ZipOutputStream.writeTextEntry(name: String, text: String) {
@@ -268,39 +287,5 @@ object BackupArchive {
             output.write(buffer, 0, read)
         }
         return copied
-    }
-
-    private fun escapeJson(value: String): String = buildString {
-        value.forEach { char ->
-            when (char) {
-                '\\' -> append("\\\\")
-                '"' -> append("\\\"")
-                '\n' -> append("\\n")
-                '\r' -> append("\\r")
-                '\t' -> append("\\t")
-                else -> append(char)
-            }
-        }
-    }
-
-    private fun unescapeJson(value: String): String = buildString {
-        var index = 0
-        while (index < value.length) {
-            val char = value[index]
-            if (char == '\\' && index + 1 < value.length) {
-                append(
-                    when (val escaped = value[index + 1]) {
-                        'n' -> '\n'
-                        'r' -> '\r'
-                        't' -> '\t'
-                        else -> escaped
-                    }
-                )
-                index += 2
-            } else {
-                append(char)
-                index++
-            }
-        }
     }
 }
