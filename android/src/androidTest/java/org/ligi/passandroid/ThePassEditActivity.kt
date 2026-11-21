@@ -20,6 +20,11 @@ import org.ligi.passandroid.model.pass.PassType.COUPON
 import org.ligi.passandroid.model.pass.PassType.EVENT
 import org.ligi.passandroid.ui.edit.PassEditActivity
 import org.ligi.passandroid.rules.TestIntentRule
+import android.view.View
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
+import androidx.test.espresso.matcher.ViewMatchers.isEnabled
+import org.hamcrest.Matcher
 import org.junit.Before
 import org.ligi.passandroid.model.pass.Pass
 
@@ -54,9 +59,8 @@ class ThePassEditActivity {
     fun testSetToCouponWorks() {
         onView(withId(R.id.categoryView)).perform(click())
 
-        // on small screens the sheet opens half way - coupon is further down
-        onView(withText(R.string.select_category_dialog_title)).perform(swipeUp())
-        onView(withText(R.string.category_coupon)).perform(click())
+        // on small screens the sheet opens half way and coupon is below the visible part
+        onView(withText(R.string.category_coupon)).perform(clickRowEvenIfOffScreen())
         assertThat(pass.type).isEqualTo(COUPON)
 
         rule.screenShot("edit_set_coupon")
@@ -112,4 +116,13 @@ class ThePassEditActivity {
         intended(hasAction(Intent.ACTION_GET_CONTENT))
     }
 
+    /** clicks the clickable row around the view - also when it is outside the visible part of the screen */
+    private fun clickRowEvenIfOffScreen() = object : ViewAction {
+        override fun getConstraints(): Matcher<View> = isEnabled()
+        override fun getDescription() = "click the clickable row around the view"
+        override fun perform(uiController: UiController, view: View) {
+            generateSequence(view) { it.parent as? View }.first { it.isClickable }.performClick()
+            uiController.loopMainThreadUntilIdle()
+        }
+    }
 }
