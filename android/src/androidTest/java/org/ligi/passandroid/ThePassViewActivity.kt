@@ -73,20 +73,11 @@ class ThePassViewActivity {
     }
 
     @Test
-    fun testZoomControlsAreThereWithBarcode() {
+    fun testZoomControlsAreNotShown() {
         getActPass().barCode = BarCode(PassBarCodeFormat.AZTEC, "foo")
         rule.launchActivity(TestApp.intentFor(PassViewActivity::class.java, pass))
 
-        onView(withId(R.id.zoomIn)).check(matches(isDisplayed()))
-        onView(withId(R.id.zoomIn)).check(matches(isDisplayed()))
-    }
-
-    @Test
-    fun testZoomControlsAreGoneWithoutBarcode() {
-        getActPass().barCode = null
-        rule.launchActivity(TestApp.intentFor(PassViewActivity::class.java, pass))
-
         onView(withId(R.id.zoomIn)).check(matches(not(isDisplayed())))
-        onView(withId(R.id.zoomIn)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.zoomOut)).check(matches(not(isDisplayed())))
     }
 }

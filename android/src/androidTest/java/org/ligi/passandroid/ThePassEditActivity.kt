@@ -85,30 +85,30 @@ class ThePassEditActivity {
 
     @Test
     fun testAddAbortFooterImagePick() {
-        intending(hasAction(Intent.ACTION_CHOOSER)).respondWith(Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null))
+        intending(hasAction(Intent.ACTION_GET_CONTENT)).respondWith(Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null))
 
         onView(withId(R.id.add_footer)).perform(scrollTo(), click())
 
-        intended(hasAction(Intent.ACTION_CHOOSER))
+        intended(hasAction(Intent.ACTION_GET_CONTENT))
     }
 
     @Test
     fun testAddAbortStripImagePick() {
-        intending(hasAction(Intent.ACTION_CHOOSER)).respondWith(Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null))
+        intending(hasAction(Intent.ACTION_GET_CONTENT)).respondWith(Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null))
 
         onView(withId(R.id.add_strip)).perform(scrollTo(), click())
 
-        intended(hasAction(Intent.ACTION_CHOOSER))
+        intended(hasAction(Intent.ACTION_GET_CONTENT))
     }
 
     @Test
     fun testAddAbortLogoImagePick() {
 
-        intending(hasAction(Intent.ACTION_CHOOSER)).respondWith(Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null))
+        intending(hasAction(Intent.ACTION_GET_CONTENT)).respondWith(Instrumentation.ActivityResult(Activity.RESULT_CANCELED, null))
 
         onView(withId(R.id.add_logo)).perform(scrollTo(), click())
 
-        intended(hasAction(Intent.ACTION_CHOOSER))
+        intended(hasAction(Intent.ACTION_GET_CONTENT))
     }
 
 }

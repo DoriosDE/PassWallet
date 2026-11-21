@@ -68,7 +68,7 @@ class TheBarCodeEditing {
         closeSoftKeyboard()
 
         onView(withId(R.id.messageInput)).check(matches(withText("")))
-        onView(withText(android.R.string.ok)).perform(click())
+        onView(withId(R.id.saveBarcodeButton)).perform(scrollTo(), click())
 
         assertThat(currentPass.barCode!!.format).isEqualTo(PassBarCodeFormat.QR_CODE)
         assertThat(currentPass.barCode!!.message).isEqualTo("")
@@ -86,7 +86,7 @@ class TheBarCodeEditing {
             onView(withId(R.id.messageInput)).perform(clearText(), replaceText(validMessageFor(passBarCodeFormat)))
             closeSoftKeyboard()
 
-            onView(withText(android.R.string.ok)).perform(click())
+            onView(withId(R.id.saveBarcodeButton)).perform(scrollTo(), click())
 
             assertThat(currentPass.barCode!!.format).isEqualTo(passBarCodeFormat)
             rule.screenShot("edit_set_" + passBarCodeFormat.name)
@@ -104,7 +104,7 @@ class TheBarCodeEditing {
 
         closeSoftKeyboard()
 
-        onView(withText(android.R.string.ok)).perform(click())
+        onView(withId(R.id.saveBarcodeButton)).perform(scrollTo(), click())
 
         onView(withText(R.string.edit_barcode_dialog_title)).check(doesNotExist())
 
@@ -123,7 +123,7 @@ class TheBarCodeEditing {
 
         closeSoftKeyboard()
 
-        onView(withText(android.R.string.ok)).perform(click())
+        onView(withId(R.id.saveBarcodeButton)).perform(scrollTo(), click())
 
         onView(withText(R.string.edit_barcode_dialog_title)).check(doesNotExist())
 
