@@ -26,8 +26,8 @@
     <string name="empty_text_title">Your travel passes live here</string>
     <string name="empty_text_body">Import a pass from a file. Everything you import stays available offline.</string>
     <string name="downloading_new_pass_version">downloading new pass version</string>
-    <string name="unzip_pass_dialog_title">Opening Passbook</string>
-    <string name="unzip_pass_dialog_message">Please wait…</string>
+    <string name="import_pass_dialog_title">Opening Passbook</string>
+    <string name="import_pass_dialog_message">Please wait…</string>
     <string name="progress_dialog_title">Working</string>
     <string name="import_status_title">Importing pass</string>
     <string name="import_status_message">Checking the file and preparing it for PassWallet.</string>

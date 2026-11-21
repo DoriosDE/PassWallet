@@ -25,7 +25,7 @@ import org.ligi.passandroid.model.PassGroups
 import org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_ICON
 import org.ligi.passandroid.model.State
 import org.ligi.passandroid.model.pass.Pass
-import org.ligi.passandroid.ui.UnzipPassController.InputStreamUnzipControllerSpec
+import org.ligi.passandroid.ui.PassImportController.InputStreamImportSpec
 import java.io.IOException
 
 @SuppressLint("Registered")
@@ -197,15 +197,15 @@ open class PassViewActivityBase : PassAndroidActivity() {
                     when (val result = interpretPassUpdateResponse(response)) {
                         is PassUpdateResult.Available -> {
                             val inputStreamWithSource = InputStreamWithSource(url, result.body.byteStream())
-                            val spec = InputStreamUnzipControllerSpec(
+                            val spec = InputStreamImportSpec(
                                 inputStreamWithSource,
                                 this@PassViewActivityBase,
                                 passStore,
-                                MyUnzipSuccessCallback(dlg),
-                                MyUnzipFailCallback(dlg),
+                                UpdateSuccessCallback(dlg),
+                                UpdateFailCallback(dlg),
                             )
                             spec.overwrite = true
-                            UnzipPassController.processInputStream(spec)
+                            PassImportController.processInputStream(spec)
                         }
                         is PassUpdateResult.Unavailable -> showUpdateUnavailable(dlg, result.statusCode)
                     }
@@ -241,7 +241,7 @@ open class PassViewActivityBase : PassAndroidActivity() {
         }
     }
 
-    inner class MyUnzipFailCallback constructor(private val dlg: Dialog) : UnzipPassController.FailCallback {
+    inner class UpdateFailCallback constructor(private val dlg: Dialog) : PassImportController.FailCallback {
 
         override fun fail(reason: String) {
             runOnUiThread {
@@ -257,7 +257,7 @@ open class PassViewActivityBase : PassAndroidActivity() {
         }
     }
 
-    inner class MyUnzipSuccessCallback constructor(private val dlg: Dialog) : UnzipPassController.SuccessCallback {
+    inner class UpdateSuccessCallback constructor(private val dlg: Dialog) : PassImportController.SuccessCallback {
 
         override fun call(uuids: List<String>) {
             val uuid = uuids.firstOrNull() ?: return

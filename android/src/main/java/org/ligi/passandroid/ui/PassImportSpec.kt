@@ -3,11 +3,11 @@ package org.ligi.passandroid.ui
 import android.content.Context
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.Settings
-import org.ligi.passandroid.ui.UnzipPassController.FailCallback
-import org.ligi.passandroid.ui.UnzipPassController.SuccessCallback
+import org.ligi.passandroid.ui.PassImportController.FailCallback
+import org.ligi.passandroid.ui.PassImportController.SuccessCallback
 import java.io.File
 
-open class UnzipControllerSpec(var targetPath: File,
+open class PassImportSpec(var targetPath: File,
                                val context: Context,
                                val passStore: PassStore,
                                val onSuccessCallback: SuccessCallback?,

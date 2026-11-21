@@ -8,9 +8,9 @@ import org.ligi.passandroid.model.InputStreamWithSource
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.reader.AppleStylePassReader
-import org.ligi.passandroid.ui.UnzipPassController
-import org.ligi.passandroid.ui.UnzipPassController.FailCallback
-import org.ligi.passandroid.ui.UnzipPassController.InputStreamUnzipControllerSpec
+import org.ligi.passandroid.ui.PassImportController
+import org.ligi.passandroid.ui.PassImportController.FailCallback
+import org.ligi.passandroid.ui.PassImportController.InputStreamImportSpec
 import org.mockito.Mockito.*
 import java.io.File
 
@@ -26,9 +26,9 @@ fun loadPassFromAsset(asset: String, callback: (pass: Pass?) -> Unit) {
         val inputStreamWithSource = InputStreamWithSource("none", inputStream)
 
         val mock = mock(FailCallback::class.java)
-        val spec = InputStreamUnzipControllerSpec(inputStreamWithSource, instrumentation.targetContext, mock(
+        val spec = InputStreamImportSpec(inputStreamWithSource, instrumentation.targetContext, mock(
                 PassStore::class.java),
-                object : UnzipPassController.SuccessCallback {
+                object : PassImportController.SuccessCallback {
                     override fun call(uuids: List<String>) {
                         val uuid = uuids.first()
                         callback.invoke(AppleStylePassReader.read(File(getTestTargetPath(instrumentation.targetContext), uuid), "en",
@@ -40,7 +40,7 @@ fun loadPassFromAsset(asset: String, callback: (pass: Pass?) -> Unit) {
 
         spec.overwrite = true
         spec.targetPath = getTestTargetPath(spec.context)
-        UnzipPassController.processInputStream(spec)
+        PassImportController.processInputStream(spec)
 
         verify(mock, never()).fail(anyString())
 

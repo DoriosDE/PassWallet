@@ -25,8 +25,8 @@
     <string name="empty_text_title">Tus pases aparecerán aquí</string>
     <string name="empty_text_body">Importa un pase desde un archivo. Todo lo que importes estará disponible sin conexión.</string>
     <string name="downloading_new_pass_version">descargando nueva versión del pase</string>
-    <string name="unzip_pass_dialog_title">Abriendo pase</string>
-    <string name="unzip_pass_dialog_message">Espera…</string>
+    <string name="import_pass_dialog_title">Abriendo pase</string>
+    <string name="import_pass_dialog_message">Espera…</string>
     <string name="progress_dialog_title">Trabajando</string>
     <string name="import_status_title">Importando pase</string>
     <string name="import_status_message">Comprobando el archivo y preparándolo para PassWallet.</string>

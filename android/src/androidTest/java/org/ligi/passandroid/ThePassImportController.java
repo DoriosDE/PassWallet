@@ -6,23 +6,23 @@ import org.junit.Before;
 import org.junit.Test;
 import org.ligi.passandroid.model.InputStreamWithSource;
 import org.ligi.passandroid.model.PassStore;
-import org.ligi.passandroid.ui.UnzipPassController;
+import org.ligi.passandroid.ui.PassImportController;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import static org.assertj.core.api.Fail.fail;
-import static org.ligi.passandroid.ui.UnzipPassController.InputStreamUnzipControllerSpec;
+import static org.ligi.passandroid.ui.PassImportController.InputStreamImportSpec;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
-public class TheUnzipPassController  {
+public class ThePassImportController  {
 
     @Mock
-    UnzipPassController.FailCallback failCallback;
+    PassImportController.FailCallback failCallback;
 
     @Mock
-    UnzipPassController.SuccessCallback successCallback;
+    PassImportController.SuccessCallback successCallback;
 
     @Mock
     PassStore passStore;
@@ -39,12 +39,12 @@ public class TheUnzipPassController  {
 
             final InputStream inputStream = InstrumentationRegistry.getInstrumentation().getContext().getResources().getAssets().open("passes/broken/fail.pkpass");
             final InputStreamWithSource inputStreamWithSource = new InputStreamWithSource("none", inputStream);
-            final InputStreamUnzipControllerSpec spec = new InputStreamUnzipControllerSpec(inputStreamWithSource,
+            final InputStreamImportSpec spec = new InputStreamImportSpec(inputStreamWithSource,
                                                                                            InstrumentationRegistry.getInstrumentation().getTargetContext(),
                                                                                            passStore,
                                                                                            successCallback,
                                                                                            failCallback);
-            UnzipPassController.INSTANCE.processInputStream(spec);
+            PassImportController.INSTANCE.processInputStream(spec);
 
             verify(successCallback, never()).call(anyList());
             verify(failCallback).fail(any(String.class));

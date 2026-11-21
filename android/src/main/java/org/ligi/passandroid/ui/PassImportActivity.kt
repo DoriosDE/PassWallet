@@ -71,15 +71,15 @@ class PassImportActivity : AppCompatActivity() {
                         if (isFinishing) {
                             // finish with no UI/Dialogs
                             // let's do it silently TODO check if we need to jump to a service here as the activity is dying
-                            val spec = UnzipPassController.InputStreamUnzipControllerSpec(fromURI, application, passStore, object : UnzipPassController.SuccessCallback {
+                            val spec = PassImportController.InputStreamImportSpec(fromURI, application, passStore, object : PassImportController.SuccessCallback {
                                 override fun call(uuids: List<String>) {
                                     passStore.archive.setState(uuids.mapNotNull { passStore.getPassbookForId(it) }, ArchiveState.ACTIVE)
                                     autoGroupImportedPasses(passStore, settings, uuids)
                                 }
                             }, null)
-                            UnzipPassController.processInputStream(spec)
+                            PassImportController.processInputStream(spec)
                         } else {
-                            UnzipPassDialog.show(fromURI, this@PassImportActivity, passStore) { importedIds ->
+                            PassImportDialog.show(fromURI, this@PassImportActivity, passStore) { importedIds ->
                                 passStore.archive.setState(importedIds.mapNotNull { passStore.getPassbookForId(it) }, ArchiveState.ACTIVE)
 
                                 val groupedCount = autoGroupImportedPasses(passStore, settings, importedIds)

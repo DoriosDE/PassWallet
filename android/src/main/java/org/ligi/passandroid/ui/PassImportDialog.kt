@@ -5,11 +5,11 @@ import android.app.Dialog
 import org.ligi.passandroid.R
 import org.ligi.passandroid.model.InputStreamWithSource
 import org.ligi.passandroid.model.PassStore
-import org.ligi.passandroid.ui.UnzipPassController.FailCallback
-import org.ligi.passandroid.ui.UnzipPassController.InputStreamUnzipControllerSpec
-import org.ligi.passandroid.ui.UnzipPassController.SuccessCallback
+import org.ligi.passandroid.ui.PassImportController.FailCallback
+import org.ligi.passandroid.ui.PassImportController.InputStreamImportSpec
+import org.ligi.passandroid.ui.PassImportController.SuccessCallback
 
-object UnzipPassDialog {
+object PassImportDialog {
 
     private fun displayError(activity: Activity, title: String, err: String) {
         activity.showImportErrorDialog(
@@ -29,8 +29,8 @@ object UnzipPassDialog {
         }
 
         val dialog = activity.createProgressDialog(
-            activity.getString(R.string.unzip_pass_dialog_message),
-            R.string.unzip_pass_dialog_title,
+            activity.getString(R.string.import_pass_dialog_message),
+            R.string.import_pass_dialog_title,
         )
         dialog.show()
         dialog.setCancelable(false)
@@ -38,7 +38,7 @@ object UnzipPassDialog {
         class AlertDialogUpdater(private val call_after_finish: (uuids: List<String>) -> Unit) : Runnable {
 
             override fun run() {
-                val spec = InputStreamUnzipControllerSpec(ins, activity, passStore, object : SuccessCallback {
+                val spec = InputStreamImportSpec(ins, activity, passStore, object : SuccessCallback {
 
                     override fun call(uuids: List<String>) {
                         activity.runOnUiThread(Runnable {
@@ -60,7 +60,7 @@ object UnzipPassDialog {
                         })
                     }
                 })
-                UnzipPassController.processInputStream(spec)
+                PassImportController.processInputStream(spec)
             }
         }
 

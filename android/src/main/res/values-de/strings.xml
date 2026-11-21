@@ -25,8 +25,8 @@
     <string name="empty_text_title">Hier wohnen deine Pässe</string>
     <string name="empty_text_body">Importiere einen Pass aus einer Datei. Alles, was du importierst, ist auch offline verfügbar.</string>
     <string name="downloading_new_pass_version">neue Pass-Version wird heruntergeladen</string>
-    <string name="unzip_pass_dialog_title">Pass wird geöffnet</string>
-    <string name="unzip_pass_dialog_message">Bitte warten…</string>
+    <string name="import_pass_dialog_title">Pass wird geöffnet</string>
+    <string name="import_pass_dialog_message">Bitte warten…</string>
     <string name="progress_dialog_title">Wird bearbeitet</string>
     <string name="import_status_title">Pass wird importiert</string>
     <string name="import_status_message">Die Datei wird geprüft und für PassWallet vorbereitet.</string>

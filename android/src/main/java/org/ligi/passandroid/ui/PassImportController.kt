@@ -14,7 +14,7 @@ import org.ligi.passandroid.model.Settings
  * Connects the screens to the [PassImporter]: runs an import and reports the result through the callbacks
  * (every problem to the fail callback, the imported passes to the success callback).
  */
-object UnzipPassController : KoinComponent {
+object PassImportController : KoinComponent {
 
     val tracker: Tracker by inject()
     val settings: Settings by inject()
@@ -27,7 +27,7 @@ object UnzipPassController : KoinComponent {
         fun fail(reason: String)
     }
 
-    fun processInputStream(spec: InputStreamUnzipControllerSpec) {
+    fun processInputStream(spec: InputStreamImportSpec) {
         val importer = PassImporter(
             passesDir = spec.targetPath,
             workDir = spec.context.cacheDir,
@@ -54,11 +54,11 @@ object UnzipPassController : KoinComponent {
         }
     }
 
-    class InputStreamUnzipControllerSpec(
+    class InputStreamImportSpec(
         internal val inputStreamWithSource: InputStreamWithSource,
         context: Context,
         passStore: PassStore,
         onSuccessCallback: SuccessCallback?,
         failCallback: FailCallback?,
-    ) : UnzipControllerSpec(context, passStore, onSuccessCallback, failCallback, settings)
+    ) : PassImportSpec(context, passStore, onSuccessCallback, failCallback, settings)
 }
