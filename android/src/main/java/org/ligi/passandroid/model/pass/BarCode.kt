@@ -5,17 +5,13 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import androidx.core.graphics.drawable.toDrawable
 import com.squareup.moshi.JsonClass
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.functions.generateBarCodeBitmap
 import timber.log.Timber
 import java.util.Locale
 
 @JsonClass(generateAdapter = true)
-class BarCode(val format: PassBarCodeFormat?, val message: String? = "") : KoinComponent {
+class BarCode(val format: PassBarCodeFormat?, val message: String? = "") {
 
-    val tracker: Tracker by inject ()
     var alternativeText: String? = null
 
     @Transient
@@ -30,13 +26,11 @@ class BarCode(val format: PassBarCodeFormat?, val message: String? = "") : KoinC
     fun getBitmap(resources: Resources, widthPx: Int? = null, heightPx: Int? = null): BitmapDrawable? {
         if (message == null) {
             // no message -> no barcode
-            tracker.trackException("No Barcode in pass - strange", false)
             return null
         }
 
         val barcodeFormat = if (format == null) {
             Timber.w("Barcode format is null - fallback to QR")
-            tracker.trackException("Barcode format is null - fallback to QR", false)
             PassBarCodeFormat.QR_CODE
         } else {
             format

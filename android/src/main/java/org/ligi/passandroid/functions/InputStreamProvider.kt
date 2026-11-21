@@ -5,7 +5,6 @@ import android.net.Uri
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
-import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.model.InputStreamWithSource
 import java.io.BufferedInputStream
 import java.io.FilterInputStream
@@ -21,20 +20,18 @@ private val importHttpClient = OkHttpClient.Builder()
     .writeTimeout(10, TimeUnit.SECONDS)
     .build()
 
-fun fromURI(context: Context, uri: Uri, tracker: Tracker): InputStreamWithSource? {
-    tracker.trackEvent("protocol", "to_inputstream", uri.scheme, null)
+fun fromURI(context: Context, uri: Uri): InputStreamWithSource? {
     return when (uri.scheme) {
         "content" -> fromContent(context, uri)
-        "http", "https" -> fromOKHttp(uri, tracker)
+        "http", "https" -> fromOKHttp(uri)
         "file" -> getDefaultInputStreamForUri(uri)
         else -> {
-            tracker.trackException("unknown scheme in ImportAsyncTask" + uri.scheme, false)
             getDefaultInputStreamForUri(uri)
         }
     }
 }
 
-private fun fromOKHttp(uri: Uri, tracker: Tracker): InputStreamWithSource? {
+private fun fromOKHttp(uri: Uri): InputStreamWithSource? {
     val url = URL("$uri")
     val requestBuilder = Request.Builder().url(url)
 
@@ -51,7 +48,6 @@ private fun fromOKHttp(uri: Uri, tracker: Tracker): InputStreamWithSource? {
 
     for ((key, value) in iPhoneFakeMap) {
         if ("$uri".contains(value)) {
-            tracker.trackEvent("quirk_fix", "ua_fake", key, null)
             requestBuilder.header("User-Agent", IPHONE_USER_AGENT)
         }
     }
@@ -59,7 +55,6 @@ private fun fromOKHttp(uri: Uri, tracker: Tracker): InputStreamWithSource? {
     val response = importHttpClient.newCall(requestBuilder.build()).execute()
     if (!response.isSuccessful) {
         response.close()
-        tracker.trackException("import download failed with HTTP ${response.code()}", false)
         return null
     }
 

@@ -1,12 +1,11 @@
 package org.ligi.passandroid.ui.quirk_fix
 
 import android.net.Uri
-import org.ligi.passandroid.Tracker
 import java.net.URLEncoder
 
 private const val CHARSET = "UTF-8"
 
-class URLRewriteController(private val tracker: Tracker) {
+class URLRewriteController {
 
     fun getUrlByUri(uri: Uri): String? {
         if (uri.scheme != null && uri.authority == "import") {
@@ -39,9 +38,7 @@ class URLRewriteController(private val tracker: Tracker) {
         val passId: String?
         if ("$uri".contains("CheckInApiIntegration")) {
             passId = uri.getQueryParameter("key")
-            tracker.trackEvent("quirk_fix", "redirect_attempt", "virgin_australia2", null)
         } else {
-            tracker.trackEvent("quirk_fix", "redirect_attempt", "virgin_australia1", null)
             passId = uri.getQueryParameter("c")
         }
 
@@ -49,20 +46,17 @@ class URLRewriteController(private val tracker: Tracker) {
             return null
         }
 
-        tracker.trackEvent("quirk_fix", "redirect", "virgin_australia", null)
 
         return "https://mobile.virginaustralia.com/boarding/pass.pkpass?key=" + URLEncoder.encode(passId, CHARSET)
     }
 
     private fun getCathay(uri: Uri): String? {
         val passId = uri.getQueryParameter("v")
-        tracker.trackEvent("quirk_fix", "redirect_attempt", "cathay", null)
 
         if (passId == null) {
             return null
         }
 
-        tracker.trackEvent("quirk_fix", "redirect", "cathay", null)
 
         return "https://www.cathaypacific.com/icheckin2/PassbookServlet?v=" + URLEncoder.encode(passId, CHARSET)
     }

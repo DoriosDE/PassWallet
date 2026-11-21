@@ -17,7 +17,6 @@ import org.koin.android.ext.android.inject
 import org.ligi.kaxt.startActivityFromClass
 import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.R
-import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.backup.BackupArchive
 import org.ligi.passandroid.databinding.ActivityImportBinding
 import org.ligi.passandroid.functions.autoGroupImportedPasses
@@ -28,7 +27,6 @@ import org.ligi.passandroid.model.Settings
 class PassImportActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityImportBinding
-    val tracker: Tracker by inject()
     val passStore: PassStore by inject()
     val settings: Settings by inject()
 
@@ -97,12 +95,11 @@ class PassImportActivity : AppCompatActivity() {
             try {
                 val uri = importUri()
                 if (uri == null) {
-                    tracker.trackException("invalid_import_uri", false)
                     withContext(Dispatchers.Main) { finish() }
                     return@launch
                 }
 
-                val fromURI = fromURI(this@PassImportActivity, uri, tracker)
+                val fromURI = fromURI(this@PassImportActivity, uri)
 
                 withContext(Dispatchers.Main) {
 
@@ -136,7 +133,6 @@ class PassImportActivity : AppCompatActivity() {
                         onExternalStorageDenied()
                     }
                 } else {
-                    tracker.trackException("Error in import", e, false)
                     withContext(Dispatchers.Main) {
                         binding.progressContainer.visibility = GONE
                         showImportFailed(getString(R.string.import_error_generic_message, e.localizedMessage ?: e.javaClass.simpleName))
@@ -156,7 +152,6 @@ class PassImportActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         if (importUri()?.scheme == null) {
-            tracker.trackException("invalid_import_uri", false)
             finish()
             return
         }

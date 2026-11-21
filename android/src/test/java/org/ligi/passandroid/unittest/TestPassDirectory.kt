@@ -1,7 +1,6 @@
 package org.ligi.passandroid.unittest
 
 import android.content.Context
-import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.json_adapter.PassWalletMoshi
 import org.ligi.passandroid.model.AndroidFileSystemPassStore
 import org.ligi.passandroid.model.PassGrouping
@@ -28,7 +27,7 @@ class TestPassDirectory(root: File) {
     private val moshi = PassWalletMoshi.create()
 
     /** a fresh store on this directory - like the app after a restart */
-    fun newStore() = AndroidFileSystemPassStore(mock(Context::class.java), settings, moshi, mock(Tracker::class.java)) { "en" }
+    fun newStore() = AndroidFileSystemPassStore(mock(Context::class.java), settings, moshi) { "en" }
 
     companion object {
         fun pass(id: String, description: String) = PassImpl(id).apply {

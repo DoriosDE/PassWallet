@@ -81,13 +81,10 @@ class PassListActivity : PassAndroidActivity() {
 
         // don't want too many windows in worst case - so check for errors first
         if (TraceDroid.stackTraceFiles.isNotEmpty()) {
-            tracker.trackEvent("ui_event", "send", "stacktraces", null)
 
             if (settings.doTraceDroidEmailSend()) {
                 sendTraceDroidStackTracesIfExist("ligi+passandroid@ligi.de", this)
             }
-        } else {
-            tracker.trackEvent("ui_event", "processFile", "updatenotice", null)
         }
 
         onBackPressedDispatcher.addCallback(this) {

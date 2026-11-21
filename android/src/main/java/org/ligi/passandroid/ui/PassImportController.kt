@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.importer.ImageOrPdfImport
 import org.ligi.passandroid.importer.ImportError
 import org.ligi.passandroid.importer.PassImporter
@@ -20,7 +19,6 @@ import java.io.File
  */
 object PassImportController : KoinComponent {
 
-    private val tracker: Tracker by inject()
     private val settings: Settings by inject()
 
     /** imported pass ids and the (translated) problems found on the way */
@@ -44,7 +42,6 @@ object PassImportController : KoinComponent {
             passesDir = passesDir,
             workDir = context.cacheDir,
             fallbackImport = ImageOrPdfImport(context, passStore),
-            tracker = tracker,
         )
         val result = importer.import(input.inputStream, input.source, overwrite)
         Outcome(result.passIds, result.errors.map { it.message(context) })

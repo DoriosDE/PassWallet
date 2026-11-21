@@ -23,7 +23,6 @@ import okhttp3.Request
 import org.ligi.passandroid.R
 import java.util.concurrent.TimeUnit
 import org.ligi.passandroid.model.InputStreamWithSource
-import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.applyUpdate
 import org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_ICON
 import org.ligi.passandroid.model.State
@@ -77,14 +76,12 @@ open class PassViewActivityBase : PassAndroidActivity() {
         val uuid = intent.getStringExtra(EXTRA_KEY_UUID)
 
         if (uuid == null) {
-            tracker.trackException("pass view opened without uuid in $this", false)
             finish()
             return
         }
 
         val pass = passStore.getPassbookForId(uuid)
         if (pass == null) {
-            tracker.trackException("pass $uuid not present in $this", false)
             finish()
             return
         }

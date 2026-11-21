@@ -27,12 +27,11 @@ open class App : Application() {
 
         return module {
             single {
-                AndroidFileSystemPassStore(this@App, get(), moshi, get()) {
+                AndroidFileSystemPassStore(this@App, get(), moshi) {
                     ConfigurationCompat.getLocales(resources.configuration)[0]?.language ?: Locale.getDefault().language
                 } as PassStore
             }
             single { settings as Settings }
-            single { createTracker(this@App) }
         }
     }
 

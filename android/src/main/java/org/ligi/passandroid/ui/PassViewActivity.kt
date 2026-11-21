@@ -61,7 +61,6 @@ class PassViewActivity : PassViewActivityBase() {
         viewPager.adapter = pagerAdapter
         val initialPosition = pagerAdapter.getPos(currentPass)
         if (initialPosition < 0) {
-            tracker.trackException("pass ${currentPass.id} not present in pager projection", false)
             finish()
             return
         }

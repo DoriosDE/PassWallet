@@ -23,13 +23,11 @@ class TestApp : App() {
         return module {
             single { passStore as PassStore }
             single { settings }
-            single { tracker }
         }
     }
 
     companion object {
 
-        val tracker = mock(Tracker::class.java)
         val passStore = FixedPassListPassStore(emptyList())
         val settings = mock(Settings::class.java).apply {
             `when`(getSortOrder()).thenReturn(PassSortOrder.DATE_ASC)

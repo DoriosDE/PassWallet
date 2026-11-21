@@ -5,7 +5,6 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Fail.fail
-import org.ligi.passandroid.TestApp
 import org.ligi.passandroid.model.InputStreamWithSource
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
@@ -38,7 +37,7 @@ fun loadPassFromAsset(asset: String, callback: (pass: Pass?) -> Unit) {
 
         assertThat(outcome.errorMessages).isEmpty()
         val uuid = outcome.passIds.first()
-        callback.invoke(AppleStylePassReader.read(File(targetPath, uuid), "en", instrumentation.targetContext, TestApp.tracker))
+        callback.invoke(AppleStylePassReader.read(File(targetPath, uuid), "en", instrumentation.targetContext))
 
     } catch (e: Exception) {
         fail("should be able to load file ", e)

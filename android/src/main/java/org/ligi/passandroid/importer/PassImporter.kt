@@ -2,7 +2,6 @@ package org.ligi.passandroid.importer
 
 import androidx.annotation.StringRes
 import org.ligi.passandroid.R
-import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.functions.readJSONSafely
 import timber.log.Timber
 import java.io.File
@@ -27,7 +26,6 @@ class PassImporter(
     private val passesDir: File,
     private val workDir: File,
     private val fallbackImport: FallbackImport,
-    private val tracker: Tracker,
 ) {
 
     /**
@@ -42,10 +40,8 @@ class PassImporter(
             }
             importFile(tempFile, source, overwrite)
         } catch (e: ImportValidationException) {
-            tracker.trackException("unsafe import rejected", e, false)
             ImportResult.failed(ImportError(e.messageRes))
         } catch (e: Exception) {
-            tracker.trackException("problem processing InputStream", e, false)
             ImportResult.failed(ImportError(R.string.import_error_read_file, e.reason()))
         } finally {
             tempFile.delete()
@@ -169,10 +165,8 @@ class PassImporter(
             }
         } catch (e: ImportValidationException) {
             // the passes imported so far are stored - report them together with the problem
-            tracker.trackException("unsafe pkpasses bundle rejected", e, false)
             return ImportResult(passIds, errors + ImportError(e.messageRes))
         } catch (e: Exception) {
-            tracker.trackException("problem processing pkpasses bundle", e, false)
             return ImportResult(passIds, errors + ImportError(R.string.import_error_bundle, e.reason()))
         }
 

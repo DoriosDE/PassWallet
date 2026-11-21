@@ -5,11 +5,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.ligi.passandroid.R
-import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.importer.FallbackImport
 import org.ligi.passandroid.importer.ImportError
 import org.ligi.passandroid.importer.PassImporter
-import org.mockito.Mockito.mock
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.io.File
@@ -28,7 +26,7 @@ class ThePassImporter {
     private val workDir by lazy { temporaryFolder.newFolder("work") }
 
     private fun importer(fallback: FallbackImport = FallbackImport { null }) =
-        PassImporter(passesDir, workDir, fallback, mock(Tracker::class.java))
+        PassImporter(passesDir, workDir, fallback)
 
     private fun import(bytes: ByteArray, overwrite: Boolean = false, fallback: FallbackImport = FallbackImport { null }) =
         importer(fallback).import(ByteArrayInputStream(bytes), source = "test-source", overwrite = overwrite)

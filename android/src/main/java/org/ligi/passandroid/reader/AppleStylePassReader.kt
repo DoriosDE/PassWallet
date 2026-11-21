@@ -8,7 +8,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.ligi.kaxt.parseColor
 import org.ligi.passandroid.R
-import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.functions.getHumanCategoryString
 import org.ligi.passandroid.functions.readJSONSafely
 import org.ligi.passandroid.model.ApplePassbookQuirkCorrector
@@ -33,7 +32,7 @@ object AppleStylePassReader {
         pass.labelColorValue = readJsonSafeAsOptional(passJSON, "labelColor")
     }
 
-    fun read(passFile: File, language: String, context: Context, tracker: Tracker): Pass? {
+    fun read(passFile: File, language: String, context: Context): Pass? {
 
         val translation = AppleStylePassTranslation()
 
@@ -41,7 +40,7 @@ object AppleStylePassReader {
 
         var passJSON: JSONObject? = null
 
-        val localizedPath = findLocalizedPath(passFile, language, tracker)
+        val localizedPath = findLocalizedPath(passFile, language)
 
         if (localizedPath != null) {
             val file = File(localizedPath, "pass.strings")
@@ -84,7 +83,6 @@ object AppleStylePassReader {
 
         if (passJSON == null) {
             Timber.w("could not load pass.json from passcode ")
-            tracker.trackEvent("problem_event", "pass", "without_pass_json", null)
             return null
         }
 
@@ -93,7 +91,6 @@ object AppleStylePassReader {
             if (barcodeJSON != null) {
                 val barcodeFormatString = barcodeJSON.getString("format")
 
-                tracker.trackEvent("measure_event", "barcode_format", barcodeFormatString, 0L)
                 val barcodeFormat = BarCode.getFormatFromString(barcodeFormatString)
                 val barCode = BarCode(barcodeFormat, barcodeJSON.getString("message"))
                 pass.barCode = barCode
@@ -112,9 +109,8 @@ object AppleStylePassReader {
             } catch (e: JSONException) {
                 // be robust when it comes to bad dates - had a RL crash with "2013-12-25T00:00-57:00" here
                 // OK then we just have no date here
-                tracker.trackException("problem parsing relevant date", e, false)
             } catch (e: DateTimeException) {
-                tracker.trackException("problem parsing relevant date", e, false)
+                // invalid date - the pass has no date then
             }
 
         }
@@ -125,9 +121,8 @@ object AppleStylePassReader {
             } catch (e: JSONException) {
                 // be robust when it comes to bad dates - had a RL crash with "2013-12-25T00:00-57:00" here
                 // OK then we just have no date here
-                tracker.trackException("problem parsing expiration date", e, false)
             } catch (e: DateTimeException) {
-                tracker.trackException("problem parsing expiration date", e, false)
+                // invalid date - the pass has no date then
             }
 
         }
@@ -208,12 +203,11 @@ object AppleStylePassReader {
 
         try {
             pass.creator = passJSON.getString("organizationName")
-            tracker.trackEvent("measure_event", "organisation_parse", pass.creator, 1L)
         } catch (ignored: JSONException) {
             // ok - we have no organisation - big deal ..-)
         }
 
-        ApplePassbookQuirkCorrector(tracker).correctQuirks(pass)
+        ApplePassbookQuirkCorrector().correctQuirks(pass)
         pass.visualType = PassVisualClassifier.classify(pass)
 
         return pass
@@ -254,18 +248,16 @@ object AppleStylePassReader {
 
     }
 
-    private fun findLocalizedPath(path: File, language: String, tracker: Tracker): String? {
+    private fun findLocalizedPath(path: File, language: String): String? {
         val localized = File(path, "$language.lproj")
 
         if (localized.exists() && localized.isDirectory) {
-            tracker.trackEvent("measure_event", "pass", language + "_native_lproj", null)
             return localized.path
         }
 
         val fallback = File(path, "en.lproj")
 
         if (fallback.exists() && fallback.isDirectory) {
-            tracker.trackEvent("measure_event", "pass", "en_lproj", null)
             return fallback.path
         }
 

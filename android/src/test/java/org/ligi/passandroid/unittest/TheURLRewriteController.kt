@@ -3,13 +3,11 @@ package org.ligi.passandroid.unittest
 import androidx.core.net.toUri
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.ui.quirk_fix.URLRewriteController
-import org.mockito.Mockito.mock
 
 class TheURLRewriteController {
 
-    private val tested = URLRewriteController(mock(Tracker::class.java))
+    private val tested = URLRewriteController()
 
     @Test
     fun testAppSpotRewrite() {

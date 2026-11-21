@@ -9,10 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.ligi.passandroid.R
-import org.ligi.passandroid.Tracker
 import java.io.File
 
 /**
@@ -21,9 +18,8 @@ import java.io.File
 internal class PassExportTaskAndShare(
         private val activity: AppCompatActivity,
         private val inputPath: File
-) : KoinComponent {
+) {
 
-    private val tracker: Tracker by inject()
 
     @UiThread
     fun execute() {
@@ -44,7 +40,6 @@ internal class PassExportTaskAndShare(
 
             val exception = passExporter.exception
             if (exception != null) {
-                tracker.trackException("passExporterException", exception, false)
                 val reason = exception.localizedMessage ?: exception.javaClass.simpleName
                 Toast.makeText(activity, activity.getString(R.string.pass_export_error, reason), Toast.LENGTH_LONG).show()
             } else {

@@ -1,12 +1,11 @@
 package org.ligi.passandroid.model
 
-import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.model.pass.PassField
 import org.ligi.passandroid.model.pass.PassImpl
 import org.threeten.bp.DateTimeException
 import org.threeten.bp.ZonedDateTime
 
-class ApplePassbookQuirkCorrector(val tracker: Tracker) {
+class ApplePassbookQuirkCorrector {
 
     fun correctQuirks(pass: PassImpl) {
         // Vendor specific fixes
@@ -36,7 +35,6 @@ class ApplePassbookQuirkCorrector(val tracker: Tracker) {
             }.firstOrNull { it != null }
 
             if (foundDate != null) {
-                tracker.trackEvent("quirk_fix", "find_date", "find_date", 0L)
                 pass.calendarTimespan = PassImpl.TimeSpan(from = foundDate)
             }
         }
@@ -58,13 +56,11 @@ class ApplePassbookQuirkCorrector(val tracker: Tracker) {
         if (pass.creator == null || pass.creator != "RENFE OPERADORA") {
             return
         }
-        tracker.trackEvent("quirk_fix", "description_replace", "RENFE OPERADORA", 0L)
 
         val optionalDepart = getPassFieldForKey(pass, "boardingTime")
         val optionalArrive = getPassFieldForKey(pass, "destino")
 
         if (optionalDepart != null && optionalArrive != null) {
-            tracker.trackEvent("quirk_fix", "description_replace", "RENFE OPERADORA", 1L)
             pass.description = optionalDepart.label + " -> " + optionalArrive.label
         }
     }
@@ -73,13 +69,11 @@ class ApplePassbookQuirkCorrector(val tracker: Tracker) {
         if (pass.creator == null || pass.creator != "SWISS") {
             return
         }
-        tracker.trackEvent("quirk_fix", "description_replace", "SWISS", 0L)
 
         val optionalDepart = getPassFieldForKey(pass, "depart")
         val optionalArrive = getPassFieldForKey(pass, "destination")
 
         if (optionalDepart != null && optionalArrive != null) {
-            tracker.trackEvent("quirk_fix", "description_replace", "SWISS", 1L)
             pass.description = optionalDepart.value + " -> " + optionalArrive.value
         }
     }
@@ -90,13 +84,11 @@ class ApplePassbookQuirkCorrector(val tracker: Tracker) {
             return
         }
 
-        tracker.trackEvent("quirk_fix", "description_replace", "cathay_pacific", 0L)
 
         val optionalDepart = getPassFieldForKey(pass, "departure")
         val optionalArrive = getPassFieldForKey(pass, "arrival")
 
         if (optionalDepart != null && optionalArrive != null) {
-            tracker.trackEvent("quirk_fix", "description_replace", "cathay_pacific", 1L)
             pass.description = optionalDepart.label + " -> " + optionalArrive.label
         }
     }
@@ -107,13 +99,11 @@ class ApplePassbookQuirkCorrector(val tracker: Tracker) {
             return
         }
 
-        tracker.trackEvent("quirk_fix", "description_replace", "virgin_australia", 0L)
 
         val optionalDepart = getPassFieldForKey(pass, "origin")
         val optionalArrive = getPassFieldForKey(pass, "destination")
 
         if (optionalDepart != null && optionalArrive != null) {
-            tracker.trackEvent("quirk_fix", "description_replace", "virgin_australia", 1L)
             pass.description = optionalDepart.label + " -> " + optionalArrive.label
         }
     }
@@ -123,13 +113,11 @@ class ApplePassbookQuirkCorrector(val tracker: Tracker) {
             return
         }
 
-        tracker.trackEvent("quirk_fix", "description_replace", "air_canada", 0L)
 
         val optionalDepart = getPassFieldForKey(pass, "depart")
         val optionalArrive = getPassFieldForKey(pass, "arrive")
 
         if (optionalDepart != null && optionalArrive != null) {
-            tracker.trackEvent("quirk_fix", "description_replace", "air_canada", 1L)
             pass.description = optionalDepart.label + " -> " + optionalArrive.label
         }
     }
@@ -139,13 +127,11 @@ class ApplePassbookQuirkCorrector(val tracker: Tracker) {
             return
         }
 
-        tracker.trackEvent("quirk_fix", "description_replace", "usairways", 0L)
 
         val optionalDepart = getPassFieldForKey(pass, "depart")
         val optionalArrive = getPassFieldForKey(pass, "destination")
 
         if (optionalDepart != null && optionalArrive != null) {
-            tracker.trackEvent("quirk_fix", "description_replace", "usairways", 1L)
             pass.description = optionalDepart.label + " -> " + optionalArrive.label
         }
     }
@@ -155,7 +141,6 @@ class ApplePassbookQuirkCorrector(val tracker: Tracker) {
             return
         }
 
-        tracker.trackEvent("quirk_fix", "description_replace", "westbahn", 0L)
 
         val originField = getPassFieldForKey(pass, "from")
         val destinationField = getPassFieldForKey(pass, "to")
@@ -165,13 +150,11 @@ class ApplePassbookQuirkCorrector(val tracker: Tracker) {
         if (originField != null) {
             val value = originField.value
             if (value != null) {
-                tracker.trackEvent("quirk_fix", "description_replace", "westbahn", 1L)
                 description = value
             }
         }
 
         if (destinationField != null) {
-            tracker.trackEvent("quirk_fix", "description_replace", "westbahn", 2L)
             description += "->" + destinationField.value!!
         }
 
@@ -183,17 +166,14 @@ class ApplePassbookQuirkCorrector(val tracker: Tracker) {
             return
         }
 
-        tracker.trackEvent("quirk_fix", "description_replace", "tuiflight", 0L)
 
         val originField = getPassFieldForKey(pass, "Origin")
         val destinationField = getPassFieldForKey(pass, "Des")
         val seatField = getPassFieldForKey(pass, "SeatNumber")
 
         if (originField != null && destinationField != null) {
-            tracker.trackEvent("quirk_fix", "description_replace", "tuiflight", 1L)
             var description = originField.value + "->" + destinationField.value
             if (seatField != null) {
-                tracker.trackEvent("quirk_fix", "description_replace", "tuiflight", 2L)
                 description += " @" + seatField.value!!
             }
             pass.description = description
@@ -217,7 +197,6 @@ class ApplePassbookQuirkCorrector(val tracker: Tracker) {
         val boardingGroupField = getPassFieldForKey(pass, "boardingGroup")
 
         if (flightField != null && seatField != null && boardingGroupField != null) {
-            tracker.trackEvent("quirk_fix", "description_replace", "air_berlin", 0L)
             var description = flightField.label + " " + flightField.value
             description += " | " + seatField.label + " " + seatField.value
             description += " | " + boardingGroupField.label + " " + boardingGroupField.value

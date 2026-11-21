@@ -10,7 +10,6 @@ import okio.buffer
 import okio.sink
 import okio.source
 import org.ligi.passandroid.BuildConfig
-import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.model.pass.PassVisualClassifier
@@ -29,7 +28,6 @@ class AndroidFileSystemPassStore(
         private val context: Context,
         settings: Settings,
         private val moshi: Moshi,
-        private val tracker: Tracker,
         private val language: () -> String,
 ) : PassStore {
 
@@ -94,12 +92,11 @@ class AndroidFileSystemPassStore(
             try {
                 result = jsonAdapter.fromJson(file.source().buffer())
             } catch (ignored: JsonDataException) {
-                tracker.trackException("invalid main.json", false)
             }
         }
 
         if (result == null && File(pathForID, "pass.json").exists()) {
-            result = AppleStylePassReader.read(pathForID, language, context, tracker)
+            result = AppleStylePassReader.read(pathForID, language, context)
         }
 
         if (result != null) {
