@@ -72,7 +72,7 @@ open class PassViewActivityBase : PassAndroidActivity() {
             return
         }
 
-        val pass = passStore.getPassbookForId(uuid)
+        val pass = passStore.getPass(uuid)
         if (pass == null) {
             finish()
             return

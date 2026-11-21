@@ -45,7 +45,7 @@ class PassListFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                passStore.updateChannel.collect {
+                passStore.changes.collect {
                     refreshPassList()
                 }
             }

@@ -56,7 +56,7 @@ class ImageOrPdfImport(private val context: Context, private val passStore: Pass
 
     /** stores [pass] as active pass; [writeStrip] writes the picture it shows (strip.png) */
     private fun storePassShowing(pass: Pass, writeStrip: (File) -> Unit): String {
-        val passDir = passStore.getPathForID(pass.id)
+        val passDir = passStore.directoryOf(pass.id)
         passDir.mkdirs()
         writeStrip(File(passDir, "strip.png"))
 

@@ -12,7 +12,7 @@ import org.ligi.passandroid.model.Settings
 fun autoGroupImportedPasses(passStore: PassStore, settings: Settings, importedIds: List<String>): Int {
     if (!settings.isGroupingEnabled()) return 0
 
-    val importedPasses = importedIds.distinct().mapNotNull { passStore.getPassbookForId(it) }
+    val importedPasses = importedIds.distinct().mapNotNull { passStore.getPass(it) }
     val activePasses = passStore.archive.passesIn(ArchiveState.ACTIVE)
 
     val changed = PassGroups.autoGroup(importedPasses, activePasses)

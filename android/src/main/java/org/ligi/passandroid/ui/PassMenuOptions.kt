@@ -41,7 +41,7 @@ class PassMenuOptions(val activity: AppCompatActivity, val pass: Pass) : KoinCom
             }
 
             R.id.menu_share -> {
-                PassExportTaskAndShare(activity, passStore.getPathForID(pass.id)).execute()
+                PassExportTaskAndShare(activity, passStore.directoryOf(pass.id)).execute()
                 return true
             }
 

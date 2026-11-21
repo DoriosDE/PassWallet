@@ -205,7 +205,7 @@ class PassViewFragment : Fragment() {
         arguments?.takeIf { it.containsKey(PassViewActivityBase.EXTRA_KEY_UUID) }?.apply {
             val uuid = getString(PassViewActivityBase.EXTRA_KEY_UUID)
             pass = if (uuid != null) {
-                passStore.getPassbookForId(uuid) ?: passStore.currentPass
+                passStore.getPass(uuid) ?: passStore.currentPass
             } else {
                 passStore.currentPass
             } ?: return rootView

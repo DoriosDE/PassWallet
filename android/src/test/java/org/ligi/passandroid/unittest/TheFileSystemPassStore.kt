@@ -33,7 +33,7 @@ class TheFileSystemPassStore {
     /** how many change notifications [store] sends while [action] runs - several quick ones may be merged into one */
     private fun countNotifications(store: PassStore, action: () -> Unit): Int = runBlocking {
         var count = 0
-        val collector = launch(start = CoroutineStart.UNDISPATCHED) { store.updateChannel.collect { count++ } }
+        val collector = launch(start = CoroutineStart.UNDISPATCHED) { store.changes.collect { count++ } }
         action()
         yield()
         collector.cancel()
@@ -61,7 +61,7 @@ class TheFileSystemPassStore {
         val store = newStore()
         store.save(pass("p1", "Concert"))
 
-        assertThat(countNotifications(store) { store.deletePassWithId("p1") }).isEqualTo(1)
+        assertThat(countNotifications(store) { store.delete("p1") }).isEqualTo(1)
     }
 
     @Test
@@ -70,7 +70,7 @@ class TheFileSystemPassStore {
         val store = newStore()
 
         val notifications = countNotifications(store) {
-            assertThat(store.getPassbookForId("p1")!!.visualType).isEqualTo(PassVisualType.DEFAULT)
+            assertThat(store.getPass("p1")!!.visualType).isEqualTo(PassVisualType.DEFAULT)
         }
 
         assertThat(notifications).isZero()
@@ -84,7 +84,7 @@ class TheFileSystemPassStore {
         store.archive.setState(saved, ArchiveState.ARCHIVED)
 
         val restarted = newStore()
-        val loaded = restarted.getPassbookForId("p1")
+        val loaded = restarted.getPass("p1")
 
         assertThat(loaded).isNotNull
         assertThat(loaded!!.description).isEqualTo("Concert")
@@ -102,12 +102,12 @@ class TheFileSystemPassStore {
         store.archive.setState(kept, ArchiveState.ARCHIVED)
         store.archive.setState(deleted, ArchiveState.ARCHIVED)
 
-        assertThat(store.deletePassWithId("deleted")).isTrue()
+        assertThat(store.delete("deleted")).isTrue()
 
-        assertThat(store.getPassbookForId("deleted")).isNull()
+        assertThat(store.getPass("deleted")).isNull()
         assertThat(store.archive.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("kept")
         val restarted = newStore()
-        assertThat(restarted.getPassbookForId("deleted")).isNull()
+        assertThat(restarted.getPass("deleted")).isNull()
         assertThat(restarted.archive.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("kept")
     }
 
@@ -115,13 +115,13 @@ class TheFileSystemPassStore {
     fun reloadReadsPassAgainAfterItsFilesWereReplaced() {
         val store = newStore()
         store.save(pass("p1", "Old version"))
-        assertThat(store.getPassbookForId("p1")!!.description).isEqualTo("Old version")
+        assertThat(store.getPass("p1")!!.description).isEqualTo("Old version")
 
         // files replaced behind the store's back - as a pass update does
         newStore().save(pass("p1", "New version"))
 
         assertThat(store.reload("p1")!!.description).isEqualTo("New version")
-        assertThat(store.getPassbookForId("p1")!!.description).isEqualTo("New version")
+        assertThat(store.getPass("p1")!!.description).isEqualTo("New version")
     }
 
     @Test
@@ -131,7 +131,7 @@ class TheFileSystemPassStore {
         File(settings.getPassesDir(), "p1").deleteRecursively()
 
         assertThat(store.reload("p1")).isNull()
-        assertThat(store.getPassbookForId("p1")).isNull()
+        assertThat(store.getPass("p1")).isNull()
     }
 
     @Test
@@ -154,7 +154,7 @@ class TheFileSystemPassStore {
 
         store.reloadAll()
 
-        assertThat(store.getPassbookForId("both")!!.description).isEqualTo("Backup version")
+        assertThat(store.getPass("both")!!.description).isEqualTo("Backup version")
         assertThat(store.archive.passesIn(ArchiveState.ARCHIVED).map { it.id })
             .containsOnly("device-only", "both", "restored")
         assertThat(store.archive.passesIn(ArchiveState.ACTIVE)).isEmpty()
@@ -196,8 +196,8 @@ class TheFileSystemPassStore {
 
         val restarted = newStore()
 
-        assertThat(restarted.getPassbookForId("ungrouped")!!.grouping).isEqualTo(PassGrouping.UngroupedByUser)
-        assertThat(restarted.getPassbookForId("single")!!.grouping).isEqualTo(PassGrouping.None)
+        assertThat(restarted.getPass("ungrouped")!!.grouping).isEqualTo(PassGrouping.UngroupedByUser)
+        assertThat(restarted.getPass("single")!!.grouping).isEqualTo(PassGrouping.None)
     }
 
     @Test
@@ -213,7 +213,7 @@ class TheFileSystemPassStore {
 
         assertThat(updated!!.description).isEqualTo("New")
         assertThat(updated.grouping).isEqualTo(PassGrouping.InGroup("stack"))
-        assertThat(store.getPassbookForId("old-id")).isNull()
-        assertThat(newStore().getPassbookForId("new-id")!!.grouping).isEqualTo(PassGrouping.InGroup("stack"))
+        assertThat(store.getPass("old-id")).isNull()
+        assertThat(newStore().getPass("new-id")!!.grouping).isEqualTo(PassGrouping.InGroup("stack"))
     }
 }

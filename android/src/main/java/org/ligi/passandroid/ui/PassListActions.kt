@@ -36,7 +36,7 @@ fun Activity.confirmAndDeletePasses(passStore: PassStore, passes: List<Pass>, on
         message = resources.getQuantityString(R.plurals.delete_passes_dialog_message, passes.size, passes.size),
         confirmTextRes = R.string.menu_delete_permanently
     ) {
-        passes.forEach { passStore.deletePassWithId(it.id) }
+        passes.forEach { passStore.delete(it.id) }
         onDeleted()
     }
 }

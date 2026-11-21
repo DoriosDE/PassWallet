@@ -1,6 +1,6 @@
 package org.ligi.passandroid.backup
 
-import org.ligi.passandroid.model.AndroidFileSystemPassStore.Companion.ARCHIVE_STATE_FILE
+import org.ligi.passandroid.model.FileSystemPassStore.Companion.ARCHIVE_STATE_FILE
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.InputStream

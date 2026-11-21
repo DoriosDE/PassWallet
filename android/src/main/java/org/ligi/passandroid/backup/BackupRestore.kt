@@ -62,7 +62,7 @@ object BackupRestore {
         if (removePassesNotInBackup) {
             passStore.archive.knownPassIds
                 .filterNot { it in backupIds }
-                .forEach { passStore.deletePassWithId(it) }
+                .forEach { passStore.delete(it) }
         }
     }
 }

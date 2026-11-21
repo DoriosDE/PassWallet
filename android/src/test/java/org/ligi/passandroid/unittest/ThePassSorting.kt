@@ -9,7 +9,7 @@ import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.PassStoreProjection
-import org.ligi.passandroid.model.PassStoreUpdateEvent
+import org.ligi.passandroid.model.PassStoreChange
 import org.ligi.passandroid.model.comparator.PassSortOrder
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassImpl
@@ -85,7 +85,7 @@ class ThePassSorting {
     }
 
     private class ProjectionTestPassStore(private val passesById: Map<String, Pass>) : PassStore {
-        override val updateChannel: SharedFlow<PassStoreUpdateEvent> = MutableSharedFlow()
+        override val changes: SharedFlow<PassStoreChange> = MutableSharedFlow()
         override var currentPass: Pass? = null
         override val archive = PassArchive(
             passesById.keys.associateWith { ArchiveState.ACTIVE.storedValue }.toMutableMap(),
@@ -93,11 +93,11 @@ class ThePassSorting {
         )
 
         override fun save(pass: Pass) = Unit
-        override fun getPassbookForId(id: String): Pass? = passesById[id]
+        override fun getPass(id: String): Pass? = passesById[id]
         override fun reload(id: String): Pass? = passesById[id]
         override fun reloadAll() = Unit
-        override fun deletePassWithId(id: String): Boolean = false
-        override fun getPathForID(id: String): File = File(id)
+        override fun delete(id: String): Boolean = false
+        override fun directoryOf(id: String): File = File(id)
         override fun syncArchiveWithStorage() = Unit
     }
 }

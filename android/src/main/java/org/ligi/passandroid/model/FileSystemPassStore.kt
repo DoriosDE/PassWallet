@@ -16,27 +16,25 @@ import org.ligi.passandroid.model.pass.PassVisualClassifier
 import org.ligi.passandroid.reader.AppleStylePassReader
 import java.io.File
 
-object PassStoreUpdateEvent
-
 /**
  * Stores every pass in its own directory below [Settings.getPassesDir] (main.json plus images / the original pass files).
  *
  * @param context only used when a Passbook pass is read for the first time (translated field labels)
  * @param language language of the device, used to pick the translation when a Passbook pass is read
  */
-class AndroidFileSystemPassStore(
+class FileSystemPassStore(
         private val context: Context,
         settings: Settings,
         private val moshi: Moshi,
         private val language: () -> String,
 ) : PassStore {
 
-    private val mutableUpdateChannel = MutableSharedFlow<PassStoreUpdateEvent>(
+    private val mutableChanges = MutableSharedFlow<PassStoreChange>(
         replay = 0,
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
-    override val updateChannel = mutableUpdateChannel.asSharedFlow()
+    override val changes = mutableChanges.asSharedFlow()
 
     private val path: File = settings.getPassesDir()
 
@@ -59,13 +57,13 @@ class AndroidFileSystemPassStore(
     private fun write(pass: Pass) {
         val jsonAdapter = moshi.adapter(PassImpl::class.java)
 
-        val pathForID = getPathForID(pass.id)
+        val passDirectory = directoryOf(pass.id)
 
-        if (!pathForID.exists()) {
-            pathForID.mkdirs()
+        if (!passDirectory.exists()) {
+            passDirectory.mkdirs()
         }
 
-        val buffer = File(pathForID, "main.json").sink().buffer()
+        val buffer = File(passDirectory, "main.json").sink().buffer()
 
         if (BuildConfig.DEBUG) {
             val of = com.squareup.moshi.JsonWriter.of(buffer)
@@ -82,14 +80,14 @@ class AndroidFileSystemPassStore(
     }
 
     private fun readPass(id: String): Pass? {
-        val pathForID = getPathForID(id)
+        val passDirectory = directoryOf(id)
         val language = language()
 
-        if (!pathForID.exists() || !pathForID.isDirectory) {
+        if (!passDirectory.exists() || !passDirectory.isDirectory) {
             return null
         }
 
-        val file = File(pathForID, "main.json")
+        val file = File(passDirectory, "main.json")
         var result: Pass? = null
         var dirty = true
         if (file.exists()) {
@@ -101,8 +99,8 @@ class AndroidFileSystemPassStore(
             }
         }
 
-        if (result == null && File(pathForID, "pass.json").exists()) {
-            result = AppleStylePassReader.read(pathForID, language, context)
+        if (result == null && File(passDirectory, "pass.json").exists()) {
+            result = AppleStylePassReader.read(passDirectory, language, context)
         }
 
         if (result != null) {
@@ -127,7 +125,7 @@ class AndroidFileSystemPassStore(
         return true
     }
 
-    override fun getPassbookForId(id: String): Pass? {
+    override fun getPass(id: String): Pass? {
         return passMap[id] ?: readPass(id)
     }
 
@@ -143,8 +141,8 @@ class AndroidFileSystemPassStore(
         notifyChange()
     }
 
-    override fun deletePassWithId(id: String): Boolean {
-        val result = getPathForID(id).deleteRecursively()
+    override fun delete(id: String): Boolean {
+        val result = directoryOf(id).deleteRecursively()
         if (result) {
             passMap.remove(id)
             archive.removePass(id)
@@ -153,16 +151,16 @@ class AndroidFileSystemPassStore(
         return result
     }
 
-    override fun getPathForID(id: String): File {
+    override fun directoryOf(id: String): File {
         return File(path, id)
     }
 
     private fun notifyChange() {
-        mutableUpdateChannel.tryEmit(PassStoreUpdateEvent)
+        mutableChanges.tryEmit(PassStoreChange)
     }
 
     override fun syncArchiveWithStorage() {
-        val existingPassIds = path.listFiles()?.map { it.name }?.filter { getPassbookForId(it) != null }.orEmpty()
+        val existingPassIds = path.listFiles()?.map { it.name }?.filter { getPass(it) != null }.orEmpty()
         archive.syncWith(existingPassIds)
     }
 

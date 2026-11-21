@@ -19,7 +19,7 @@ class ThePassArchive {
     private val passes = listOf("a", "b", "c").associateWith { PassImpl(it) as Pass }
 
     private val passStore = mock(PassStore::class.java).apply {
-        `when`(getPassbookForId(anyString())).thenAnswer { passes[it.arguments[0]] }
+        `when`(getPass(anyString())).thenAnswer { passes[it.arguments[0]] }
     }
 
     private var changes = 0

@@ -17,7 +17,7 @@ class ImageEditHelper(private val context: Activity, private val passStore: Pass
         val pass = passStore.currentPass
         if (extractedFile != null && pass != null && extractedFile.exists()) {
             try {
-                val destinationFile = File(passStore.getPathForID(pass.id), name + PassImpl.FILETYPE_IMAGES)
+                val destinationFile = File(passStore.directoryOf(pass.id), name + PassImpl.FILETYPE_IMAGES)
                 destinationFile.delete()
                 extractedFile.copyTo(destinationFile)
             } catch (e: IOException) {

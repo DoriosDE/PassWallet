@@ -28,7 +28,7 @@ fun createAndAddEmptyPass(passStore: PassStore, resources: Resources, type: Pass
         ?: Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
 
     try {
-        FileOutputStream(File(passStore.getPathForID(pass.id), PassBitmapDefinitions.BITMAP_ICON + ".png")).use { outputStream ->
+        FileOutputStream(File(passStore.directoryOf(pass.id), PassBitmapDefinitions.BITMAP_ICON + ".png")).use { outputStream ->
             bitmap.compress(Bitmap.CompressFormat.PNG, 90, outputStream)
         }
     } catch (ignored: FileNotFoundException) {

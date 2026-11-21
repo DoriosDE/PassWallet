@@ -122,7 +122,7 @@ class PassListActivity : PassAndroidActivity() {
 
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                passStore.updateChannel.collect {
+                passStore.changes.collect {
                     binding.root.post {
                         if (!isFinishing && !isDestroyed) {
                             refresh()
@@ -163,7 +163,7 @@ class PassListActivity : PassAndroidActivity() {
                 confirmTextRes = R.string.empty_archive_label
             ) {
                 for (pass in archivedPasses) {
-                    passStore.deletePassWithId(pass.id)
+                    passStore.delete(pass.id)
                 }
             }
             true

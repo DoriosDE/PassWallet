@@ -59,9 +59,9 @@ class TheBackupRestore {
             restorePreferences = {},
         )
 
-        assertThat(store.getPassbookForId("device-only")).isNull()
+        assertThat(store.getPass("device-only")).isNull()
         assertThat(File(device.settings.getPassesDir(), "device-only")).doesNotExist()
-        assertThat(store.getPassbookForId("both")!!.description).isEqualTo("Backup version")
+        assertThat(store.getPass("both")!!.description).isEqualTo("Backup version")
         assertThat(store.archive.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("both")
         assertThat(store.archive.passesIn(ArchiveState.ACTIVE).map { it.id }).containsExactly("restored")
     }
@@ -99,6 +99,6 @@ class TheBackupRestore {
             // expected
         }
 
-        assertThat(store.getPassbookForId("device-only")).isNotNull
+        assertThat(store.getPass("device-only")).isNotNull
     }
 }

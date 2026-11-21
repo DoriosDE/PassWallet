@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.model.PassStore
-import org.ligi.passandroid.model.PassStoreUpdateEvent
+import org.ligi.passandroid.model.PassStoreChange
 import org.ligi.passandroid.model.pass.Pass
 import java.io.File
 
@@ -39,7 +39,7 @@ class FixedPassListPassStore(private var passes: List<Pass>) : PassStore {
         return hashMap
     }
 
-    override fun getPassbookForId(id: String): Pass? {
+    override fun getPass(id: String): Pass? {
         return passMap[id]
     }
 
@@ -48,15 +48,15 @@ class FixedPassListPassStore(private var passes: List<Pass>) : PassStore {
 
     override fun reloadAll() = Unit
 
-    override fun deletePassWithId(id: String): Boolean {
+    override fun delete(id: String): Boolean {
         return false
     }
 
-    override fun getPathForID(id: String): File {
+    override fun directoryOf(id: String): File {
         return File("")
     }
 
-    override val updateChannel: SharedFlow<PassStoreUpdateEvent> = MutableSharedFlow(
+    override val changes: SharedFlow<PassStoreChange> = MutableSharedFlow(
         replay = 0,
         extraBufferCapacity = 1,
         onBufferOverflow = BufferOverflow.DROP_OLDEST,

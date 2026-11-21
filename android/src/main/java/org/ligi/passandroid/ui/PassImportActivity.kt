@@ -49,7 +49,7 @@ class PassImportActivity : AppCompatActivity() {
     /** imported passes become active and are stacked with matching passes - returns how many were grouped */
     private fun takeOverImportedPasses(passIds: List<String>): Int {
         if (passIds.isEmpty()) return 0
-        passStore.archive.setState(passIds.mapNotNull { passStore.getPassbookForId(it) }, ArchiveState.ACTIVE)
+        passStore.archive.setState(passIds.mapNotNull { passStore.getPass(it) }, ArchiveState.ACTIVE)
         return autoGroupImportedPasses(passStore, settings, passIds)
     }
 
@@ -79,7 +79,7 @@ class PassImportActivity : AppCompatActivity() {
             finish()
         } else if (outcome.passIds.size == 1) {
             val importedId = outcome.passIds.first()
-            passStore.currentPass = passStore.getPassbookForId(importedId)
+            passStore.currentPass = passStore.getPass(importedId)
             startActivity(
                 Intent(this, PassViewActivity::class.java)
                     .putExtra(PassViewActivityBase.EXTRA_KEY_UUID, importedId)

@@ -84,7 +84,7 @@ class PassEditActivity : AppCompatActivity() {
         }
 
         val passFromIntent = intent.getStringExtra(PassViewActivityBase.EXTRA_KEY_UUID)
-            ?.let { passStore.getPassbookForId(it) as? PassImpl }
+            ?.let { passStore.getPass(it) as? PassImpl }
         val currentPass = passFromIntent ?: passStore.currentPass as? PassImpl
         if (currentPass != null) {
             this.currentPass = currentPass

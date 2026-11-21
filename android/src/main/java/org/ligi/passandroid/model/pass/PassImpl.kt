@@ -78,7 +78,7 @@ class PassImpl(override val id: String) : Pass {
 
     override fun getBitmap(passStore: PassStore, @Pass.PassBitmap passBitmap: String): Bitmap? {
         return try {
-            val file = File(passStore.getPathForID(id), passBitmap + FILETYPE_IMAGES)
+            val file = File(passStore.directoryOf(id), passBitmap + FILETYPE_IMAGES)
             BitmapFactory.decodeStream(FileInputStream(file))
         } catch (expectedInSomeCases_willJustReturnNull: FileNotFoundException) {
             null
@@ -89,7 +89,7 @@ class PassImpl(override val id: String) : Pass {
     }
 
     override fun getSource(passStore: PassStore): String? {
-        val file = File(passStore.getPathForID(id), "source.txt")
+        val file = File(passStore.directoryOf(id), "source.txt")
 
         if (file.exists()) {
             return file.bufferedReader().readText()

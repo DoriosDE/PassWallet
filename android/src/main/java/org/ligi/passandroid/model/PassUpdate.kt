@@ -10,7 +10,7 @@ import org.ligi.passandroid.model.pass.Pass
 fun PassStore.applyUpdate(previous: Pass, updatedPassId: String): Pass? {
     val previousGrouping = previous.grouping
     if (previous.id != updatedPassId) {
-        deletePassWithId(previous.id)
+        delete(previous.id)
     }
     val updated = reload(updatedPassId) ?: return null
     if (PassGroups.keepGroupingAfterUpdate(previousGrouping, updated)) {

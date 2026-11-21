@@ -35,7 +35,7 @@ open class PassArchive(
     fun passesIn(state: ArchiveState): List<Pass> = stateById
         .filterValues { ArchiveState.fromStoredValue(it) == state }
         .keys
-        .mapNotNull { passStore.getPassbookForId(it) }
+        .mapNotNull { passStore.getPass(it) }
 
     /** moves the passes to [state] - written and announced once for all of them */
     fun setState(passes: Collection<Pass>, state: ArchiveState) {
