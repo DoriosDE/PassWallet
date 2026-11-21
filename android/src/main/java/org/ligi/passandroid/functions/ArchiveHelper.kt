@@ -2,6 +2,7 @@ package org.ligi.passandroid.functions
 
 import android.app.Activity
 import android.view.View
+import androidx.core.view.isVisible
 import com.google.android.material.snackbar.Snackbar
 import org.ligi.passandroid.R
 import org.ligi.passandroid.model.ArchiveState
@@ -11,8 +12,10 @@ import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.ui.showDestructiveConfirmationDialog
 
 fun Activity.showPassListSnackbar(message: CharSequence, undo: (() -> Unit)? = null) {
-    val anchor: View = findViewById(R.id.fam) ?: findViewById(android.R.id.content)
-    Snackbar.make(anchor, message, Snackbar.LENGTH_LONG).apply {
+    val plusButton: View? = findViewById(R.id.fam)
+    Snackbar.make(plusButton ?: findViewById(android.R.id.content), message, Snackbar.LENGTH_LONG).apply {
+        // shown above the plus button, so it never covers it
+        if (plusButton?.isVisible == true) anchorView = plusButton
         undo?.let { setAction(R.string.undo) { it() } }
     }.show()
 }
