@@ -37,20 +37,14 @@
 
         <activity
             android:name=".ui.passlist.PassListActivity"
-            android:exported="false"
-            android:theme="@style/AppThemeNoActionbar" />
-
-        <!-- keeps the old name of the launcher activity, so icons on home screens stay valid -->
-        <activity-alias
-            android:name=".ui.PassListActivity"
             android:exported="true"
-            android:targetActivity=".ui.passlist.PassListActivity">
+            android:theme="@style/AppThemeNoActionbar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity-alias>
+        </activity>
 
         <activity
             android:name=".ui.settings.PreferenceActivity"
@@ -201,12 +195,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".ui.passlist.PassListActivity" />
         </activity>
-
-        <!-- keeps the old name of the pass view, so pass shortcuts pinned to home screens stay valid -->
-        <activity-alias
-            android:name=".ui.PassViewActivity"
-            android:exported="false"
-            android:targetActivity=".ui.passview.PassViewActivity" />
 
         <activity
             android:name=".ui.scan.ScanBarcodeActivity"
