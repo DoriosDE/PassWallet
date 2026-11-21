@@ -27,6 +27,7 @@ import org.ligi.passandroid.model.Settings
 import org.ligi.passandroid.ui.passlist.PassListActivity
 import org.ligi.passandroid.ui.passview.PassViewActivity
 import org.ligi.passandroid.ui.passview.SinglePassActivity
+import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
 class PassImportActivity : AppCompatActivity() {
 
@@ -83,10 +84,9 @@ class PassImportActivity : AppCompatActivity() {
             finish()
         } else if (outcome.passIds.size == 1) {
             val importedId = outcome.passIds.first()
-            passStore.currentPass = passStore.getPass(importedId)
             startActivity(
                 Intent(this, PassViewActivity::class.java)
-                    .putExtra(SinglePassActivity.EXTRA_KEY_UUID, importedId)
+                    .putExtra(EXTRA_PASS_ID, importedId)
             )
         } else {
             startActivityFromClass(PassListActivity::class.java)

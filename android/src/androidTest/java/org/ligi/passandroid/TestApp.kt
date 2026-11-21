@@ -15,6 +15,9 @@ import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import java.io.File
 import java.util.*
+import org.ligi.passandroid.ui.EXTRA_PASS_ID
+import androidx.test.platform.app.InstrumentationRegistry
+import android.content.Intent
 
 class TestApp : App() {
 
@@ -35,7 +38,8 @@ class TestApp : App() {
             `when`(doTraceDroidEmailSend()).thenReturn(false)
         }
 
-        fun populatePassStoreWithSinglePass() {
+        /** stores one pass (with description and barcode) as the only pass and returns it */
+        fun populatePassStoreWithSinglePass(): PassImpl {
 
             val passList = ArrayList<Pass>()
             val pass = PassImpl(UUID.randomUUID().toString())
@@ -46,7 +50,18 @@ class TestApp : App() {
             fixedPassListPassStore().setList(passList)
 
             passStore.archive.setState(pass, ArchiveState.ACTIVE)
+            return pass
         }
+
+        /** stores [pass] as the only pass */
+        fun setSinglePass(pass: Pass) {
+            fixedPassListPassStore().setList(listOf(pass))
+            passStore.archive.setState(pass, ArchiveState.ACTIVE)
+        }
+
+        /** an intent to open [activity] for [pass] */
+        fun intentFor(activity: Class<*>, pass: Pass): Intent =
+            Intent(InstrumentationRegistry.getInstrumentation().targetContext, activity).putExtra(EXTRA_PASS_ID, pass.id)
 
         fun emptyPassStore() {
             fixedPassListPassStore().setList(emptyList())

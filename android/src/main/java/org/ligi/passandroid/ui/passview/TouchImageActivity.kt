@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import org.koin.android.ext.android.inject
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.ui.views.ZoomImageView
+import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
 class TouchImageActivity : AppCompatActivity() {
 
@@ -18,9 +19,8 @@ class TouchImageActivity : AppCompatActivity() {
 
         setContentView(touchImageView)
 
-        val bitmap = intent.getStringExtra("IMAGE")?.let { image_from_extra ->
-            passStore.currentPass?.getBitmap(passStore, image_from_extra)
-        }
+        val pass = intent.getStringExtra(EXTRA_PASS_ID)?.let { passStore.getPass(it) }
+        val bitmap = intent.getStringExtra(EXTRA_IMAGE)?.let { image -> pass?.getBitmap(passStore, image) }
 
         if (bitmap == null) {
             finish()
@@ -37,5 +37,10 @@ class TouchImageActivity : AppCompatActivity() {
             true
         }
         else -> super.onOptionsItemSelected(item)
+    }
+
+    companion object {
+        /** which picture of the pass to show, e.g. [org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_STRIP] */
+        const val EXTRA_IMAGE = "image"
     }
 }

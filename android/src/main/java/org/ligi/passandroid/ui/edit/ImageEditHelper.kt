@@ -12,10 +12,9 @@ import java.io.IOException
 
 class ImageEditHelper(private val context: Activity, private val passStore: PassStore) {
 
-    fun importImage(uri: Uri, @Pass.PassBitmap name: String) {
+    fun importImage(pass: Pass, uri: Uri, @Pass.PassBitmap name: String) {
         val extractedFile = uri.loadImage(context)
-        val pass = passStore.currentPass
-        if (extractedFile != null && pass != null && extractedFile.exists()) {
+        if (extractedFile != null && extractedFile.exists()) {
             try {
                 val destinationFile = File(passStore.directoryOf(pass.id), name + PassImpl.FILETYPE_IMAGES)
                 destinationFile.delete()

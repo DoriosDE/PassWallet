@@ -21,17 +21,26 @@ import org.ligi.passandroid.model.pass.PassType.COUPON
 import org.ligi.passandroid.model.pass.PassType.EVENT
 import org.ligi.passandroid.ui.edit.PassEditActivity
 import org.ligi.trulesk.TruleskIntentRule
+import org.junit.Before
+import org.ligi.passandroid.model.pass.Pass
 
 @TargetApi(14)
 class ThePassEditActivity {
 
     val passStore = TestApp.passStore
 
+    private lateinit var pass: Pass
+
     @get:Rule
-    var rule = TruleskIntentRule(PassEditActivity::class.java) {
-        TestApp.populatePassStoreWithSinglePass()
+    var rule = TruleskIntentRule(PassEditActivity::class.java, false) {
         TestButler.grantPermission(InstrumentationRegistry.getInstrumentation().targetContext, Manifest.permission.READ_EXTERNAL_STORAGE)
         TestButler.grantPermission(InstrumentationRegistry.getInstrumentation().targetContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    }
+
+    @Before
+    fun before() {
+        pass = TestApp.populatePassStoreWithSinglePass()
+        rule.launchActivity(TestApp.intentFor(PassEditActivity::class.java, pass))
     }
 
     @Test
@@ -40,7 +49,7 @@ class ThePassEditActivity {
 
         onView(withText(R.string.select_category_dialog_title)).perform(click())
         onView(withText(R.string.category_event)).perform(click())
-        assertThat(passStore.currentPass!!.type).isEqualTo(EVENT)
+        assertThat(pass.type).isEqualTo(EVENT)
 
         rule.screenShot("edit_set_event")
     }
@@ -51,7 +60,7 @@ class ThePassEditActivity {
 
         onView(withText(R.string.select_category_dialog_title)).perform(click())
         onView(withText(R.string.category_coupon)).perform(click())
-        assertThat(passStore.currentPass!!.type).isEqualTo(COUPON)
+        assertThat(pass.type).isEqualTo(COUPON)
 
         rule.screenShot("edit_set_coupon")
     }
@@ -60,7 +69,7 @@ class ThePassEditActivity {
     fun testSetDescriptionWorks() {
 
         onView(withId(R.id.passTitle)).perform(clearText(), replaceText("test description"))
-        assertThat(passStore.currentPass!!.description).isEqualTo("test description")
+        assertThat(pass.description).isEqualTo("test description")
 
         rule.screenShot("edit_set_description")
     }

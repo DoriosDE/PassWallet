@@ -29,11 +29,12 @@ import org.ligi.passandroid.model.pass.PassVisualClassifier
 import org.ligi.passandroid.model.pass.PassVisualType
 import org.ligi.passandroid.ui.BarcodePanel
 import org.ligi.passandroid.ui.showBitmapOrHide
+import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
 internal const val LINKIFY_MASK = Linkify.WEB_URLS or Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS
 
 /**
- * One page of the pass view, showing the pass whose id is in the arguments ([SinglePassActivity.EXTRA_KEY_UUID]).
+ * One page of the pass view, showing the pass whose id is in the arguments ([EXTRA_PASS_ID]).
  * The subclasses lay out the pass - [forPass] picks the one that fits.
  */
 abstract class PassPageFragment : Fragment() {
@@ -47,14 +48,7 @@ abstract class PassPageFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater.inflate(R.layout.activity_pass_view_page, container, false)
-        arguments?.takeIf { it.containsKey(SinglePassActivity.EXTRA_KEY_UUID) }?.apply {
-            val uuid = getString(SinglePassActivity.EXTRA_KEY_UUID)
-            pass = if (uuid != null) {
-                passStore.getPass(uuid) ?: passStore.currentPass
-            } else {
-                passStore.currentPass
-            } ?: return rootView
-        }
+        arguments?.getString(EXTRA_PASS_ID)?.let { passStore.getPass(it) }?.let { pass = it }
         return rootView
     }
 
@@ -95,9 +89,8 @@ abstract class PassPageFragment : Fragment() {
     /** shows the barcode and opens it in fullscreen when tapped */
     protected fun showBarcode(root: View) {
         val openFullscreenBarcode = View.OnClickListener { view ->
-            passStore.currentPass = pass
             val intent = Intent(view.context, FullscreenBarcodeActivity::class.java)
-            intent.putExtra(SinglePassActivity.EXTRA_KEY_UUID, pass.id)
+            intent.putExtra(EXTRA_PASS_ID, pass.id)
             startActivity(intent)
         }
         root.findViewById<View>(R.id.barcode_img).setOnClickListener(openFullscreenBarcode)
@@ -125,7 +118,8 @@ abstract class PassPageFragment : Fragment() {
         if (bitmap != null && bitmap.width > 300) {
             view.setOnClickListener {
                 val intent = Intent(view.context, TouchImageActivity::class.java)
-                intent.putExtra("IMAGE", name)
+                    .putExtra(EXTRA_PASS_ID, pass.id)
+                    .putExtra(TouchImageActivity.EXTRA_IMAGE, name)
                 startActivity(intent)
             }
         } else {
@@ -174,7 +168,7 @@ abstract class PassPageFragment : Fragment() {
                     else -> GenericPassFragment()
                 }
             }
-            fragment.arguments = bundleOf(SinglePassActivity.EXTRA_KEY_UUID to pass.id)
+            fragment.arguments = bundleOf(EXTRA_PASS_ID to pass.id)
             return fragment
         }
     }

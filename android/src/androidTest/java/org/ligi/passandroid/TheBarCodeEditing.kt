@@ -35,9 +35,7 @@ class TheBarCodeEditing {
     private lateinit var currentPass: PassImpl
 
     private fun start(setupPass: (pass: PassImpl) -> Unit = {}) {
-        TestApp.populatePassStoreWithSinglePass()
-
-        currentPass = passStore.currentPass as PassImpl
+        currentPass = TestApp.populatePassStoreWithSinglePass()
 
         setupPass(currentPass)
 
@@ -45,7 +43,7 @@ class TheBarCodeEditing {
         TestButler.grantPermission(ApplicationProvider.getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
         TestButler.grantPermission(ApplicationProvider.getApplicationContext(), Manifest.permission.CAMERA)
 
-        rule.launchActivity(null)
+        rule.launchActivity(TestApp.intentFor(PassEditActivity::class.java, currentPass))
         closeSoftKeyboard()
     }
 
@@ -111,7 +109,7 @@ class TheBarCodeEditing {
 
         onView(withText(R.string.edit_barcode_dialog_title)).check(doesNotExist())
 
-        assertThat(passStore.currentPass!!.barCode!!.message).isEqualTo("msg foo txt ;-)")
+        assertThat(currentPass.barCode!!.message).isEqualTo("msg foo txt ;-)")
         rule.screenShot("edit_set_msg")
     }
 
@@ -130,7 +128,7 @@ class TheBarCodeEditing {
 
         onView(withText(R.string.edit_barcode_dialog_title)).check(doesNotExist())
 
-        assertThat(passStore.currentPass!!.barCode!!.alternativeText).isEqualTo("alt bar txt ;-)")
+        assertThat(currentPass.barCode!!.alternativeText).isEqualTo("alt bar txt ;-)")
         rule.screenShot("edit_set_altmsg")
     }
 

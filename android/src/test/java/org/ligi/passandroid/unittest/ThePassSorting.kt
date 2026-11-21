@@ -98,7 +98,6 @@ class ThePassSorting {
 
     private class ProjectionTestPassStore(private val passesById: Map<String, Pass>) : PassStore {
         override val changes: SharedFlow<PassStoreChange> = MutableSharedFlow()
-        override var currentPass: Pass? = null
         override val archive = PassArchive(
             passesById.keys.associateWith { ArchiveState.ACTIVE.storedValue }.toMutableMap(),
             this,

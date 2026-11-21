@@ -21,7 +21,6 @@ fun createAndAddEmptyPass(passStore: PassStore, resources: Resources, type: Pass
     pass.description = resources.getString(R.string.new_pass_default_title)
     pass.type = type
 
-    passStore.currentPass = pass
     passStore.save(pass)
 
     val bitmap = BitmapFactory.decodeResource(resources, R.mipmap.ic_launcher_foreground)

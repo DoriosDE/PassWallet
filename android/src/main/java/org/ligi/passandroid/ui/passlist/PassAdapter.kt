@@ -23,6 +23,7 @@ import org.ligi.passandroid.ui.viewholder.PassListCardViewHolder
 import org.ligi.passandroid.ui.rendering.PassRenderers
 import org.ligi.passandroid.ui.passview.PassViewActivity
 import org.ligi.passandroid.ui.passview.SinglePassActivity
+import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
 class PassAdapter(
         private val passListActivity: AppCompatActivity,
@@ -168,9 +169,8 @@ class PassAdapter(
     )
 
     private fun openPass(pass: Pass) {
-        passStore.currentPass = pass
         val intent = Intent(passListActivity, PassViewActivity::class.java)
-            .putExtra(SinglePassActivity.EXTRA_KEY_UUID, pass.id)
+            .putExtra(EXTRA_PASS_ID, pass.id)
         passListActivity.startActivity(intent)
     }
 

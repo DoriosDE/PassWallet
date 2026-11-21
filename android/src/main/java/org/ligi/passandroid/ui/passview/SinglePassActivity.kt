@@ -25,9 +25,10 @@ import org.ligi.passandroid.ui.PassWalletActivity
 import org.ligi.passandroid.ui.createProgressDialog
 import org.ligi.passandroid.ui.passimport.showImportErrorDialog
 import org.ligi.passandroid.ui.dismissSafely
+import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
 /**
- * Base of the screens that show one pass, given by its id in [EXTRA_KEY_UUID]: the pass menu
+ * Base of the screens that show one pass, given by its id in [EXTRA_PASS_ID]: the pass menu
  * (archive, delete, share, edit, print, update, shortcut) and full brightness while a pass is shown.
  */
 @SuppressLint("Registered")
@@ -67,7 +68,7 @@ open class SinglePassActivity : PassWalletActivity() {
     }
 
     private fun updateCurrentPass() {
-        val uuid = intent.getStringExtra(EXTRA_KEY_UUID)
+        val uuid = intent.getStringExtra(EXTRA_PASS_ID)
 
         if (uuid == null) {
             finish()
@@ -80,7 +81,6 @@ open class SinglePassActivity : PassWalletActivity() {
             return
         }
 
-        passStore.currentPass = pass
         currentPass = pass
     }
 
@@ -150,7 +150,7 @@ open class SinglePassActivity : PassWalletActivity() {
 
         val targetIntent = Intent(this, PassViewActivity::class.java)
             .setAction(Intent.ACTION_MAIN)
-            .putExtra(EXTRA_KEY_UUID, currentPass.id)
+            .putExtra(EXTRA_PASS_ID, currentPass.id)
         val shortcutInfo = ShortcutInfoCompat.Builder(this, "shortcut$name")
             .setIntent(targetIntent)
             .setShortLabel(name)
@@ -187,7 +187,6 @@ open class SinglePassActivity : PassWalletActivity() {
             )
             is PassUpdater.Outcome.Imported -> {
                 outcome.updatedPass?.let { updatedPass ->
-                    passStore.currentPass = updatedPass
                     currentPass = updatedPass
                     refresh()
                     Snackbar.make(window.decorView, R.string.pass_updated, Snackbar.LENGTH_LONG).show()
@@ -217,7 +216,5 @@ open class SinglePassActivity : PassWalletActivity() {
     }
 
     companion object {
-
-        const val EXTRA_KEY_UUID = "uuid"
     }
 }

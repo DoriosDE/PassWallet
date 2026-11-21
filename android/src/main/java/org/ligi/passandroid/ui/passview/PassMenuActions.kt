@@ -15,6 +15,7 @@ import org.ligi.passandroid.printing.printPass
 import org.ligi.passandroid.share.sharePass
 import org.ligi.passandroid.ui.edit.PassEditActivity
 import org.ligi.passandroid.ui.passlist.confirmAndDeletePasses
+import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
 class PassMenuActions(val activity: AppCompatActivity, val pass: Pass) : KoinComponent {
 
@@ -49,10 +50,9 @@ class PassMenuActions(val activity: AppCompatActivity, val pass: Pass) : KoinCom
             }
 
             R.id.menu_edit -> {
-                passStore.currentPass = pass
                 activity.startActivity(
                     Intent(activity, PassEditActivity::class.java)
-                        .putExtra(SinglePassActivity.EXTRA_KEY_UUID, pass.id)
+                        .putExtra(EXTRA_PASS_ID, pass.id)
                 )
                 return true
             }

@@ -37,8 +37,6 @@ interface PassStore {
     /** the directory with the files of the pass (main.json, pictures, original pass files) */
     fun directoryOf(id: String): File
 
-    var currentPass: Pass?
-
     /** notifies listeners of the store when the archive state of passes changes */
     val archive: PassArchive
 

@@ -13,14 +13,20 @@ import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.ui.edit.PassEditActivity
 import org.ligi.trulesk.TruleskIntentRule
 import java.util.*
+import org.junit.Before
 
 class TheFieldListEditFragment {
 
     @get:Rule
-    val rule = TruleskIntentRule(PassEditActivity::class.java) {
-        TestApp.passStore.currentPass = PassImpl(UUID.randomUUID().toString()).apply {
+    val rule = TruleskIntentRule(PassEditActivity::class.java, false)
+
+    @Before
+    fun before() {
+        val pass = PassImpl(UUID.randomUUID().toString()).apply {
             fields = arrayListOf(field)
         }
+        TestApp.setSinglePass(pass)
+        rule.launchActivity(TestApp.intentFor(PassEditActivity::class.java, pass))
     }
 
     private val field: PassField = PassField(null, "labelfieldcontent", "valuefieldcontent", false)

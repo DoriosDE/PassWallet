@@ -32,6 +32,7 @@ import org.ligi.passandroid.ui.edit.PassEditActivity
 import org.ligi.passandroid.ui.passimport.PassImportActivity
 import org.ligi.passandroid.ui.settings.PreferenceActivity
 import org.ligi.passandroid.ui.showDestructiveConfirmationDialog
+import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
 class PassListActivity : PassWalletActivity() {
 
@@ -112,9 +113,8 @@ class PassListActivity : PassWalletActivity() {
             val pass = createAndAddEmptyPass(passStore, resources)
 
             setFabMenuExpanded(false)
-            startActivityFromClass(PassEditActivity::class.java)
-
             passStore.archive.setState(pass, ArchiveState.ACTIVE)
+            startActivity(Intent(this, PassEditActivity::class.java).putExtra(EXTRA_PASS_ID, pass.id))
         }
 
         binding.fabActionImport.setOnClickListener {

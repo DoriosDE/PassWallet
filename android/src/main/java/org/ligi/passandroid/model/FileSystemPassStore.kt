@@ -41,8 +41,6 @@ class FileSystemPassStore(
     /** passes read so far - files are only read once, see [reload] / [reloadAll] after changes on disk */
     private val passMap = HashMap<String, Pass>()
 
-    override var currentPass: Pass? = null
-
     override val archive: PassArchive by lazy {
         val archiveStateFile = File(settings.getStateDir(), ARCHIVE_STATE_FILE)
         FileBackedPassArchive(archiveStateFile, this, moshi, ::notifyChange)

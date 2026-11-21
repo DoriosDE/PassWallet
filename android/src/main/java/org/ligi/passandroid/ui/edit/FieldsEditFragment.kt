@@ -14,13 +14,14 @@ import org.ligi.passandroid.databinding.EditFieldsBinding
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.PassField
 import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
 
 class FieldsEditFragment : Fragment() {
 
     val passStore by inject<PassStore>()
 
-    private fun getPass(): PassImpl = passStore.currentPass as PassImpl
+    private fun getPass(): PassImpl = passStore.getPass(requireArguments().getString(EXTRA_PASS_ID)!!) as PassImpl
 
     private var isEditingHiddenFields: Boolean = false
 
@@ -83,9 +84,9 @@ class FieldsEditFragment : Fragment() {
 
         private const val ARGUMENT_KEY = "KEY"
 
-        fun create(primary: Boolean): FieldsEditFragment {
+        fun create(passId: String, primary: Boolean): FieldsEditFragment {
             val fieldsEditFragment = FieldsEditFragment()
-            fieldsEditFragment.arguments = bundleOf(ARGUMENT_KEY to primary)
+            fieldsEditFragment.arguments = bundleOf(EXTRA_PASS_ID to passId, ARGUMENT_KEY to primary)
             return fieldsEditFragment
         }
     }

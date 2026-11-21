@@ -31,6 +31,7 @@ import org.ligi.passandroid.ui.BarcodePanel
 import org.ligi.passandroid.ui.applyMaterialInsets
 import org.ligi.passandroid.ui.passview.SinglePassActivity
 import org.ligi.passandroid.ui.showBitmapOrHide
+import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
 class PassEditActivity : AppCompatActivity() {
 
@@ -43,7 +44,7 @@ class PassEditActivity : AppCompatActivity() {
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
         val imageName = pendingImageName
         if (uri != null && imageName != null) {
-            imageEditHelper.importImage(uri, imageName)
+            imageEditHelper.importImage(currentPass, uri, imageName)
             refresh(currentPass)
         }
         pendingImageName = null
@@ -84,22 +85,18 @@ class PassEditActivity : AppCompatActivity() {
             currentPass.description = "$it"
         }
 
-        val passFromIntent = intent.getStringExtra(SinglePassActivity.EXTRA_KEY_UUID)
-            ?.let { passStore.getPass(it) as? PassImpl }
-        val currentPass = passFromIntent ?: passStore.currentPass as? PassImpl
-        if (currentPass != null) {
-            this.currentPass = currentPass
-            passStore.currentPass = currentPass
-        } else {
+        val passFromIntent = intent.getStringExtra(EXTRA_PASS_ID)?.let { passStore.getPass(it) as? PassImpl }
+        if (passFromIntent == null) {
             finish()
             return
         }
+        currentPass = passFromIntent
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         supportFragmentManager.commit {
-            add(R.id.container_for_primary_fields, FieldsEditFragment.create(false))
-            add(R.id.container_for_secondary_fields, FieldsEditFragment.create(true))
+            add(R.id.container_for_primary_fields, FieldsEditFragment.create(currentPass.id, false))
+            add(R.id.container_for_secondary_fields, FieldsEditFragment.create(currentPass.id, true))
         }
 
         binding.addBarcodeButton.setOnClickListener {

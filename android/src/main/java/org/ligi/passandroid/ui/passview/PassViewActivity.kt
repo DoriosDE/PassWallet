@@ -67,7 +67,6 @@ class PassViewActivity : SinglePassActivity() {
         viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
             override fun onPageSelected(pos: Int) {
                 currentPass = pagerAdapter.getPass(pos)
-                passStore.currentPass = currentPass
                 updateGroupPositionSubtitle()
             }
         })

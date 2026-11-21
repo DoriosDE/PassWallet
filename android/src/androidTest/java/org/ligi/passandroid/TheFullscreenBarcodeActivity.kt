@@ -69,9 +69,9 @@ class TheFullscreenBarcodeActivity {
         val pass = PassImpl(UUID.randomUUID().toString())
         pass.barCode = BarCode(format, BARCODE_MESSAGE)
 
-        TestApp.passStore.currentPass = pass
+        TestApp.setSinglePass(pass)
 
-        rule.launchActivity(null)
+        rule.launchActivity(TestApp.intentFor(FullscreenBarcodeActivity::class.java, pass))
         onView(withId(R.id.fullscreen_barcode)).check(matches(isDisplayed()))
 
         val viewById = rule.activity.findViewById(R.id.fullscreen_barcode) as ImageView

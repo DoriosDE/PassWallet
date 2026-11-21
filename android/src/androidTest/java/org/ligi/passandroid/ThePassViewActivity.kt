@@ -22,19 +22,21 @@ import java.util.ArrayList
 @TargetApi(14)
 class ThePassViewActivity {
 
-    private fun getActPass() = TestApp.passStore.currentPass as PassImpl
+    private lateinit var pass: PassImpl
+
+    private fun getActPass() = pass
 
     @get:Rule
     var rule = TruleskActivityRule(PassViewActivity::class.java, false)
 
     @Before
     fun before() {
-        TestApp.populatePassStoreWithSinglePass()
+        pass = TestApp.populatePassStoreWithSinglePass()
     }
 
     @Test
     fun testPassDetailCardIsThere() {
-        rule.launchActivity(null)
+        rule.launchActivity(TestApp.intentFor(PassViewActivity::class.java, pass))
 
         onView(withId(R.id.pass_card)).check(matches(isDisplayed()))
         onView(withId(R.id.passExtrasContainer)).check(matches(isDisplayed()))
@@ -42,7 +44,7 @@ class ThePassViewActivity {
 
     @Test
     fun testListHeaderIsNotRenderedInPassDetail() {
-        rule.launchActivity(null)
+        rule.launchActivity(TestApp.intentFor(PassViewActivity::class.java, pass))
 
         onView(withId(R.id.pass_top)).check(doesNotExist())
         onView(withId(R.id.categoryView)).check(doesNotExist())
@@ -55,7 +57,7 @@ class ThePassViewActivity {
         val locations = ArrayList<PassLocation>()
         locations.add(PassLocation())
         getActPass().locations = locations
-        rule.launchActivity(null)
+        rule.launchActivity(TestApp.intentFor(PassViewActivity::class.java, pass))
 
         onView(withId(R.id.pass_card)).check(matches(isDisplayed()))
         onView(withId(R.id.pass_top)).check(doesNotExist())
@@ -64,7 +66,7 @@ class ThePassViewActivity {
     @Test
     fun testClickOnBarcodeOpensFullscreenImage() {
         getActPass().barCode = BarCode(PassBarCodeFormat.QR_CODE, "foo")
-        rule.launchActivity(null)
+        rule.launchActivity(TestApp.intentFor(PassViewActivity::class.java, pass))
         onView(withId(R.id.barcode_img)).perform(click())
 
         onView(withId(R.id.fullscreen_barcode)).check(matches(isDisplayed()))
@@ -73,7 +75,7 @@ class ThePassViewActivity {
     @Test
     fun testZoomControlsAreThereWithBarcode() {
         getActPass().barCode = BarCode(PassBarCodeFormat.AZTEC, "foo")
-        rule.launchActivity(null)
+        rule.launchActivity(TestApp.intentFor(PassViewActivity::class.java, pass))
 
         onView(withId(R.id.zoomIn)).check(matches(isDisplayed()))
         onView(withId(R.id.zoomIn)).check(matches(isDisplayed()))
@@ -82,7 +84,7 @@ class ThePassViewActivity {
     @Test
     fun testZoomControlsAreGoneWithoutBarcode() {
         getActPass().barCode = null
-        rule.launchActivity(null)
+        rule.launchActivity(TestApp.intentFor(PassViewActivity::class.java, pass))
 
         onView(withId(R.id.zoomIn)).check(matches(not(isDisplayed())))
         onView(withId(R.id.zoomIn)).check(matches(not(isDisplayed())))

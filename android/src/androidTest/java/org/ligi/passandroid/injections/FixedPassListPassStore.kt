@@ -17,16 +17,13 @@ class FixedPassListPassStore(private var passes: List<Pass>) : PassStore {
         archive = PassArchive(HashMap(), this)
     }
 
-    fun setList(newPasses: List<Pass>, newCurrentPass: Pass? = newPasses.firstOrNull()) {
-        currentPass = newCurrentPass
+    fun setList(newPasses: List<Pass>) {
         passes = newPasses
         passMap.clear()
         passMap.putAll(createHashMap())
 
         archive = PassArchive(HashMap(), this)
     }
-
-    override var currentPass: Pass? = null
 
     private val passMap: HashMap<String, Pass> by lazy {
         return@lazy createHashMap()
