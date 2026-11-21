@@ -42,7 +42,7 @@ internal class PassActionsUI(
 
     private val pass = passes.first()
     private val isGroup = passes.size > 1
-    private val archived = passStore.classifier.isArchived(pass)
+    private val archived = passStore.archive.isArchived(pass)
 
     fun show() {
         val (dialog, container) = createSheet(
@@ -52,7 +52,7 @@ internal class PassActionsUI(
 
         if (archived) {
             container.addView(createRow(R.drawable.ic_unarchive_24, R.color.accent, context.getString(R.string.menu_restore)) {
-                restoreWithUndoSnackbar(passStore.classifier, passes, context)
+                restoreWithUndoSnackbar(passStore.archive, passes, context)
                 dialog.dismiss()
             })
             container.addView(createRow(R.drawable.ic_action_delete, R.color.danger, context.getString(R.string.menu_delete_permanently)) {
@@ -61,7 +61,7 @@ internal class PassActionsUI(
             })
         } else {
             container.addView(createRow(R.drawable.ic_archive_24, R.color.accent, context.getString(R.string.menu_archive)) {
-                archiveWithUndoSnackbar(passStore.classifier, passes, context)
+                archiveWithUndoSnackbar(passStore.archive, passes, context)
                 dialog.dismiss()
             })
         }
@@ -99,7 +99,7 @@ internal class PassActionsUI(
      * Passes already in the same group are left out.
      */
     private fun groupCandidates(): List<Pass> {
-        return passStore.classifier.passesIn(passStore.classifier.stateOf(pass)).filter { candidate ->
+        return passStore.archive.passesIn(passStore.archive.stateOf(pass)).filter { candidate ->
             candidate.id != pass.id && !(PassGroups.isGrouped(pass) && candidate.groupId == pass.groupId)
         }
     }

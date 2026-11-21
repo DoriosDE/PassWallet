@@ -50,9 +50,9 @@ class AndroidFileSystemPassStore(
 
     override var currentPass: Pass? = null
 
-    override val classifier: PassClassifier by lazy {
-        val classificationFile = File(settings.getStateDir(), "classifier_state.json")
-        FileBackedPassClassifier(classificationFile, this, moshi)
+    override val archive: PassArchive by lazy {
+        val archiveStateFile = File(settings.getStateDir(), "classifier_state.json")
+        FileBackedPassArchive(archiveStateFile, this, moshi)
     }
 
     override fun save(pass: Pass) {
@@ -179,8 +179,8 @@ class AndroidFileSystemPassStore(
 
     override fun reloadAll() {
         passMap.clear()
-        classifier.mergeFromStorage()
-        syncPassStoreWithClassifier()
+        archive.mergeFromStorage()
+        syncArchiveWithStorage()
         notifyChange()
     }
 
@@ -188,7 +188,7 @@ class AndroidFileSystemPassStore(
         val result = getPathForID(id).deleteRecursively()
         if (result) {
             passMap.remove(id)
-            classifier.removePass(id)
+            archive.removePass(id)
             notifyChange()
         }
         return result
@@ -202,8 +202,8 @@ class AndroidFileSystemPassStore(
         mutableUpdateChannel.tryEmit(PassStoreUpdateEvent)
     }
 
-    override fun syncPassStoreWithClassifier() {
+    override fun syncArchiveWithStorage() {
         val existingPassIds = path.listFiles()?.map { it.name }?.filter { getPassbookForId(it) != null }.orEmpty()
-        classifier.syncWith(existingPassIds)
+        archive.syncWith(existingPassIds)
     }
 }

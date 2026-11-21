@@ -134,7 +134,7 @@ object UnzipPassController : KoinComponent {
                     File(spec.zipFileString).copyTo(File(pathForID, "strip.png"))
 
                     spec.passStore.save(imagePass)
-                    spec.passStore.classifier.setState(imagePass, ArchiveState.ACTIVE)
+                    spec.passStore.archive.setState(imagePass, ArchiveState.ACTIVE)
                     return listOf(imagePass.id)
                 }
 
@@ -159,7 +159,7 @@ object UnzipPassController : KoinComponent {
                         pdfBitmap.compress(Bitmap.CompressFormat.PNG, 100, FileOutputStream(File(pathForID, "strip.png")))
 
                         spec.passStore.save(imagePass)
-                        spec.passStore.classifier.setState(imagePass, ArchiveState.ACTIVE)
+                        spec.passStore.archive.setState(imagePass, ArchiveState.ACTIVE)
                         return listOf(imagePass.id)
                     }
                 } catch (e: Exception) {

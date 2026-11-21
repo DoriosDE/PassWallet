@@ -3,7 +3,7 @@ package org.ligi.passandroid.unittest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.ligi.passandroid.model.ArchiveState
-import org.ligi.passandroid.model.PassClassifier
+import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassImpl
@@ -17,7 +17,7 @@ import org.mockito.Mockito.`when`
 /**
  * The archive state of passes, tested in memory.
  */
-class ThePassClassifier {
+class ThePassArchive {
 
     private val passes = listOf("a", "b", "c").associateWith { PassImpl(it) as Pass }
 
@@ -25,11 +25,11 @@ class ThePassClassifier {
         `when`(getPassbookForId(anyString())).thenAnswer { passes[it.arguments[0]] }
     }
 
-    private fun classifier(vararg stored: Pair<String, String>) = PassClassifier(mutableMapOf(*stored), passStore)
+    private fun archive(vararg stored: Pair<String, String>) = PassArchive(mutableMapOf(*stored), passStore)
 
     @Test
     fun passesAreActiveUnlessArchived() {
-        val tested = classifier("a" to "new", "b" to "archive")
+        val tested = archive("a" to "new", "b" to "archive")
 
         assertThat(tested.stateOf(passes.getValue("a"))).isEqualTo(ArchiveState.ACTIVE)
         assertThat(tested.stateOf(passes.getValue("b"))).isEqualTo(ArchiveState.ARCHIVED)
@@ -38,7 +38,7 @@ class ThePassClassifier {
 
     @Test
     fun listsPassesByState() {
-        val tested = classifier("a" to "new", "b" to "archive", "c" to "new")
+        val tested = archive("a" to "new", "b" to "archive", "c" to "new")
 
         assertThat(tested.passesIn(ArchiveState.ACTIVE).map { it.id }).containsOnly("a", "c")
         assertThat(tested.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("b")
@@ -46,7 +46,7 @@ class ThePassClassifier {
 
     @Test
     fun setsTheStateOfSeveralPassesAtOnce() {
-        val tested = classifier("a" to "new", "b" to "new", "c" to "new")
+        val tested = archive("a" to "new", "b" to "new", "c" to "new")
 
         tested.setState(listOf(passes.getValue("a"), passes.getValue("b")), ArchiveState.ARCHIVED)
 
@@ -56,7 +56,7 @@ class ThePassClassifier {
 
     @Test
     fun knowsWhichPassesItHoldsAndForgetsRemovedOnes() {
-        val tested = classifier("a" to "new", "b" to "archive")
+        val tested = archive("a" to "new", "b" to "archive")
 
         tested.removePass("a")
 
@@ -65,7 +65,7 @@ class ThePassClassifier {
 
     @Test
     fun leftoverValuesFromOldVersionsCountAsActive() {
-        val tested = classifier("a" to "trash", "b" to "Concerts", "c" to "archive")
+        val tested = archive("a" to "trash", "b" to "Concerts", "c" to "archive")
 
         assertThat(tested.passesIn(ArchiveState.ACTIVE).map { it.id }).containsOnly("a", "b")
         assertThat(tested.isArchived(passes.getValue("c"))).isTrue()
@@ -73,7 +73,7 @@ class ThePassClassifier {
 
     @Test
     fun syncForgetsGonePassesAndAddsNewOnesAsActive() {
-        val tested = classifier("a" to "archive", "gone" to "new")
+        val tested = archive("a" to "archive", "gone" to "new")
 
         tested.syncWith(listOf("a", "b"))
 
@@ -85,7 +85,7 @@ class ThePassClassifier {
 
     @Test
     fun syncWithoutChangesDoesNotAnnounceAnything() {
-        val tested = classifier("a" to "archive", "b" to "new")
+        val tested = archive("a" to "archive", "b" to "new")
 
         tested.syncWith(listOf("a", "b"))
 
@@ -94,7 +94,7 @@ class ThePassClassifier {
 
     @Test
     fun setsTheStateOfASinglePass() {
-        val tested = classifier("a" to "new")
+        val tested = archive("a" to "new")
 
         tested.setState(passes.getValue("a"), ArchiveState.ARCHIVED)
 

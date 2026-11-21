@@ -20,7 +20,7 @@ object BackupRestore {
      */
     fun passesNotInBackup(passStore: PassStore, openBackup: () -> InputStream): Set<String> {
         val backupIds = readBackupPassIds(openBackup)
-        return passStore.classifier.knownPassIds.filterNot { it in backupIds }.toSet()
+        return passStore.archive.knownPassIds.filterNot { it in backupIds }.toSet()
     }
 
     /** checks the file first, so a wrong file can never lead to removed passes */
@@ -60,7 +60,7 @@ object BackupRestore {
         passStore.reloadAll()
 
         if (removePassesNotInBackup) {
-            passStore.classifier.knownPassIds
+            passStore.archive.knownPassIds
                 .filterNot { it in backupIds }
                 .forEach { passStore.deletePassWithId(it) }
         }

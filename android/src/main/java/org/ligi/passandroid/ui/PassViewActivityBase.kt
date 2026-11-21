@@ -110,7 +110,7 @@ open class PassViewActivityBase : PassAndroidActivity() {
         val res = super.onPrepareOptionsMenu(menu)
         menu.findItem(R.id.menu_light).isVisible = !fullBrightnessSet
         menu.findItem(R.id.menu_print).isVisible = true
-        val archived = hasCurrentPass() && passStore.classifier.isArchived(currentPass)
+        val archived = hasCurrentPass() && passStore.archive.isArchived(currentPass)
         menu.findItem(R.id.menu_archive_pass).isVisible = !archived
         menu.findItem(R.id.menu_restore_pass).isVisible = archived
         menu.findItem(R.id.menu_delete).isVisible = archived

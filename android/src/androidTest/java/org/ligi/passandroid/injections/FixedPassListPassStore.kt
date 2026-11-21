@@ -3,7 +3,7 @@ package org.ligi.passandroid.injections
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
-import org.ligi.passandroid.model.PassClassifier
+import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.PassStoreUpdateEvent
 import org.ligi.passandroid.model.pass.Pass
@@ -11,10 +11,10 @@ import java.io.File
 
 class FixedPassListPassStore(private var passes: List<Pass>) : PassStore {
 
-    override lateinit var classifier: PassClassifier
+    override lateinit var archive: PassArchive
 
     init {
-        classifier = PassClassifier(HashMap(), this)
+        archive = PassArchive(HashMap(), this)
     }
 
     fun setList(newPasses: List<Pass>, newCurrentPass: Pass? = newPasses.firstOrNull()) {
@@ -23,7 +23,7 @@ class FixedPassListPassStore(private var passes: List<Pass>) : PassStore {
         passMap.clear()
         passMap.putAll(createHashMap())
 
-        classifier = PassClassifier(HashMap(), this)
+        archive = PassArchive(HashMap(), this)
     }
 
     override var currentPass: Pass? = null
@@ -70,7 +70,7 @@ class FixedPassListPassStore(private var passes: List<Pass>) : PassStore {
         // no effect in this impl
     }
 
-    override fun syncPassStoreWithClassifier() {
+    override fun syncArchiveWithStorage() {
         // no effect in this impl
     }
 

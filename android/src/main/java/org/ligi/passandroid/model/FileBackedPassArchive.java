@@ -11,12 +11,12 @@ import okio.BufferedSource;
 import okio.Okio;
 import timber.log.Timber;
 
-public class FileBackedPassClassifier extends PassClassifier {
+public class FileBackedPassArchive extends PassArchive {
 
     private final JsonAdapter<Map> adapter;
     private final File backed_file;
 
-    public FileBackedPassClassifier(final File backed_file, final PassStore passStore, final Moshi moshi) {
+    public FileBackedPassArchive(final File backed_file, final PassStore passStore, final Moshi moshi) {
         super(readStoredState(backed_file, getAdapter(moshi)), passStore);
 
         this.backed_file = backed_file;
@@ -39,7 +39,7 @@ public class FileBackedPassClassifier extends PassClassifier {
                     return stored;
                 }
             } catch (IOException | RuntimeException e) {
-                Timber.w(e, "could not read classifier state");
+                Timber.w(e, "could not read archive state");
             }
         }
 
@@ -68,7 +68,7 @@ public class FileBackedPassClassifier extends PassClassifier {
 
             return Okio.buffer(Okio.sink(backed_file));
         } catch (IOException e) {
-            Timber.w(e, "could not open classifier state for writing");
+            Timber.w(e, "could not open archive state for writing");
             return null;
         }
     }
@@ -86,7 +86,7 @@ public class FileBackedPassClassifier extends PassClassifier {
                     adapter.toJson(buffer, getStateById());
                     buffer.close();
                 } catch (IOException e) {
-                    Timber.w(e, "could not close classifier state writer");
+                    Timber.w(e, "could not close archive state writer");
                 }
             }
         }

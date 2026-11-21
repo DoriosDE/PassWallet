@@ -5,7 +5,7 @@ import org.ligi.passandroid.model.pass.Pass
 /**
  * Knows for every pass whether it is active or archived ([ArchiveState]).
  */
-open class PassClassifier(protected val stateById: MutableMap<String, String>, private val passStore: PassStore) {
+open class PassArchive(protected val stateById: MutableMap<String, String>, private val passStore: PassStore) {
 
     /** persists and announces a change - overridden to also write the state file */
     protected open fun processDataChange() {
@@ -15,7 +15,7 @@ open class PassClassifier(protected val stateById: MutableMap<String, String>, p
 
     /**
      * Takes over the stored state of the passes found in storage, keeping the state of all other passes.
-     * Nothing to do for a purely in-memory classifier.
+     * Nothing to do for a purely in-memory archive.
      */
     open fun mergeFromStorage() = Unit
 

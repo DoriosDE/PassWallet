@@ -6,7 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Before
 import org.junit.Test
 import org.ligi.passandroid.model.ArchiveState
-import org.ligi.passandroid.model.PassClassifier
+import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.PassStoreProjection
 import org.ligi.passandroid.model.PassStoreUpdateEvent
@@ -87,7 +87,7 @@ class ThePassSorting {
     private class ProjectionTestPassStore(private val passesById: Map<String, Pass>) : PassStore {
         override val updateChannel: SharedFlow<PassStoreUpdateEvent> = MutableSharedFlow()
         override var currentPass: Pass? = null
-        override val classifier = PassClassifier(
+        override val archive = PassArchive(
             passesById.keys.associateWith { ArchiveState.ACTIVE.storedValue }.toMutableMap(),
             this,
         )
@@ -99,6 +99,6 @@ class ThePassSorting {
         override fun deletePassWithId(id: String): Boolean = false
         override fun getPathForID(id: String): File = File(id)
         override fun notifyChange() = Unit
-        override fun syncPassStoreWithClassifier() = Unit
+        override fun syncArchiveWithStorage() = Unit
     }
 }

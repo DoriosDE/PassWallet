@@ -47,7 +47,7 @@ class TestApp : App() {
 
             fixedPassListPassStore().setList(passList)
 
-            passStore.classifier.setState(pass, ArchiveState.ACTIVE)
+            passStore.archive.setState(pass, ArchiveState.ACTIVE)
         }
 
         fun emptyPassStore() {

@@ -53,7 +53,7 @@ class PassStoreProjection(
 
     fun refresh(passSortOrder: PassSortOrder? = this.passSortOrder) {
         this.passSortOrder = passSortOrder
-        val newPassList = passStore.classifier.passesIn(state)
+        val newPassList = passStore.archive.passesIn(state)
         if (passSortOrder != null) {
             Collections.sort(newPassList, passSortOrder.toComparator())
         }

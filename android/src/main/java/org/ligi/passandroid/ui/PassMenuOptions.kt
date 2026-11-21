@@ -26,7 +26,7 @@ class PassMenuOptions(val activity: Activity, val pass: Pass) : KoinComponent {
 
             R.id.menu_archive_pass -> {
                 tracker.trackEvent("ui_action", "archive", "archive", null)
-                setArchived(passStore.classifier, listOf(pass), true)
+                setArchived(passStore.archive, listOf(pass), true)
                 Toast.makeText(activity, activity.resources.getQuantityString(R.plurals.passes_archived, 1, 1), Toast.LENGTH_SHORT).show()
                 closePassView()
                 return true
@@ -34,7 +34,7 @@ class PassMenuOptions(val activity: Activity, val pass: Pass) : KoinComponent {
 
             R.id.menu_restore_pass -> {
                 tracker.trackEvent("ui_action", "restore", "restore", null)
-                setArchived(passStore.classifier, listOf(pass), false)
+                setArchived(passStore.archive, listOf(pass), false)
                 Toast.makeText(activity, activity.resources.getQuantityString(R.plurals.passes_restored, 1, 1), Toast.LENGTH_SHORT).show()
                 closePassView()
                 return true

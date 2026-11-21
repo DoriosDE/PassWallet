@@ -101,7 +101,7 @@ class PassListActivity : PassAndroidActivity() {
             }
         }
 
-        passStore.syncPassStoreWithClassifier()
+        passStore.syncArchiveWithStorage()
 
         refresh()
 
@@ -111,7 +111,7 @@ class PassListActivity : PassAndroidActivity() {
             setFabMenuExpanded(false)
             startActivityFromClass(PassEditActivity::class.java)
 
-            passStore.classifier.setState(pass, ArchiveState.ACTIVE)
+            passStore.archive.setState(pass, ArchiveState.ACTIVE)
         }
 
         binding.fabActionImport.setOnClickListener {
@@ -141,7 +141,7 @@ class PassListActivity : PassAndroidActivity() {
         binding.emptyView.visibility = if (currentPasses().isEmpty()) VISIBLE else GONE
     }
 
-    private fun currentPasses() = passStore.classifier.passesIn(listState)
+    private fun currentPasses() = passStore.archive.passesIn(listState)
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.menu_settings -> {

@@ -29,8 +29,8 @@ class ThePassListLongPress {
 
         onView(withText(R.string.menu_archive)).perform(click())
 
-        assertThat(TestApp.passStore.classifier.passesIn(ArchiveState.ARCHIVED)).hasSize(1)
-        assertThat(TestApp.passStore.classifier.passesIn(ArchiveState.ACTIVE)).isEmpty()
+        assertThat(TestApp.passStore.archive.passesIn(ArchiveState.ARCHIVED)).hasSize(1)
+        assertThat(TestApp.passStore.archive.passesIn(ArchiveState.ACTIVE)).isEmpty()
     }
 
     @Test

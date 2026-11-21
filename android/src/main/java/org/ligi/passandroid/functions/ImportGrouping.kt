@@ -13,7 +13,7 @@ fun autoGroupImportedPasses(passStore: PassStore, settings: Settings, importedId
     if (!settings.isGroupingEnabled()) return 0
 
     val importedPasses = importedIds.distinct().mapNotNull { passStore.getPassbookForId(it) }
-    val activePasses = passStore.classifier.passesIn(ArchiveState.ACTIVE)
+    val activePasses = passStore.archive.passesIn(ArchiveState.ACTIVE)
 
     val changed = PassGroups.autoGroup(importedPasses, activePasses)
     if (changed.isEmpty()) return 0

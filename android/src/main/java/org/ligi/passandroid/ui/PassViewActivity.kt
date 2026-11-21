@@ -49,10 +49,10 @@ class PassViewActivity : PassViewActivityBase() {
             content = findViewById(R.id.pager),
         )
 
-        val state = passStore.classifier.stateOf(currentPass)
+        val state = passStore.archive.stateOf(currentPass)
         // grouped passes: swiping only switches between the passes of the same group
         val groupFilter = if (settings.isGroupingEnabled()) {
-            PassGroupFilter.forPass(currentPass, passStore.classifier.passesIn(state))
+            PassGroupFilter.forPass(currentPass, passStore.archive.passesIn(state))
         } else {
             PassGroupFilter.All
         }

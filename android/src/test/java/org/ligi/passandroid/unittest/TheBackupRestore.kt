@@ -26,8 +26,8 @@ class TheBackupRestore {
         val restored = pass("restored", "Restored")
         store.save(both)
         store.save(restored)
-        store.classifier.setState(both, ArchiveState.ARCHIVED)
-        store.classifier.setState(restored, ArchiveState.ACTIVE)
+        store.archive.setState(both, ArchiveState.ARCHIVED)
+        store.archive.setState(restored, ArchiveState.ACTIVE)
 
         val archive = ByteArrayOutputStream()
         BackupArchive.exportBackup(
@@ -48,7 +48,7 @@ class TheBackupRestore {
         val deviceOnly = pass("device-only", "Device only")
         store.save(deviceOnly)
         store.save(pass("both", "Device version"))
-        store.classifier.setState(deviceOnly, ArchiveState.ACTIVE)
+        store.archive.setState(deviceOnly, ArchiveState.ACTIVE)
         val backup = backup()
 
         BackupRestore.restore(
@@ -62,8 +62,8 @@ class TheBackupRestore {
         assertThat(store.getPassbookForId("device-only")).isNull()
         assertThat(File(device.settings.getPassesDir(), "device-only")).doesNotExist()
         assertThat(store.getPassbookForId("both")!!.description).isEqualTo("Backup version")
-        assertThat(store.classifier.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("both")
-        assertThat(store.classifier.passesIn(ArchiveState.ACTIVE).map { it.id }).containsExactly("restored")
+        assertThat(store.archive.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("both")
+        assertThat(store.archive.passesIn(ArchiveState.ACTIVE).map { it.id }).containsExactly("restored")
     }
 
     @Test
@@ -72,7 +72,7 @@ class TheBackupRestore {
         val store = device.newStore()
         store.save(pass("device-only", "Device only"))
         store.save(pass("both", "Device version"))
-        store.syncPassStoreWithClassifier()
+        store.syncArchiveWithStorage()
         val backup = backup()
 
         assertThat(BackupRestore.passesNotInBackup(store) { ByteArrayInputStream(backup) }).containsExactly("device-only")
@@ -83,7 +83,7 @@ class TheBackupRestore {
         val device = TestPassDirectory(temporaryFolder.newFolder())
         val store = device.newStore()
         store.save(pass("device-only", "Device only"))
-        store.syncPassStoreWithClassifier()
+        store.syncArchiveWithStorage()
         val notABackup = "just some text".toByteArray()
 
         try {
