@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit
 import org.ligi.passandroid.model.InputStreamWithSource
 import org.ligi.passandroid.model.applyUpdate
 import org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_ICON
-import org.ligi.passandroid.model.State
 import org.ligi.passandroid.model.pass.Pass
 import java.io.IOException
 
@@ -53,13 +52,6 @@ open class PassViewActivityBase : PassAndroidActivity() {
         }
 
         updateCurrentPass()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        if (hasCurrentPass()) {
-            State.lastSelectedPassUUID = currentPass.id
-        }
     }
 
     override fun onResume() {
