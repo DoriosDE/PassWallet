@@ -52,7 +52,8 @@
         android:layout_marginBottom="24dp"
         android:clipToPadding="false"
         android:gravity="end"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        app:layout_behavior="org.ligi.passandroid.ui.MyShyFABBehavior">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fab_action_import"

@@ -23,7 +23,6 @@ import org.ligi.kaxt.startActivityFromClass
 import org.ligi.passandroid.R
 import org.ligi.passandroid.databinding.PassListBinding
 import org.ligi.passandroid.functions.createAndAddEmptyPass
-import org.ligi.passandroid.functions.showPassListSnackbar
 import org.ligi.passandroid.model.ArchiveState
 import org.ligi.tracedroid.TraceDroid
 import org.ligi.tracedroid.sending.sendTraceDroidStackTracesIfExist
@@ -47,7 +46,7 @@ class PassListActivity : PassAndroidActivity() {
         try {
             importPassLauncher.launch(arrayOf("*/*"))
         } catch (e: ActivityNotFoundException) {
-            showPassListSnackbar(getString(R.string.import_unavailable))
+            Snackbar.make(binding.fam, R.string.import_unavailable, Snackbar.LENGTH_LONG).show()
         }
 
     }
