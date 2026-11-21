@@ -20,7 +20,8 @@ import org.ligi.passandroid.R
 import org.ligi.passandroid.backup.BackupArchive
 import org.ligi.passandroid.databinding.ActivityImportBinding
 import org.ligi.passandroid.importer.autoGroupImportedPasses
-import org.ligi.passandroid.importer.fromURI
+import org.ligi.passandroid.importer.BackgroundImport
+import org.ligi.passandroid.importer.ImportInput
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.Settings
 
@@ -53,7 +54,7 @@ class PassImportActivity : AppCompatActivity() {
         return autoGroupImportedPasses(passStore, settings, passIds)
     }
 
-    private fun onImported(outcome: PassImportController.Outcome) {
+    private fun onImported(outcome: BackgroundImport.Outcome) {
         val groupedCount = takeOverImportedPasses(outcome.passIds)
         if (isFinishing) return
 
@@ -99,13 +100,13 @@ class PassImportActivity : AppCompatActivity() {
                     return@launch
                 }
 
-                val fromURI = fromURI(this@PassImportActivity, uri)
+                val input = ImportInput.open(this@PassImportActivity, uri)
 
                 withContext(Dispatchers.Main) {
 
                     binding.progressContainer.visibility = GONE
 
-                    if (fromURI == null) {
+                    if (input == null) {
                         showImportFailed(getString(R.string.import_error_file_message))
                     } else if (isPassWalletBackup(uri)) {
                         showImportFailed(getString(R.string.import_error_backup_message))
@@ -114,11 +115,11 @@ class PassImportActivity : AppCompatActivity() {
                         if (isFinishing) {
                             // the screen is already closing: import silently without dialogs
                             withContext(NonCancellable) {
-                                val outcome = PassImportController.import(application, passStore, fromURI)
+                                val outcome = BackgroundImport.run(application, passStore, input)
                                 takeOverImportedPasses(outcome.passIds)
                             }
                         } else {
-                            val outcome = PassImportDialog.importWithProgress(this@PassImportActivity, passStore, fromURI)
+                            val outcome = importWithProgressDialog(passStore, input)
                             if (outcome != null) {
                                 onImported(outcome)
                             }

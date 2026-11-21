@@ -5,11 +5,11 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Fail.fail
-import org.ligi.passandroid.model.InputStreamWithSource
+import org.ligi.passandroid.importer.ImportInput
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.reader.AppleStylePassReader
-import org.ligi.passandroid.ui.PassImportController
+import org.ligi.passandroid.importer.BackgroundImport
 import org.mockito.Mockito.mock
 import java.io.File
 
@@ -22,14 +22,14 @@ fun loadPassFromAsset(asset: String, callback: (pass: Pass?) -> Unit) {
 
         val instrumentation = InstrumentationRegistry.getInstrumentation()
         val inputStream = instrumentation.context.resources.assets.open(asset)
-        val inputStreamWithSource = InputStreamWithSource("none", inputStream)
+        val importInput = ImportInput("none", inputStream)
 
         val targetPath = getTestTargetPath(instrumentation.targetContext)
         val outcome = runBlocking {
-            PassImportController.import(
+            BackgroundImport.run(
                 instrumentation.targetContext,
                 mock(PassStore::class.java),
-                inputStreamWithSource,
+                importInput,
                 overwrite = true,
                 passesDir = targetPath,
             )

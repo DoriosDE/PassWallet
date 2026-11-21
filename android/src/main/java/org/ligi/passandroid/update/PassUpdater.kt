@@ -5,10 +5,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import org.ligi.passandroid.model.InputStreamWithSource
+import org.ligi.passandroid.importer.BackgroundImport
+import org.ligi.passandroid.importer.ImportInput
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
-import org.ligi.passandroid.ui.PassImportController
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
@@ -40,10 +40,10 @@ class PassUpdater(
             client.newCall(request).execute().use { response ->
                 when (val answer = UpdateResponse.of(response)) {
                     is UpdateResponse.Available -> {
-                        val imported = PassImportController.import(
+                        val imported = BackgroundImport.run(
                             context,
                             passStore,
-                            InputStreamWithSource(url, answer.body.byteStream()),
+                            ImportInput(url, answer.body.byteStream()),
                             overwrite = true,
                         )
                         // the pass store is used by the screens on the main thread - take the update over there
