@@ -1,7 +1,6 @@
 package org.ligi.passandroid.model
 
 import android.content.Context
-import androidx.core.os.ConfigurationCompat
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -10,8 +9,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import okio.buffer
 import okio.sink
 import okio.source
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import org.ligi.passandroid.BuildConfig
 import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.model.pass.BoardingTransitType
@@ -22,15 +19,22 @@ import org.ligi.passandroid.model.pass.PassVisualClassifier
 import org.ligi.passandroid.reader.AppleStylePassReader
 import org.ligi.passandroid.reader.PassReader
 import java.io.File
-import java.util.Locale
 
 object PassStoreUpdateEvent
 
+/**
+ * Stores every pass in its own directory below [Settings.getPassesDir] (main.json plus images / the original pass files).
+ *
+ * @param context only used when a Passbook pass is read for the first time (translated field labels)
+ * @param language language of the device, used to pick the translation when a Passbook pass is read
+ */
 class AndroidFileSystemPassStore(
         private val context: Context,
         settings: Settings,
-        private val moshi: Moshi
-) : PassStore, KoinComponent {
+        private val moshi: Moshi,
+        private val tracker: Tracker,
+        private val language: () -> String,
+) : PassStore {
 
     private val mutableUpdateChannel = MutableSharedFlow<PassStoreUpdateEvent>(
         replay = 0,
@@ -44,8 +48,6 @@ class AndroidFileSystemPassStore(
     override val passMap = HashMap<String, Pass>()
 
     override var currentPass: Pass? = null
-
-    private val tracker: Tracker by inject()
 
     override val classifier: PassClassifier by lazy {
         val classificationFile = File(settings.getStateDir(), "classifier_state.json")
@@ -79,8 +81,7 @@ class AndroidFileSystemPassStore(
 
     private fun readPass(id: String): Pass? {
         val pathForID = getPathForID(id)
-        val language = ConfigurationCompat.getLocales(context.resources.configuration)[0]?.language
-            ?: Locale.getDefault().language
+        val language = language()
 
         if (!pathForID.exists() || !pathForID.isDirectory) {
             return null

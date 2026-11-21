@@ -2,6 +2,7 @@ package org.ligi.passandroid
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.ConfigurationCompat
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.squareup.moshi.Moshi
 import org.koin.android.ext.koin.androidContext
@@ -16,6 +17,7 @@ import org.ligi.passandroid.model.AndroidSettings
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.Settings
 import org.ligi.tracedroid.TraceDroid
+import java.util.Locale
 
 open class App : Application() {
 
@@ -29,7 +31,11 @@ open class App : Application() {
     open fun createKoin(): Module {
 
         return module {
-            single { AndroidFileSystemPassStore(this@App, get(), moshi) as PassStore }
+            single {
+                AndroidFileSystemPassStore(this@App, get(), moshi, get()) {
+                    ConfigurationCompat.getLocales(resources.configuration)[0]?.language ?: Locale.getDefault().language
+                } as PassStore
+            }
             single { settings as Settings }
             single { createTracker(this@App) }
         }
