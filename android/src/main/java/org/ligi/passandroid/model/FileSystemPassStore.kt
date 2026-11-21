@@ -1,6 +1,5 @@
 package org.ligi.passandroid.model
 
-import android.content.Context
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.channels.BufferOverflow
@@ -12,20 +11,17 @@ import okio.source
 import org.ligi.passandroid.BuildConfig
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassVisualClassifier
-import org.ligi.passandroid.reader.PkpassReader
 import java.io.File
 
 /**
  * Stores every pass in its own directory below [Settings.getPassesDir] (main.json plus images / the original pass files).
  *
- * @param context only used when a Passbook pass is read for the first time (translated field labels)
- * @param language language of the device, used to pick the translation when a Passbook pass is read
+ * @param readPkpass reads a pass directory that only holds an extracted pkpass (no main.json yet) - see PkpassReader
  */
 class FileSystemPassStore(
-        private val context: Context,
         settings: Settings,
         private val moshi: Moshi,
-        private val language: () -> String,
+        private val readPkpass: (passDirectory: File) -> Pass?,
 ) : PassStore {
 
     private val mutableChanges = MutableSharedFlow<PassStoreChange>(
@@ -78,7 +74,6 @@ class FileSystemPassStore(
 
     private fun readPass(id: String): Pass? {
         val passDirectory = directoryOf(id)
-        val language = language()
 
         if (!passDirectory.exists() || !passDirectory.isDirectory) {
             return null
@@ -97,7 +92,7 @@ class FileSystemPassStore(
         }
 
         if (result == null && File(passDirectory, "pass.json").exists()) {
-            result = PkpassReader.read(passDirectory, language, context)
+            result = readPkpass(passDirectory)
         }
 
         if (result != null) {

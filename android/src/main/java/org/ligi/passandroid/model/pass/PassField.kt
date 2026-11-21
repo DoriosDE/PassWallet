@@ -1,7 +1,5 @@
 package org.ligi.passandroid.model.pass
 
-import android.content.res.Resources
-import androidx.annotation.StringRes
 import com.squareup.moshi.JsonClass
 
 @JsonClass(generateAdapter = true)
@@ -19,7 +17,4 @@ class PassField(var key: String?, var label: String?, var value: String?, var hi
         return "$result"
     }
 
-    companion object {
-        fun create(@StringRes label: Int, @StringRes value: Int, res: Resources, hide: Boolean = false, hint: String? = null) = PassField(null, res.getString(label), res.getString(value), hide, hint)
-    }
 }

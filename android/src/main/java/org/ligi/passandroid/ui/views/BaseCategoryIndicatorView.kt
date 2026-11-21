@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import org.ligi.passandroid.R
-import org.ligi.passandroid.model.pass.topImageRes
+import org.ligi.passandroid.ui.topImageRes
 import org.ligi.passandroid.model.pass.PassType
 
 open class BaseCategoryIndicatorView @JvmOverloads constructor(context: Context, attrs: AttributeSet, @LayoutRes val layoutRes: Int = R.layout.category_indicator_base) : LinearLayout(context, attrs) {

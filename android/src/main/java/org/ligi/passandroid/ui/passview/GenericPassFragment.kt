@@ -11,6 +11,7 @@ import androidx.core.text.util.LinkifyCompat
 import org.ligi.passandroid.R
 import org.ligi.passandroid.model.PassBitmapDefinitions
 import org.ligi.passandroid.model.pass.Pass
+import org.ligi.passandroid.ui.getBitmap
 
 
 /** the page for generic passes, coupons and vouchers: all front fields in one list */

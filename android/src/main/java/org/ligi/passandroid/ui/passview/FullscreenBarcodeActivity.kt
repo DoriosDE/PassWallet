@@ -10,6 +10,7 @@ import org.ligi.passandroid.model.pass.BarCode
 import timber.log.Timber
 import kotlin.math.max
 import kotlin.math.min
+import org.ligi.passandroid.ui.barcode.getBitmap
 
 class FullscreenBarcodeActivity : SinglePassActivity() {
 

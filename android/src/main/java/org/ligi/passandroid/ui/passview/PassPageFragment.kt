@@ -30,6 +30,7 @@ import org.ligi.passandroid.model.pass.PassVisualType
 import org.ligi.passandroid.ui.BarcodePanel
 import org.ligi.passandroid.ui.showBitmapOrHide
 import org.ligi.passandroid.ui.EXTRA_PASS_ID
+import org.ligi.passandroid.ui.getBitmap
 
 internal const val LINKIFY_MASK = Linkify.WEB_URLS or Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS
 

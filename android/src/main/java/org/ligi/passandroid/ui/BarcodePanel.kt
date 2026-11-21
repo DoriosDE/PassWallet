@@ -13,6 +13,7 @@ import org.ligi.passandroid.R
 import org.ligi.passandroid.model.pass.BarCode
 import kotlin.math.max
 import kotlin.math.min
+import org.ligi.passandroid.ui.barcode.getBitmap
 
 /**
  * Shows the barcode of a pass (or hides the barcode panel when there is none) in the views below [rootView],

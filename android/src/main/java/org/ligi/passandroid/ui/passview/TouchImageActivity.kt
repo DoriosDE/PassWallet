@@ -7,6 +7,7 @@ import org.koin.android.ext.android.inject
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.ui.views.ZoomImageView
 import org.ligi.passandroid.ui.EXTRA_PASS_ID
+import org.ligi.passandroid.ui.getBitmap
 
 class TouchImageActivity : AppCompatActivity() {
 

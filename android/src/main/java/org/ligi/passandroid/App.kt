@@ -11,7 +11,7 @@ import org.koin.core.module.Module
 import org.koin.dsl.module
 import org.ligi.passandroid.json.PassWalletMoshi
 import org.ligi.passandroid.model.FileSystemPassStore
-import org.ligi.passandroid.model.AndroidSettings
+import org.ligi.passandroid.reader.PkpassReader
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.Settings
 import org.ligi.tracedroid.TraceDroid
@@ -27,8 +27,9 @@ open class App : Application() {
 
         return module {
             single {
-                FileSystemPassStore(this@App, get(), moshi) {
-                    ConfigurationCompat.getLocales(resources.configuration)[0]?.language ?: Locale.getDefault().language
+                FileSystemPassStore(get(), moshi) { passDirectory ->
+                    val language = ConfigurationCompat.getLocales(resources.configuration)[0]?.language ?: Locale.getDefault().language
+                    PkpassReader.read(passDirectory, language, this@App)
                 } as PassStore
             }
             single { settings as Settings }

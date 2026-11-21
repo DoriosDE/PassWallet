@@ -9,7 +9,7 @@ import com.linkedin.android.testbutler.TestButler
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
-import org.ligi.passandroid.model.AndroidSettings
+import org.ligi.passandroid.AndroidSettings
 import org.ligi.passandroid.model.PassSortOrder
 import org.ligi.passandroid.ui.settings.PreferenceActivity
 import org.ligi.trulesk.TruleskActivityRule

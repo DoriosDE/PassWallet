@@ -1,9 +1,12 @@
-package org.ligi.passandroid.model
+package org.ligi.passandroid.templates
 
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import androidx.annotation.StringRes
 import org.ligi.passandroid.R
+import org.ligi.passandroid.model.PassBitmapDefinitions
+import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassField
 import org.ligi.passandroid.model.pass.PassType
@@ -40,9 +43,9 @@ fun createPassForImageImport(resources: Resources): Pass {
         description = resources.getString(R.string.image_import)
 
         fields = mutableListOf(
-                PassField.create(R.string.field_source, R.string.field_source_image, resources),
-                PassField.create(R.string.field_advice_label, R.string.field_advice_text, resources),
-                PassField.create(R.string.field_note, R.string.field_note_image, resources, true)
+                fieldOf(R.string.field_source, R.string.field_source_image, resources),
+                fieldOf(R.string.field_advice_label, R.string.field_advice_text, resources),
+                fieldOf(R.string.field_note, R.string.field_note_image, resources, true)
         )
     }
 }
@@ -52,9 +55,9 @@ fun createPassForPDFImport(resources: Resources): Pass {
         description = resources.getString(R.string.pdf_import)
 
         fields = mutableListOf(
-                PassField.create(R.string.field_source, R.string.field_source_pdf, resources),
-                PassField.create(R.string.field_advice_label, R.string.field_advice_text, resources),
-                PassField.create(R.string.field_note, R.string.field_note_pdf, resources, true)
+                fieldOf(R.string.field_source, R.string.field_source_pdf, resources),
+                fieldOf(R.string.field_advice_label, R.string.field_advice_text, resources),
+                fieldOf(R.string.field_note, R.string.field_note_pdf, resources, true)
         )
     }
 }
@@ -66,3 +69,6 @@ private fun createBasePass(): Pass {
     pass.type = PassType.EVENT
     return pass
 }
+
+private fun fieldOf(@StringRes label: Int, @StringRes value: Int, resources: Resources, hide: Boolean = false) =
+    PassField(null, resources.getString(label), resources.getString(value), hide)

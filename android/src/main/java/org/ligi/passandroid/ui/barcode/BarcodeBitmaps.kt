@@ -1,15 +1,48 @@
-package org.ligi.passandroid.model.pass
+package org.ligi.passandroid.ui.barcode
 
 import android.graphics.Bitmap
+import android.content.res.Resources
+import android.graphics.drawable.BitmapDrawable
 import androidx.core.graphics.createBitmap
+import androidx.core.graphics.drawable.toDrawable
 import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.common.BitMatrix
+import org.ligi.passandroid.model.pass.BarCode
+import org.ligi.passandroid.model.pass.PassBarCodeFormat
 import timber.log.Timber
+import java.util.WeakHashMap
 
 private const val MAX_WIDTH_1D = 1500
 private const val MAX_WIDTH_2D = 500
 private const val DEFAULT_1D_HEIGHT = 300
+
+/** the last bitmap made for a barcode, with the size it was made for */
+private class CachedBitmap(val bitmap: Bitmap, val widthPx: Int?, val heightPx: Int?)
+
+/** bitmaps are only made again when the barcode or the size changes - only used on the main thread */
+private val bitmapCache = WeakHashMap<BarCode, CachedBitmap>()
+
+/**
+ * The barcode as drawable of [widthPx] x [heightPx] (default size of the format when not given), drawn sharp
+ * (no filtering). Null without message or when the message cannot be encoded in the format.
+ */
+fun BarCode.getBitmap(resources: Resources, widthPx: Int? = null, heightPx: Int? = null): BitmapDrawable? {
+    val message = message ?: return null // no message -> no barcode
+    val barcodeFormat = format ?: PassBarCodeFormat.QR_CODE.also { Timber.w("Barcode format is null - fallback to QR") }
+
+    val bitmap = bitmapCache[this]
+        ?.takeIf { it.widthPx == widthPx && it.heightPx == heightPx }
+        ?.bitmap
+        ?: generateBarCodeBitmap(message, barcodeFormat, widthPx, heightPx)
+            ?.also { bitmapCache[this] = CachedBitmap(it, widthPx, heightPx) }
+        ?: return null
+
+    return bitmap.toDrawable(resources).apply {
+        isFilterBitmap = false
+        setAntiAlias(false)
+    }
+}
 
 fun generateBarCodeBitmap(data: String, type: PassBarCodeFormat, widthPx: Int? = null, heightPx: Int? = null): Bitmap? {
 

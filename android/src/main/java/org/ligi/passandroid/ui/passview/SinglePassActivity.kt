@@ -26,6 +26,7 @@ import org.ligi.passandroid.ui.createProgressDialog
 import org.ligi.passandroid.ui.passimport.showImportErrorDialog
 import org.ligi.passandroid.ui.dismissSafely
 import org.ligi.passandroid.ui.EXTRA_PASS_ID
+import org.ligi.passandroid.ui.getBitmap
 
 /**
  * Base of the screens that show one pass, given by its id in [EXTRA_PASS_ID]: the pass menu

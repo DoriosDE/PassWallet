@@ -1,8 +1,9 @@
-package org.ligi.passandroid.model.pass
+package org.ligi.passandroid.ui
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import org.ligi.passandroid.R
+import org.ligi.passandroid.model.pass.PassType
 
 /** the name of the pass type as shown to the user */
 @get:StringRes

@@ -18,6 +18,7 @@ import org.ligi.passandroid.ui.rendering.BoardingTransitIcon
 import org.ligi.passandroid.ui.rendering.PassRenderers
 import org.ligi.passandroid.ui.views.CategoryIndicatorViewWithIcon
 import org.threeten.bp.ZonedDateTime
+import org.ligi.passandroid.ui.getBitmap
 
 abstract class PassViewHolder(val view: CardView) : RecyclerView.ViewHolder(view) {
 

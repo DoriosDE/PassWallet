@@ -10,6 +10,7 @@ import org.ligi.passandroid.model.PassBitmapDefinitions
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.ui.rendering.PassListAppearance
+import org.ligi.passandroid.ui.getBitmap
 
 /**
  * Binds a pass to the compact wallet card of the pass list (pass_list_item.xml):

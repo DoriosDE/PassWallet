@@ -1,7 +1,5 @@
 package org.ligi.passandroid.model.pass
 
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import androidx.annotation.StringDef
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.JsonQualifier
@@ -11,11 +9,7 @@ import org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_LOGO
 import org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_STRIP
 import org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_THUMBNAIL
 import org.ligi.passandroid.model.PassGrouping
-import org.ligi.passandroid.model.PassStore
 import org.threeten.bp.ZonedDateTime
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileNotFoundException
 import java.util.*
 
 @JsonClass(generateAdapter = true)
@@ -91,27 +85,6 @@ class Pass(val id: String) {
     var foregroundColorValue: String? = null
 
     var labelColorValue: String? = null
-
-    fun getBitmap(passStore: PassStore, @PassBitmap passBitmap: String): Bitmap? {
-        return try {
-            val file = File(passStore.directoryOf(id), passBitmap + FILETYPE_IMAGES)
-            BitmapFactory.decodeStream(FileInputStream(file))
-        } catch (expectedInSomeCases_willJustReturnNull: FileNotFoundException) {
-            null
-        } catch (e: OutOfMemoryError) {
-            null
-        }
-
-    }
-
-    fun getSource(passStore: PassStore): String? {
-        val file = File(passStore.directoryOf(id), "source.txt")
-
-        if (file.exists()) {
-            return file.bufferedReader().readText()
-        }
-        return null
-    }
 
     override fun toString(): String {
         return "ID=$id"

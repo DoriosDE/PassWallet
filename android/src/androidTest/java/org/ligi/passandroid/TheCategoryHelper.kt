@@ -2,7 +2,7 @@ package org.ligi.passandroid
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import org.ligi.passandroid.model.pass.labelRes
+import org.ligi.passandroid.ui.labelRes
 import org.ligi.passandroid.model.pass.PassType
 
 class TheCategoryHelper {

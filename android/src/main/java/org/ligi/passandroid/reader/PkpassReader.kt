@@ -15,7 +15,7 @@ import org.ligi.passandroid.model.pass.PassField
 import org.ligi.passandroid.model.pass.PassLocation
 import org.ligi.passandroid.model.pass.PassType
 import org.ligi.passandroid.model.pass.PassVisualClassifier
-import org.ligi.passandroid.model.pass.labelRes
+import org.ligi.passandroid.ui.labelRes
 import org.threeten.bp.DateTimeException
 import org.threeten.bp.ZonedDateTime
 import timber.log.Timber

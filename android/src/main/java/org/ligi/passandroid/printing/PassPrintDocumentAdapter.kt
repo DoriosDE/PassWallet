@@ -15,6 +15,7 @@ import android.print.pdf.PrintedPdfDocument
 import org.ligi.passandroid.model.pass.Pass
 import java.io.FileOutputStream
 import java.io.IOException
+import org.ligi.passandroid.ui.barcode.getBitmap
 
 class PassPrintDocumentAdapter(private val context: Context, private val pass: Pass, private val jobName: String) : PrintDocumentAdapter() {
 

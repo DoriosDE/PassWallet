@@ -28,9 +28,9 @@ import org.ligi.passandroid.ui.viewholder.EditViewHolder
 import org.ligi.passandroid.ui.scan.ScanBarcodeActivity
 import org.ligi.passandroid.ui.BarcodePanel
 import org.ligi.passandroid.ui.applyMaterialInsets
-import org.ligi.passandroid.ui.passview.SinglePassActivity
 import org.ligi.passandroid.ui.showBitmapOrHide
 import org.ligi.passandroid.ui.EXTRA_PASS_ID
+import org.ligi.passandroid.ui.getBitmap
 
 class PassEditActivity : AppCompatActivity() {
 

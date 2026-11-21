@@ -8,8 +8,8 @@ import android.os.ParcelFileDescriptor
 import androidx.core.graphics.createBitmap
 import okio.buffer
 import okio.source
-import org.ligi.passandroid.model.createPassForImageImport
-import org.ligi.passandroid.model.createPassForPDFImport
+import org.ligi.passandroid.templates.createPassForImageImport
+import org.ligi.passandroid.templates.createPassForPDFImport
 import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass

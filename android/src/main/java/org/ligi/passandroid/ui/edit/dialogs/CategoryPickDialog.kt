@@ -5,14 +5,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.google.android.material.bottomsheet.BottomSheetDialog
-import org.ligi.passandroid.R
 import org.ligi.passandroid.databinding.CategoryPickSheetBinding
 import org.ligi.passandroid.databinding.ItemCategoryPickBinding
-import org.ligi.passandroid.model.pass.labelRes
+import org.ligi.passandroid.ui.labelRes
 import org.ligi.passandroid.model.PassBitmapDefinitions
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassType
+import org.ligi.passandroid.ui.getBitmap
 
 private val passTypes = arrayOf(PassType.BOARDING, PassType.EVENT, PassType.GENERIC, PassType.LOYALTY, PassType.VOUCHER, PassType.COUPON)
 
