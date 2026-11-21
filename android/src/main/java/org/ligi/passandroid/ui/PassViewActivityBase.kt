@@ -277,7 +277,7 @@ open class PassViewActivityBase : PassAndroidActivity() {
                 if (newPass == null) {
                     showImportErrorDialog(
                         title = getString(R.string.update_error_title),
-                        message = getString(R.string.update_error_invalid_message, "Updated pass was not saved"),
+                        message = getString(R.string.update_error_invalid_message, getString(R.string.update_error_not_saved)),
                     )
                     return@Runnable
                 }

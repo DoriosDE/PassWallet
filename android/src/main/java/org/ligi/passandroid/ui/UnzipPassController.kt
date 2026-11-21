@@ -5,12 +5,14 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.pdf.PdfRenderer
 import android.os.ParcelFileDescriptor
+import androidx.annotation.StringRes
 import androidx.core.graphics.createBitmap
 import okio.buffer
 import okio.source
 import org.json.JSONObject
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import org.ligi.passandroid.R
 import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.functions.createPassForImageImport
@@ -64,10 +66,10 @@ object UnzipPassController : KoinComponent {
             }
         } catch (e: ImportValidationException) {
             tracker.trackException("unsafe import rejected", e, false)
-            spec.failCallback?.fail(e.message ?: "Unsafe import rejected")
+            spec.failWith(e.messageRes)
         } catch (e: Exception) {
             tracker.trackException("problem processing InputStream", e, false)
-            spec.failCallback?.fail("problem with temp file: $e")
+            spec.failWith(R.string.import_error_read_file, e.reason())
         } finally {
             tempFile.delete()
         }
@@ -85,7 +87,7 @@ object UnzipPassController : KoinComponent {
         path.mkdirs()
 
         if (!path.exists()) {
-            spec.failCallback?.fail("Problem creating the temp dir: $path")
+            spec.failWith(R.string.import_error_temp_dir)
             return emptyList()
         }
 
@@ -95,7 +97,7 @@ object UnzipPassController : KoinComponent {
             val extractedZip = try {
                 extractZipSafely(sourceFile, path)
             } catch (e: ImportValidationException) {
-            spec.failCallback?.fail(e.message ?: "Unsafe archive")
+            spec.failWith(e.messageRes)
             return emptyList()
         }
 
@@ -109,7 +111,7 @@ object UnzipPassController : KoinComponent {
                 manifestJSON = readJSONSafely(readToString)!!
                 uuid = manifestJSON.getString("pass.json")
             } catch (e: Exception) {
-                spec.failCallback?.fail("Problem with manifest.json: $e")
+                spec.failWith(R.string.import_error_manifest, e.reason())
                 return emptyList()
             }
             espassFile.exists() -> try {
@@ -117,7 +119,7 @@ object UnzipPassController : KoinComponent {
                 manifestJSON = readJSONSafely(readToString)!!
                 uuid = manifestJSON.getString("id")
             } catch (e: Exception) {
-                spec.failCallback?.fail("Problem with manifest.json: $e")
+                spec.failWith(R.string.import_error_manifest, e.reason())
                 return emptyList()
             }
             !extractedZip -> {
@@ -164,24 +166,24 @@ object UnzipPassController : KoinComponent {
                     Timber.w(e, "could not inspect PDF import")
                 }
 
-                spec.failCallback?.fail("Pass is not espass or pkpass format :-(")
+                spec.failWith(R.string.import_error_unknown_format)
                 return emptyList()
             }
             else -> {
-                spec.failCallback?.fail("Pass archive does not contain a readable pass manifest")
+                spec.failWith(R.string.import_error_no_manifest)
                 return emptyList()
             }
         }
 
         if (!isSafePassId(uuid)) {
-            spec.failCallback?.fail("Pass archive contains an unsafe pass id")
+            spec.failWith(R.string.import_error_invalid_pass_id)
             return emptyList()
         }
 
         spec.targetPath.mkdirs()
         val renamedFile = File(spec.targetPath, uuid)
         if (!isInsideDirectory(spec.targetPath, renamedFile)) {
-            spec.failCallback?.fail("Pass archive target path is unsafe")
+            spec.failWith(R.string.import_error_unsafe_target)
             return emptyList()
         }
 
@@ -192,7 +194,7 @@ object UnzipPassController : KoinComponent {
         if (!renamedFile.exists()) {
             if (!path.renameTo(renamedFile)) {
                 path.deleteRecursively()
-                spec.failCallback?.fail("Problem moving imported pass into storage")
+                spec.failWith(R.string.import_error_store)
                 return emptyList()
             }
         } else {
@@ -221,7 +223,7 @@ object UnzipPassController : KoinComponent {
                         hasPkpass = true
                         count++
                         if (count > MAX_PKPASS_BUNDLE_ENTRIES) {
-                            throw ImportValidationException("pkpasses bundle contains too many passes")
+                            throw ImportValidationException(R.string.import_error_bundle_too_many, "pkpasses bundle contains too many passes")
                         }
                         if (!entry.name.endsWith(".pkpass", ignoreCase = true)) {
                             return false
@@ -247,7 +249,7 @@ object UnzipPassController : KoinComponent {
                 pkpassEntries.forEach { entry ->
                     entry.safeRelativeName()
                     if (entry.size > MAX_ZIP_ENTRY_BYTES) {
-                        throw ImportValidationException("pkpasses bundle contains an oversized pass")
+                        throw ImportValidationException(R.string.import_error_bundle_oversized_pass, "pkpasses bundle contains an oversized pass")
                     }
                     val tempPass = File.createTempFile("bundle-", ".pkpass", spec.context.cacheDir)
                     try {
@@ -257,7 +259,7 @@ object UnzipPassController : KoinComponent {
                             }
                         }
                         if (copiedBytes > MAX_ZIP_TOTAL_BYTES) {
-                            throw ImportValidationException("pkpasses bundle is too large")
+                            throw ImportValidationException(R.string.import_error_bundle_too_large, "pkpasses bundle is too large")
                         }
                         importedIds += processFile(FileUnzipControllerSpec(tempPass.absolutePath, spec))
                     } finally {
@@ -267,16 +269,16 @@ object UnzipPassController : KoinComponent {
             }
         } catch (e: ImportValidationException) {
             tracker.trackException("unsafe pkpasses bundle rejected", e, false)
-            spec.failCallback?.fail(e.message ?: "Unsafe pkpasses bundle")
+            spec.failWith(e.messageRes)
             return emptyList()
         } catch (e: Exception) {
             tracker.trackException("problem processing pkpasses bundle", e, false)
-            spec.failCallback?.fail("Problem with pkpasses bundle: $e")
+            spec.failWith(R.string.import_error_bundle, e.reason())
             return emptyList()
         }
 
         if (importedIds.isEmpty()) {
-            spec.failCallback?.fail("pkpasses bundle does not contain valid pkpass files")
+            spec.failWith(R.string.import_error_bundle_empty)
         }
 
         return importedIds
@@ -295,14 +297,14 @@ object UnzipPassController : KoinComponent {
                     val relativeName = entry.safeRelativeName()
                     val target = File(destination, relativeName)
                     if (!isInsideDirectory(destination, target)) {
-                        throw ImportValidationException("Archive contains an unsafe path")
+                        throw ImportValidationException(R.string.import_error_unsafe_path, "Archive contains an unsafe path")
                     }
 
                     if (entry.isDirectory) {
                         target.mkdirs()
                     } else {
                         if (entry.size > MAX_ZIP_ENTRY_BYTES) {
-                            throw ImportValidationException("Archive contains an oversized file")
+                            throw ImportValidationException(R.string.import_error_oversized_file, "Archive contains an oversized file")
                         }
                         target.parentFile?.mkdirs()
                         zip.getInputStream(entry).use { input ->
@@ -311,7 +313,7 @@ object UnzipPassController : KoinComponent {
                             }
                         }
                         if (totalBytes > MAX_ZIP_TOTAL_BYTES) {
-                            throw ImportValidationException("Archive is too large")
+                            throw ImportValidationException(R.string.import_error_archive_too_large, "Archive is too large")
                         }
                     }
                 }
@@ -326,7 +328,7 @@ object UnzipPassController : KoinComponent {
         val normalized = name.replace('\\', '/')
         val segments = normalized.split('/')
         if (normalized.isBlank() || normalized.startsWith('/') || segments.any { it == "." || it == ".." }) {
-            throw ImportValidationException("Archive contains an unsafe path")
+            throw ImportValidationException(R.string.import_error_unsafe_path, "Archive contains an unsafe path")
         }
         return normalized
     }
@@ -344,7 +346,7 @@ object UnzipPassController : KoinComponent {
         val entries = entries()
         while (entries.hasMoreElements()) {
             if (result.size >= maxEntries) {
-                throw ImportValidationException("Archive contains too many files")
+                throw ImportValidationException(R.string.import_error_too_many_files, "Archive contains too many files")
             }
             result += entries.nextElement()
         }
@@ -361,11 +363,22 @@ object UnzipPassController : KoinComponent {
             }
             totalBytes += read
             if (totalBytes > maxBytes) {
-                throw ImportValidationException("Imported file is too large")
+                throw ImportValidationException(R.string.import_error_file_too_large, "Imported file is too large")
             }
             output.write(buffer, 0, read)
         }
     }
 
-    private class ImportValidationException(message: String) : Exception(message)
+    /** shows the (translated) reason of a failed import - [args] are filled into the string resource */
+    private fun UnzipControllerSpec.failWith(@StringRes messageRes: Int, vararg args: Any) {
+        failCallback?.fail(context.getString(messageRes, *args))
+    }
+
+    /** technical detail of an exception for the error message */
+    private fun Exception.reason() = localizedMessage ?: javaClass.simpleName
+
+    /**
+     * A file rejected by the import checks. [messageRes] is shown to the user, the English [message] is tracked.
+     */
+    private class ImportValidationException(@StringRes val messageRes: Int, message: String) : Exception(message)
 }
