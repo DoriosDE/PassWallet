@@ -139,6 +139,7 @@
     <string name="backup_import_action">ZIP-Sicherung auswählen</string>
     <string name="backup_export_success">Sicherung exportiert</string>
     <string name="backup_import_success">Sicherung importiert</string>
+    <string name="pass_export_error">Pass konnte nicht exportiert werden: %s</string>
     <string name="backup_export_error">Sicherung konnte nicht exportiert werden: %s</string>
     <string name="backup_import_error">Sicherung konnte nicht importiert werden: %s</string>
     <string name="launcher_shortcut">Verknüpfung auf dem Startbildschirm</string>

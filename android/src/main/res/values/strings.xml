@@ -142,6 +142,7 @@
     <string name="backup_import_action">Choose backup ZIP</string>
     <string name="backup_export_success">Backup exported</string>
     <string name="backup_import_success">Backup imported</string>
+    <string name="pass_export_error">Could not export pass: %s</string>
     <string name="backup_export_error">Could not export backup: %s</string>
     <string name="backup_import_error">Could not import backup: %s</string>
     <string name="launcher_shortcut">Launcher shortcut</string>

@@ -132,6 +132,7 @@
     <string name="backup_import_action">Elegir ZIP de copia</string>
     <string name="backup_export_success">Copia exportada</string>
     <string name="backup_import_success">Copia importada</string>
+    <string name="pass_export_error">No se pudo exportar el pase: %s</string>
     <string name="backup_export_error">No se pudo exportar la copia: %s</string>
     <string name="backup_import_error">No se pudo importar la copia: %s</string>
     <string name="launcher_shortcut">Acceso directo</string>

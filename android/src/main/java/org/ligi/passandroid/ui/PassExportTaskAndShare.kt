@@ -37,9 +37,11 @@ internal open class PassExportTaskAndShare(
                     progressDialog.dismissSafely()
                 }
 
-                if (passExporter.exception != null) {
-                    tracker.trackException("passExporterException", passExporter.exception!!, false)
-                    Toast.makeText(activity, "could not export pass: " + passExporter.exception, Toast.LENGTH_LONG).show()
+                val exception = passExporter.exception
+                if (exception != null) {
+                    tracker.trackException("passExporterException", exception, false)
+                    val reason = exception.localizedMessage ?: exception.javaClass.simpleName
+                    Toast.makeText(activity, activity.getString(R.string.pass_export_error, reason), Toast.LENGTH_LONG).show()
                 } else {
                     val uriForFile = FileProvider.getUriForFile(activity, activity.getString(R.string.authority_fileprovider), file)
                     val it = Intent(Intent.ACTION_SEND)
