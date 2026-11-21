@@ -1,6 +1,6 @@
 package org.ligi.passandroid.ui
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.view.MenuItem
 import android.widget.Toast
@@ -15,7 +15,7 @@ import org.ligi.passandroid.model.Settings
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.printing.doPrint
 
-class PassMenuOptions(val activity: Activity, val pass: Pass) : KoinComponent {
+class PassMenuOptions(val activity: AppCompatActivity, val pass: Pass) : KoinComponent {
 
     val passStore: PassStore by inject()
     val tracker: Tracker by inject()
