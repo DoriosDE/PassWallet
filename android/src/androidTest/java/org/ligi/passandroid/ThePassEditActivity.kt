@@ -59,7 +59,8 @@ class ThePassEditActivity {
     fun testSetToCouponWorks() {
         onView(withId(R.id.categoryView)).perform(click())
 
-        // on small screens the sheet opens half way and coupon is below the visible part
+        onView(withText(R.string.select_category_dialog_title)).perform(click())
+        // on small screens the category sheet opens half way and coupon is below the visible part
         onView(withText(R.string.category_coupon)).perform(clickRowEvenIfOffScreen())
         assertThat(pass.type).isEqualTo(COUPON)
 
