@@ -43,4 +43,9 @@ class ThePkpassJson {
         assertThat(tested).isNotNull
         assertThat(tested!!.getString("message")).isEqualTo("YO!")
     }
+
+    @Test
+    fun anEmptyBarcodeListMeansNoBarcode() {
+        assertThat(JSONObject("{ \"barcodes\": [] }").getBarcodeJson()).isNull()
+    }
 }

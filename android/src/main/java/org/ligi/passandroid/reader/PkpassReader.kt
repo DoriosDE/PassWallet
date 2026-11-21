@@ -1,8 +1,6 @@
 package org.ligi.passandroid.reader
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.Color
 import org.json.JSONException
 import org.json.JSONObject
@@ -10,197 +8,78 @@ import org.ligi.kaxt.parseColor
 import org.ligi.passandroid.R
 import org.ligi.passandroid.model.PassBitmapDefinitions
 import org.ligi.passandroid.model.PassGrouping
-import org.ligi.passandroid.model.pass.*
+import org.ligi.passandroid.model.pass.BarCode
+import org.ligi.passandroid.model.pass.BoardingTransitType
+import org.ligi.passandroid.model.pass.Pass
+import org.ligi.passandroid.model.pass.PassField
+import org.ligi.passandroid.model.pass.PassLocation
+import org.ligi.passandroid.model.pass.PassType
+import org.ligi.passandroid.model.pass.PassVisualClassifier
+import org.ligi.passandroid.model.pass.labelRes
 import org.threeten.bp.DateTimeException
 import org.threeten.bp.ZonedDateTime
 import timber.log.Timber
 import java.io.File
-import java.io.FileOutputStream
+import java.io.IOException
 import java.nio.charset.Charset
-import java.util.*
 
+/**
+ * Reads an extracted pkpass (pass.json, pass.strings of the language, pictures) into a [Pass].
+ */
 object PkpassReader {
 
-    private fun applyListAppearance(pass: Pass, passJSON: JSONObject, translation: PkpassTranslation) {
-        pass.logoText = readJsonSafeAsOptional(passJSON, "logoText")?.let { translation.translate(it) }?.takeIf { it.isNotBlank() }
-        pass.foregroundColorValue = readJsonSafeAsOptional(passJSON, "foregroundColor")
-        pass.labelColorValue = readJsonSafeAsOptional(passJSON, "labelColor")
-    }
+    private val PICTURES = listOf(
+        PassBitmapDefinitions.BITMAP_ICON,
+        PassBitmapDefinitions.BITMAP_LOGO,
+        PassBitmapDefinitions.BITMAP_STRIP,
+        PassBitmapDefinitions.BITMAP_THUMBNAIL,
+        PassBitmapDefinitions.BITMAP_FOOTER,
+    )
 
-    fun read(passFile: File, language: String, context: Context): Pass? {
+    /** the pkpass field groups in the order their fields are listed - back fields are hidden */
+    private val FIELD_GROUPS = listOf("primaryFields", "headerFields", "secondaryFields", "auxiliaryFields")
+    private const val BACK_FIELDS = "backFields"
 
+    /**
+     * Reads the pass in [passDirectory] (its name is the pass id), texts in [language] where the pass is translated.
+     * Puts the best version of each picture where the pass expects it. Returns null without a readable pass.json.
+     */
+    fun read(passDirectory: File, language: String, context: Context): Pass? {
+        val localizedPath = findLocalizedPath(passDirectory, language)
         val translation = PkpassTranslation()
+        localizedPath?.let { translation.loadFromFile(File(it, "pass.strings")) }
 
-        val pass = Pass(passFile.name)
+        PICTURES.forEach { takeBestPicture(passDirectory, localizedPath, it) }
 
-        var passJSON: JSONObject? = null
-
-        val localizedPath = findLocalizedPath(passFile, language)
-
-        if (localizedPath != null) {
-            val file = File(localizedPath, "pass.strings")
-            translation.loadFromFile(file)
-        }
-
-        copyBitmapFile(passFile, localizedPath, PassBitmapDefinitions.BITMAP_ICON)
-        copyBitmapFile(passFile, localizedPath, PassBitmapDefinitions.BITMAP_LOGO)
-        copyBitmapFile(passFile, localizedPath, PassBitmapDefinitions.BITMAP_STRIP)
-        copyBitmapFile(passFile, localizedPath, PassBitmapDefinitions.BITMAP_THUMBNAIL)
-        copyBitmapFile(passFile, localizedPath, PassBitmapDefinitions.BITMAP_FOOTER)
-
-        val file = File(passFile, "pass.json")
-
-        try {
-            val plainJsonString = PkpassTranslation.readFileAsStringGuessEncoding(file)
-            passJSON = readJSONSafely(plainJsonString)
-        } catch (e: Exception) {
-            Timber.i("PassParse Exception: $e")
-        }
-
+        val passJSON = readPassJson(File(passDirectory, "pass.json"))
         if (passJSON == null) {
-            // I had got a strange passbook with UCS-2 which could not be parsed before
-            // was searching for a auto-detection, but could not find one with support for this encoding
-            // and the right license
-
-            for (charset in Charset.availableCharsets().values) {
-                try {
-                    val json = file.bufferedReader(charset).readText()
-                    passJSON = readJSONSafely(json)
-                } catch (ignored: Exception) {
-                    // we try with next charset
-                }
-
-                if (passJSON != null) {
-                    break
-                }
-            }
-        }
-
-        if (passJSON == null) {
-            Timber.w("could not load pass.json from passcode ")
+            Timber.w("could not load pass.json from pass")
             return null
         }
 
-        try {
-            val barcodeJSON = passJSON.getBarcodeJson()
-            if (barcodeJSON != null) {
-                val barcodeFormatString = barcodeJSON.getString("format")
+        val pass = Pass(passDirectory.name)
 
-                val barcodeFormat = BarCode.getFormatFromString(barcodeFormatString)
-                val barCode = BarCode(barcodeFormat, barcodeJSON.getString("message"))
-                pass.barCode = barCode
+        pass.barCode = readBarcode(passJSON)
+        readDate(passJSON, "relevantDate")?.let { pass.calendarTimespan = Pass.TimeSpan(from = it) }
+        readDate(passJSON, "expirationDate")?.let { pass.validTimespans = listOf(Pass.TimeSpan(to = it)) }
 
-                if (barcodeJSON.has("altText")) {
-                    pass.barCode!!.alternativeText = barcodeJSON.getString("altText")
-                }
-            }
-            // TODO should check a bit more with barcode here - this can be dangerous
-        } catch (ignored: Exception) {
-        }
+        pass.serial = passJSON.stringOrNull("serialNumber")
+        pass.authToken = passJSON.stringOrNull("authenticationToken")
+        pass.webServiceURL = passJSON.stringOrNull("webServiceURL")
+        pass.passIdent = passJSON.stringOrNull("passTypeIdentifier")
+        pass.grouping = PassGrouping.fromPassbook(pass.passIdent, passJSON.stringOrNull("groupingIdentifier"))
 
-        if (passJSON.has("relevantDate")) {
-            try {
-                pass.calendarTimespan = Pass.TimeSpan(from = ZonedDateTime.parse(passJSON.getString("relevantDate")))
-            } catch (e: JSONException) {
-                // be robust when it comes to bad dates - had a RL crash with "2013-12-25T00:00-57:00" here
-                // OK then we just have no date here
-            } catch (e: DateTimeException) {
-                // invalid date - the pass has no date then
-            }
+        pass.locations = readLocations(passJSON, translation)
 
-        }
+        passJSON.stringOrNull("backgroundColor")?.let { pass.accentColor = it.parseColor(Color.BLACK) }
+        pass.logoText = passJSON.stringOrNull("logoText")?.let { translation.translate(it) }?.takeIf { it.isNotBlank() }
+        pass.foregroundColorValue = passJSON.stringOrNull("foregroundColor")
+        pass.labelColorValue = passJSON.stringOrNull("labelColor")
+        passJSON.stringOrNull("description")?.let { pass.description = translation.translate(it) }
 
-        if (passJSON.has("expirationDate")) {
-            try {
-                pass.validTimespans = listOf(Pass.TimeSpan(to = ZonedDateTime.parse(passJSON.getString("expirationDate"))))
-            } catch (e: JSONException) {
-                // be robust when it comes to bad dates - had a RL crash with "2013-12-25T00:00-57:00" here
-                // OK then we just have no date here
-            } catch (e: DateTimeException) {
-                // invalid date - the pass has no date then
-            }
+        readTypeAndFields(pass, passJSON, translation, context)
 
-        }
-
-        pass.serial = readJsonSafeAsOptional(passJSON, "serialNumber")
-        pass.authToken = readJsonSafeAsOptional(passJSON, "authenticationToken")
-        pass.webServiceURL = readJsonSafeAsOptional(passJSON, "webServiceURL")
-        pass.passIdent = readJsonSafeAsOptional(passJSON, "passTypeIdentifier")
-        pass.grouping = PassGrouping.fromPassbook(pass.passIdent, readJsonSafeAsOptional(passJSON, "groupingIdentifier"))
-
-        val locations = ArrayList<PassLocation>()
-        try {
-
-            val locationsJSON = passJSON.getJSONArray("locations")
-            for (i in 0 until locationsJSON.length()) {
-                val obj = locationsJSON.getJSONObject(i)
-
-                val location = PassLocation()
-                location.lat = obj.getDouble("latitude")
-                location.lon = obj.getDouble("longitude")
-
-                if (obj.has("relevantText")) {
-                    location.name = translation.translate(obj.getString("relevantText"))
-                }
-
-                locations.add(location)
-            }
-
-        } catch (ignored: JSONException) {
-        }
-
-        pass.locations = locations
-
-        readJsonSafe(passJSON, "backgroundColor", object : JsonStringReadCallback {
-            override fun onString(string: String) {
-                pass.accentColor = string.parseColor(Color.BLACK)
-            }
-        })
-
-        applyListAppearance(pass, passJSON, translation)
-
-        readJsonSafe(passJSON, "description", object : JsonStringReadCallback {
-            override fun onString(string: String) {
-                pass.description = translation.translate(string)
-            }
-        })
-
-
-        // try to find in a predefined set of tickets
-
-        PassType.pkpassStyles.forEach {
-            if (passJSON.has(it.pkpassStyleKey)) {
-                pass.type = it
-            }
-        }
-
-        val type = pass.type.pkpassStyleKey
-        try {
-            if (type != null) {
-                val typeJSON = passJSON.getJSONObject(type)
-                if (pass.type == PassType.PKBOARDING || pass.type == PassType.BOARDING) {
-                    pass.boardingTransitType = readBoardingTransitType(passJSON)
-                }
-                val fieldList: ArrayList<PassField> = ArrayList()
-
-                addFields(fieldList, typeJSON, "primaryFields", translation)
-                addFields(fieldList, typeJSON, "headerFields", translation)
-                addFields(fieldList, typeJSON, "secondaryFields", translation)
-                addFields(fieldList, typeJSON, "auxiliaryFields", translation)
-                addFields(fieldList, typeJSON, "backFields", translation, hide = true)
-
-                fieldList.add(PassField("", context.getString(R.string.type), context.getString(pass.type.labelRes), false))
-                pass.fields = fieldList
-            }
-        } catch (ignored: JSONException) {
-        }
-
-
-        try {
-            pass.creator = passJSON.getString("organizationName")
-        } catch (ignored: JSONException) {
-            // ok - we have no organisation - big deal ..-)
-        }
+        passJSON.stringOrNull("organizationName")?.let { pass.creator = it }
 
         PkpassQuirkCorrector().correctQuirks(pass)
         pass.visualType = PassVisualClassifier.classify(pass)
@@ -208,128 +87,133 @@ object PkpassReader {
         return pass
     }
 
-    private fun getField(jsonObject: JSONObject, key: String, translation: PkpassTranslation): String? {
-        if (jsonObject.has(key)) {
-            try {
-                return translation.translate(jsonObject.getString(key))
-            } catch (e: JSONException) {
-                Timber.w(e, "could not translate pass field")
-            }
-        }
-        return null
-    }
-
-    private fun addFields(list: ArrayList<PassField>, type_json: JSONObject, fieldsName: String, translation: PkpassTranslation, hide: Boolean = false) {
+    /** pass.json in the detected encoding - or, if that fails, in the first charset it can be read with */
+    private fun readPassJson(file: File): JSONObject? {
         try {
-            val jsonArray = type_json.getJSONArray(fieldsName)
-            for (i in 0 until jsonArray.length()) {
-                try {
-                    val jsonObject = jsonArray.getJSONObject(i)
-                    val field = PassField(key = getField(jsonObject, "key", translation),
-                            label = getField(jsonObject, "label", translation),
-                            value = getField(jsonObject, "value", translation),
-                            hide = hide,
-                            hint = fieldsName)
-                    list.add(field)
-
-                } catch (e: JSONException) {
-                    Timber.w("could not process PassField from JSON for $fieldsName cause: $e")
-                }
-
-            }
-        } catch (e: JSONException) {
-            Timber.w("could not process PassFields $fieldsName from JSON: $e")
+            readJSONSafely(PkpassTranslation.readFileAsStringGuessEncoding(file))?.let { return it }
+        } catch (e: Exception) {
+            Timber.i("PassParse Exception: $e")
         }
 
-    }
-
-    private fun findLocalizedPath(path: File, language: String): String? {
-        val localized = File(path, "$language.lproj")
-
-        if (localized.exists() && localized.isDirectory) {
-            return localized.path
-        }
-
-        val fallback = File(path, "en.lproj")
-
-        if (fallback.exists() && fallback.isDirectory) {
-            return fallback.path
-        }
-
-        return null
-    }
-
-    internal interface JsonStringReadCallback {
-        fun onString(string: String)
-    }
-
-    private fun readJsonSafeAsOptional(json: JSONObject, key: String): String? {
-        if (json.has(key)) {
+        // I had got a strange passbook with UCS-2 which could not be parsed before
+        // was searching for a auto-detection, but could not find one with support for this encoding
+        // and the right license
+        for (charset in Charset.availableCharsets().values) {
             try {
-                return json.getString(key)
-            } catch (e: JSONException) {
-                // some passes just do not have the field
+                readJSONSafely(file.bufferedReader(charset).readText())?.let { return it }
+            } catch (ignored: Exception) {
+                // we try with next charset
             }
-
         }
         return null
     }
 
-    private fun readBoardingTransitType(json: JSONObject): BoardingTransitType {
-        val boardingJson = json.optJSONObject("boardingPass") ?: return BoardingTransitType.GENERIC
-        return BoardingTransitType.fromPassKitName(readJsonSafeAsOptional(boardingJson, "transitType"))
+    /** the (first) barcode - null when there is none or it cannot be read */
+    private fun readBarcode(passJSON: JSONObject): BarCode? = try {
+        passJSON.getBarcodeJson()?.let { barcodeJSON ->
+            BarCode(BarCode.getFormatFromString(barcodeJSON.getString("format")), barcodeJSON.getString("message")).apply {
+                barcodeJSON.stringOrNull("altText")?.let { alternativeText = it }
+            }
+        }
+    } catch (ignored: Exception) {
+        // a broken barcode should not cost the whole pass
+        null
     }
 
-    private fun readJsonSafe(json: JSONObject, key: String, callback: JsonStringReadCallback) {
-        if (json.has(key)) {
-            try {
-                callback.onString(json.getString(key))
-            } catch (e: JSONException) {
-                // some passes just do not have the field
+    /** be robust when it comes to bad dates - had a RL crash with "2013-12-25T00:00-57:00" here: the pass has no date then */
+    private fun readDate(passJSON: JSONObject, key: String): ZonedDateTime? = try {
+        passJSON.stringOrNull(key)?.let { ZonedDateTime.parse(it) }
+    } catch (e: DateTimeException) {
+        null
+    }
+
+    /** the locations up to the first broken one */
+    private fun readLocations(passJSON: JSONObject, translation: PkpassTranslation): List<PassLocation> {
+        val locations = ArrayList<PassLocation>()
+        try {
+            val locationsJSON = passJSON.getJSONArray("locations")
+            for (i in 0 until locationsJSON.length()) {
+                val obj = locationsJSON.getJSONObject(i)
+                locations.add(PassLocation().apply {
+                    lat = obj.getDouble("latitude")
+                    lon = obj.getDouble("longitude")
+                    obj.stringOrNull("relevantText")?.let { name = translation.translate(it) }
+                })
             }
+        } catch (ignored: JSONException) {
+        }
+        return locations
+    }
+
+    /**
+     * The type is the pkpass style found in pass.json (with several, the last of [PassType.pkpassStyles]);
+     * the fields of that style are read, plus a field naming the type.
+     */
+    private fun readTypeAndFields(pass: Pass, passJSON: JSONObject, translation: PkpassTranslation, context: Context) {
+        PassType.pkpassStyles.lastOrNull { passJSON.has(it.pkpassStyleKey) }?.let { pass.type = it }
+
+        val styleJSON = pass.type.pkpassStyleKey?.let { passJSON.optJSONObject(it) } ?: return
+        if (pass.type == PassType.PKBOARDING || pass.type == PassType.BOARDING) {
+            pass.boardingTransitType = readBoardingTransitType(passJSON)
+        }
+
+        val fields = ArrayList<PassField>()
+        FIELD_GROUPS.forEach { fields += readFields(styleJSON, it, translation, hide = false) }
+        fields += readFields(styleJSON, BACK_FIELDS, translation, hide = true)
+        fields.add(PassField("", context.getString(R.string.type), context.getString(pass.type.labelRes), false))
+        pass.fields = fields
+    }
+
+    private fun readFields(styleJSON: JSONObject, fieldsName: String, translation: PkpassTranslation, hide: Boolean): List<PassField> {
+        val jsonArray = styleJSON.optJSONArray(fieldsName) ?: return emptyList()
+        return (0 until jsonArray.length()).mapNotNull { i ->
+            val jsonObject = jsonArray.optJSONObject(i)
+            if (jsonObject == null) {
+                Timber.w("could not process PassField from JSON for $fieldsName")
+                return@mapNotNull null
+            }
+            PassField(
+                key = jsonObject.stringOrNull("key")?.let { translation.translate(it) },
+                label = jsonObject.stringOrNull("label")?.let { translation.translate(it) },
+                value = jsonObject.stringOrNull("value")?.let { translation.translate(it) },
+                hide = hide,
+                hint = fieldsName,
+            )
         }
     }
 
-    private fun copyBitmapFile(path: File, localizedPath: String?, bitmapString: String) {
-        val bitmap = findBitmap(path, localizedPath, bitmapString)
-        if (bitmap != null) {
-            try {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, FileOutputStream(File(path, bitmapString + Pass.FILETYPE_IMAGES)))
-            } catch (e: Exception) {
-                Timber.w(e, "could not persist pass bitmap")
-            }
-        }
+    private fun readBoardingTransitType(passJSON: JSONObject): BoardingTransitType {
+        val boardingJson = passJSON.optJSONObject("boardingPass") ?: return BoardingTransitType.GENERIC
+        return BoardingTransitType.fromPassKitName(boardingJson.stringOrNull("transitType"))
     }
 
-    private fun findBitmap(path: File, localizedPath: String?, bitmap: String): Bitmap? {
+    /** the lproj directory of [language], or of English as fallback */
+    private fun findLocalizedPath(passDirectory: File, language: String): File? =
+        listOf("$language.lproj", "en.lproj")
+            .map { File(passDirectory, it) }
+            .firstOrNull { it.isDirectory }
 
-        val searchList = ArrayList<File>()
-        if (localizedPath != null) {
-            searchList.add(File(localizedPath, "$bitmap@2x.png"))
-            searchList.add(File(localizedPath, "$bitmap.png"))
+    /**
+     * Copies the best version of a picture to `<name>.png` in [passDirectory], where the pass reads it:
+     * localized high resolution, localized, high resolution. Without any of them a `<name>.png` that is already
+     * there stays.
+     */
+    private fun takeBestPicture(passDirectory: File, localizedPath: File?, name: String) {
+        val target = File(passDirectory, name + Pass.FILETYPE_IMAGES)
+        val candidates = listOfNotNull(
+            localizedPath?.let { File(it, "$name@2x.png") },
+            localizedPath?.let { File(it, "$name.png") },
+            File(passDirectory, "$name@2x.png"),
+        )
+        val best = candidates.firstOrNull { it.isFile } ?: return
+        try {
+            best.copyTo(target, overwrite = true)
+        } catch (e: IOException) {
+            Timber.w(e, "could not persist pass bitmap")
         }
-
-        searchList.add((File(path, "$bitmap@2x.png")))
-        searchList.add((File(path, "$bitmap@2x.png")))
-
-        for (current in searchList) {
-
-            var res: Bitmap? = null
-
-            try {
-                res = BitmapFactory.decodeFile(current.absolutePath)
-            } catch (e: OutOfMemoryError) {
-                System.gc()
-                try {
-                    res = BitmapFactory.decodeFile(current.absolutePath)
-                } catch (e: OutOfMemoryError) {
-                }
-            }
-
-            if (res != null) {
-                return res
-            }
-        }
-        return null
     }
 }
+
+/** the value of [key] as string - null when it is missing or JSON null */
+internal fun JSONObject.stringOrNull(key: String): String? =
+    if (has(key) && !isNull(key)) optString(key) else null

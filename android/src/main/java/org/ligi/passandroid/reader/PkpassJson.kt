@@ -3,21 +3,6 @@ package org.ligi.passandroid.reader
 import org.json.JSONObject
 
 
-fun JSONObject.getBarcodeJson(): JSONObject? {
-    if (has("barcode")) {
-        return getJSONObject("barcode")
-    }
-
-    if (has("barcodes")) {
-
-        getJSONArray("barcodes").let {
-            if (length() > 0) {
-                return it.getJSONObject(0)
-            }
-        }
-
-    }
-
-    return null
-}
-
+/** the barcode of a pass.json: "barcode", or the first of "barcodes" - null when there is none */
+fun JSONObject.getBarcodeJson(): JSONObject? =
+    optJSONObject("barcode") ?: optJSONArray("barcodes")?.optJSONObject(0)
