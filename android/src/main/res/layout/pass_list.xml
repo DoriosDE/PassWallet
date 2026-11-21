@@ -53,7 +53,7 @@
         android:clipToPadding="false"
         android:gravity="end"
         android:orientation="vertical"
-        app:layout_behavior="org.ligi.passandroid.ui.MyShyFABBehavior">
+        app:layout_behavior="org.ligi.passandroid.ui.MoveAboveSnackbarBehavior">
 
         <com.google.android.material.button.MaterialButton
             android:id="@+id/fab_action_import"

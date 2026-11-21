@@ -7,9 +7,9 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import kotlin.math.min
 
 /**
- * Moves the floating action button up while a snackbar is shown, so the snackbar does not cover it.
+ * Moves a view (the plus button of the pass list) up while a snackbar is shown, so the snackbar does not cover it.
  */
-class MyShyFABBehavior : CoordinatorLayout.Behavior<View> {
+class MoveAboveSnackbarBehavior : CoordinatorLayout.Behavior<View> {
 
     constructor() : super()
 
