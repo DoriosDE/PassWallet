@@ -15,7 +15,7 @@ import org.ligi.passandroid.functions.decodeBarCode
 import org.ligi.passandroid.model.pass.BarCode
 import org.ligi.passandroid.model.pass.PassBarCodeFormat
 import org.ligi.passandroid.model.pass.PassBarCodeFormat.*
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.ui.passview.FullscreenBarcodeActivity
 import org.ligi.trulesk.TruleskIntentRule
 import java.util.*
@@ -66,7 +66,7 @@ class TheFullscreenBarcodeActivity {
 
 
     private fun testWithBarcodeFormat(format: PassBarCodeFormat) {
-        val pass = PassImpl(UUID.randomUUID().toString())
+        val pass = Pass(UUID.randomUUID().toString())
         pass.barCode = BarCode(format, BARCODE_MESSAGE)
 
         TestApp.setSinglePass(pass)

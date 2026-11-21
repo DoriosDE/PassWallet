@@ -2,11 +2,11 @@ package org.ligi.passandroid.update
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 
 class ThePassUpdater {
 
-    private fun updatablePass() = PassImpl("id").apply {
+    private fun updatablePass() = Pass("id").apply {
         webServiceURL = "https://passes.example.org/api"
         passIdent = "pass.org.example.ticket"
         serial = "12345"

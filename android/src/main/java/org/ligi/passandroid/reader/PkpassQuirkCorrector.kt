@@ -1,13 +1,13 @@
 package org.ligi.passandroid.reader
 
 import org.ligi.passandroid.model.pass.PassField
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 import org.threeten.bp.DateTimeException
 import org.threeten.bp.ZonedDateTime
 
 class PkpassQuirkCorrector {
 
-    fun correctQuirks(pass: PassImpl) {
+    fun correctQuirks(pass: Pass) {
         // Vendor specific fixes
         careForTUIFlight(pass)
         careForAirBerlin(pass)
@@ -23,7 +23,7 @@ class PkpassQuirkCorrector {
         tryToFindDate(pass)
     }
 
-    private fun tryToFindDate(pass: PassImpl) {
+    private fun tryToFindDate(pass: Pass) {
 
         if (pass.calendarTimespan == null) {
             val foundDate = pass.fields.filter { "date" == it.key }.map {
@@ -35,24 +35,24 @@ class PkpassQuirkCorrector {
             }.firstOrNull { it != null }
 
             if (foundDate != null) {
-                pass.calendarTimespan = PassImpl.TimeSpan(from = foundDate)
+                pass.calendarTimespan = Pass.TimeSpan(from = foundDate)
             }
         }
 
     }
 
-    private fun getPassFieldForKey(pass: PassImpl, key: String): PassField? {
+    private fun getPassFieldForKey(pass: Pass, key: String): PassField? {
         return pass.fields.firstOrNull { it.key != null && it.key == key }
     }
 
-    private fun getPassFieldThatMatchesLabel(pass: PassImpl, matcher: String): PassField? {
+    private fun getPassFieldThatMatchesLabel(pass: Pass, matcher: String): PassField? {
         return pass.fields.firstOrNull {
             val label = it.label
             label != null && label.matches(matcher.toRegex())
         }
     }
 
-    private fun careForRenfe(pass: PassImpl) {
+    private fun careForRenfe(pass: Pass) {
         if (pass.creator == null || pass.creator != "RENFE OPERADORA") {
             return
         }
@@ -65,7 +65,7 @@ class PkpassQuirkCorrector {
         }
     }
 
-    private fun careForSWISS(pass: PassImpl) {
+    private fun careForSWISS(pass: Pass) {
         if (pass.creator == null || pass.creator != "SWISS") {
             return
         }
@@ -78,7 +78,7 @@ class PkpassQuirkCorrector {
         }
     }
 
-    private fun careForCathayPacific(pass: PassImpl) {
+    private fun careForCathayPacific(pass: Pass) {
         if (pass.creator == null || pass.creator != "Cathay Pacific") {
 
             return
@@ -93,7 +93,7 @@ class PkpassQuirkCorrector {
         }
     }
 
-    private fun careForVirginAustralia(pass: PassImpl) {
+    private fun careForVirginAustralia(pass: Pass) {
         // also good identifier could be  "passTypeIdentifier": "pass.com.virginaustralia.boardingpass
         if (pass.creator == null || pass.creator != "Virgin Australia") {
             return
@@ -108,7 +108,7 @@ class PkpassQuirkCorrector {
         }
     }
 
-    private fun careForAirCanada(pass: PassImpl) {
+    private fun careForAirCanada(pass: Pass) {
         if (pass.creator == null || pass.creator != "Air Canada") {
             return
         }
@@ -122,7 +122,7 @@ class PkpassQuirkCorrector {
         }
     }
 
-    private fun careForUSAirways(pass: PassImpl) {
+    private fun careForUSAirways(pass: Pass) {
         if (pass.creator == null || pass.creator != "US Airways") {
             return
         }
@@ -136,7 +136,7 @@ class PkpassQuirkCorrector {
         }
     }
 
-    private fun careForWestbahn(pass: PassImpl) {
+    private fun careForWestbahn(pass: Pass) {
         if (pass.calendarTimespan != null || (pass.creator ?: "") != "WESTbahn") {
             return
         }
@@ -161,7 +161,7 @@ class PkpassQuirkCorrector {
         pass.description = description
     }
 
-    private fun careForTUIFlight(pass: PassImpl) {
+    private fun careForTUIFlight(pass: Pass) {
         if (pass.description != "TUIfly pass") {
             return
         }
@@ -181,7 +181,7 @@ class PkpassQuirkCorrector {
     }
 
 
-    private fun careForAirBerlin(pass: PassImpl) {
+    private fun careForAirBerlin(pass: Pass) {
         if (pass.description != "boardcard") {
             return
         }

@@ -6,7 +6,6 @@ import android.graphics.BitmapFactory
 import org.ligi.passandroid.R
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassField
-import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.model.pass.PassType
 import java.io.File
 import java.io.FileNotFoundException
@@ -60,8 +59,8 @@ fun createPassForPDFImport(resources: Resources): Pass {
     }
 }
 
-private fun createBasePass(): PassImpl {
-    val pass = PassImpl(UUID.randomUUID().toString())
+private fun createBasePass(): Pass {
+    val pass = Pass(UUID.randomUUID().toString())
     pass.accentColor = 0xFF0000FF.toInt()
     pass.app = APP
     pass.type = PassType.EVENT

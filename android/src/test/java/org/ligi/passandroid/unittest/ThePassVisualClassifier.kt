@@ -3,7 +3,7 @@ package org.ligi.passandroid.unittest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.ligi.passandroid.model.pass.PassField
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassType
 import org.ligi.passandroid.model.pass.PassVisualClassifier
 import org.ligi.passandroid.model.pass.PassVisualType
@@ -13,7 +13,7 @@ class ThePassVisualClassifier {
 
     @Test
     fun detectsColegioCredentialEvenWhenPassKitTypeIsEvent() {
-        val pass = PassImpl("credential").apply {
+        val pass = Pass("credential").apply {
             type = PassType.EVENT
             description = "Carnet colegial digital"
             passIdent = "pass.com.adasistemas.carnetcolegial"
@@ -29,7 +29,7 @@ class ThePassVisualClassifier {
 
     @Test
     fun credentialRendererUsesHolderNameAndCredentialNumber() {
-        val pass = PassImpl("credential").apply {
+        val pass = Pass("credential").apply {
             visualType = PassVisualType.CREDENTIAL
             description = "Carnet colegial digital"
             fields = mutableListOf(
@@ -47,7 +47,7 @@ class ThePassVisualClassifier {
 
     @Test
     fun doesNotTreatBoardingPassAsCredential() {
-        val pass = PassImpl("boarding").apply {
+        val pass = Pass("boarding").apply {
             type = PassType.PKBOARDING
             description = "Membership boarding pass"
             fields = mutableListOf(PassField("member", "Member", "42", false, "headerFields"))

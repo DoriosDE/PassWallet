@@ -13,7 +13,7 @@ import org.ligi.passandroid.R
 import org.ligi.passandroid.databinding.EditFieldsBinding
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.PassField
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.ui.EXTRA_PASS_ID
 
 
@@ -21,7 +21,10 @@ class FieldsEditFragment : Fragment() {
 
     val passStore by inject<PassStore>()
 
-    private fun getPass(): PassImpl = passStore.getPass(requireArguments().getString(EXTRA_PASS_ID)!!) as PassImpl
+    /** the pass being edited - the same instance the edit screen changes and saves */
+    private val pass: Pass by lazy {
+        checkNotNull(passStore.getPass(requireArguments().getString(EXTRA_PASS_ID).orEmpty())) { "pass to edit not found" }
+    }
 
     private var isEditingHiddenFields: Boolean = false
 
@@ -38,21 +41,21 @@ class FieldsEditFragment : Fragment() {
         } else {
             inflate.addField.setText(R.string.add_front_field)
         }
-        getPass().fields
+        pass.fields
             .filter { it.hide == isEditingHiddenFields }
             .forEach { addField(it, inflate.fieldsContainer) }
 
         inflate.addField.setOnClickListener {
             val passField = PassField(null, null, null, isEditingHiddenFields)
             addField(passField, inflate.fieldsContainer)
-            getPass().fields.add(passField)
+            pass.fields.add(passField)
         }
         return inflate.root
     }
 
     private fun addField(passField: PassField, viewGroup: ViewGroup) {
         val child = inflater.inflate(R.layout.edit_field, viewGroup, false) as ViewGroup
-        FieldView(child).apply(passField, getPass().fields)
+        FieldView(child).apply(passField, pass.fields)
         viewGroup.addView(child)
     }
 

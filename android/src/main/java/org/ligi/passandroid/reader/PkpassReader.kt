@@ -31,7 +31,7 @@ object PkpassReader {
 
         val translation = PkpassTranslation()
 
-        val pass = PassImpl(passFile.name)
+        val pass = Pass(passFile.name)
 
         var passJSON: JSONObject? = null
 
@@ -100,7 +100,7 @@ object PkpassReader {
 
         if (passJSON.has("relevantDate")) {
             try {
-                pass.calendarTimespan = PassImpl.TimeSpan(from = ZonedDateTime.parse(passJSON.getString("relevantDate")))
+                pass.calendarTimespan = Pass.TimeSpan(from = ZonedDateTime.parse(passJSON.getString("relevantDate")))
             } catch (e: JSONException) {
                 // be robust when it comes to bad dates - had a RL crash with "2013-12-25T00:00-57:00" here
                 // OK then we just have no date here
@@ -112,7 +112,7 @@ object PkpassReader {
 
         if (passJSON.has("expirationDate")) {
             try {
-                pass.validTimespans = listOf(PassImpl.TimeSpan(to = ZonedDateTime.parse(passJSON.getString("expirationDate"))))
+                pass.validTimespans = listOf(Pass.TimeSpan(to = ZonedDateTime.parse(passJSON.getString("expirationDate"))))
             } catch (e: JSONException) {
                 // be robust when it comes to bad dates - had a RL crash with "2013-12-25T00:00-57:00" here
                 // OK then we just have no date here
@@ -294,7 +294,7 @@ object PkpassReader {
         val bitmap = findBitmap(path, localizedPath, bitmapString)
         if (bitmap != null) {
             try {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, FileOutputStream(File(path, bitmapString + PassImpl.FILETYPE_IMAGES)))
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, FileOutputStream(File(path, bitmapString + Pass.FILETYPE_IMAGES)))
             } catch (e: Exception) {
                 Timber.w(e, "could not persist pass bitmap")
             }

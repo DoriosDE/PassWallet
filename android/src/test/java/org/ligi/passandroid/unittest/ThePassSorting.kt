@@ -12,7 +12,6 @@ import org.ligi.passandroid.model.PassStoreProjection
 import org.ligi.passandroid.model.PassStoreChange
 import org.ligi.passandroid.model.PassSortOrder
 import org.ligi.passandroid.model.pass.Pass
-import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.model.pass.PassType
 import org.threeten.bp.ZonedDateTime
 import java.io.File
@@ -20,20 +19,20 @@ import java.util.*
 
 class ThePassSorting {
 
-    private val pass1 = PassImpl("ID1")
-    private val pass2 = PassImpl("ID2")
-    private val pass3 = PassImpl("ID3")
-    private val pass4 = PassImpl("ID4")
-    private val pass5 = PassImpl("ID5")
+    private val pass1 = Pass("ID1")
+    private val pass2 = Pass("ID2")
+    private val pass3 = Pass("ID3")
+    private val pass4 = Pass("ID4")
+    private val pass5 = Pass("ID5")
 
     private lateinit var passList: List<Pass>
 
     @Before
     fun init() {
-        pass1.calendarTimespan = PassImpl.TimeSpan(ZonedDateTime.now().minusHours(5))
-        pass3.calendarTimespan = PassImpl.TimeSpan(ZonedDateTime.now().plusHours(1))
-        pass2.calendarTimespan = PassImpl.TimeSpan(ZonedDateTime.now().plusHours(2))
-        pass5.validTimespans = listOf(PassImpl.TimeSpan(ZonedDateTime.now().plusHours(3)))
+        pass1.calendarTimespan = Pass.TimeSpan(ZonedDateTime.now().minusHours(5))
+        pass3.calendarTimespan = Pass.TimeSpan(ZonedDateTime.now().plusHours(1))
+        pass2.calendarTimespan = Pass.TimeSpan(ZonedDateTime.now().plusHours(2))
+        pass5.validTimespans = listOf(Pass.TimeSpan(ZonedDateTime.now().plusHours(3)))
 
         pass1.type = PassType.GENERIC
         pass2.type = PassType.EVENT

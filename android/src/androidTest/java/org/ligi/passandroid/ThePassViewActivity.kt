@@ -13,7 +13,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.model.pass.BarCode
 import org.ligi.passandroid.model.pass.PassBarCodeFormat
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassLocation
 import org.ligi.passandroid.ui.passview.PassViewActivity
 import org.ligi.trulesk.TruleskActivityRule
@@ -22,7 +22,7 @@ import java.util.ArrayList
 @TargetApi(14)
 class ThePassViewActivity {
 
-    private lateinit var pass: PassImpl
+    private lateinit var pass: Pass
 
     private fun getActPass() = pass
 

@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.PassGroups
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassType
 import org.threeten.bp.ZonedDateTime
 
@@ -19,10 +19,10 @@ class ThePassAutoGrouping {
         date: ZonedDateTime? = concertDay,
         type: PassType = PassType.EVENT,
         grouping: PassGrouping = PassGrouping.None,
-    ) = PassImpl(id).apply {
+    ) = Pass(id).apply {
         passIdent = issuer
         this.description = description
-        calendarTimespan = date?.let { PassImpl.TimeSpan(from = it) }
+        calendarTimespan = date?.let { Pass.TimeSpan(from = it) }
         this.type = type
         this.grouping = grouping
     }

@@ -10,7 +10,6 @@ import org.ligi.passandroid.model.PassSortOrder
 import org.ligi.passandroid.model.pass.BarCode
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassBarCodeFormat
-import org.ligi.passandroid.model.pass.PassImpl
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import java.io.File
@@ -39,10 +38,10 @@ class TestApp : App() {
         }
 
         /** stores one pass (with description and barcode) as the only pass and returns it */
-        fun populatePassStoreWithSinglePass(): PassImpl {
+        fun populatePassStoreWithSinglePass(): Pass {
 
             val passList = ArrayList<Pass>()
-            val pass = PassImpl(UUID.randomUUID().toString())
+            val pass = Pass(UUID.randomUUID().toString())
             pass.description = "description"
             pass.barCode = BarCode(PassBarCodeFormat.AZTEC, "messageprobe")
             passList.add(pass)

@@ -10,7 +10,6 @@ import com.google.android.material.timepicker.TimeFormat
 import org.ligi.passandroid.R
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
-import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.ui.edit.dialogs.showLocationEditDialog
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneOffset
@@ -20,13 +19,13 @@ import org.threeten.bp.temporal.ChronoUnit
 class EditViewHolder(view: CardView) : VerbosePassViewHolder(view) {
 
     private lateinit var time: ZonedDateTime
-    private lateinit var pass: PassImpl
+    private lateinit var pass: Pass
     private lateinit var passStore: PassStore
 
     override fun apply(pass: Pass, passStore: PassStore, activity: Activity) {
         super.apply(pass, passStore, activity)
 
-        this.pass = pass as PassImpl
+        this.pass = pass
         this.passStore = passStore
 
         val calendarTimespan = pass.calendarTimespan
@@ -65,7 +64,7 @@ class EditViewHolder(view: CardView) : VerbosePassViewHolder(view) {
                 .withYear(selectedDate.year)
                 .withMonth(selectedDate.monthValue)
                 .withDayOfMonth(selectedDate.dayOfMonth)
-            pass.calendarTimespan = PassImpl.TimeSpan(time, null, null)
+            pass.calendarTimespan = Pass.TimeSpan(time, null, null)
             showTimePicker(fragmentActivity)
         }
 
@@ -82,7 +81,7 @@ class EditViewHolder(view: CardView) : VerbosePassViewHolder(view) {
 
         picker.addOnPositiveButtonClickListener {
             time = time.withHour(picker.hour).withMinute(picker.minute)
-            pass.calendarTimespan = PassImpl.TimeSpan(time, null, null)
+            pass.calendarTimespan = Pass.TimeSpan(time, null, null)
             refresh(pass, passStore)
         }
 

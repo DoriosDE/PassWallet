@@ -6,7 +6,6 @@ import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
-import org.ligi.passandroid.model.pass.PassImpl
 import org.mockito.ArgumentMatchers.anyString
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.`when`
@@ -16,7 +15,7 @@ import org.mockito.Mockito.`when`
  */
 class ThePassArchive {
 
-    private val passes = listOf("a", "b", "c").associateWith { PassImpl(it) as Pass }
+    private val passes = listOf("a", "b", "c").associateWith { Pass(it) }
 
     private val passStore = mock(PassStore::class.java).apply {
         `when`(getPass(anyString())).thenAnswer { passes[it.arguments[0]] }

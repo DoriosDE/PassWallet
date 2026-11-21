@@ -6,7 +6,7 @@ import org.ligi.passandroid.model.FileSystemPassStore
 import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.Settings
 import org.ligi.passandroid.model.PassSortOrder
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 import org.mockito.Mockito.mock
 import java.io.File
 
@@ -30,7 +30,7 @@ class TestPassDirectory(root: File) {
     fun newStore() = FileSystemPassStore(mock(Context::class.java), settings, moshi) { "en" }
 
     companion object {
-        fun pass(id: String, description: String) = PassImpl(id).apply {
+        fun pass(id: String, description: String) = Pass(id).apply {
             this.description = description
             grouping = PassGrouping.InGroup("group")
         }

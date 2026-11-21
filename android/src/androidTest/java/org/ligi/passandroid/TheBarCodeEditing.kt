@@ -20,7 +20,7 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.runner.RunWith
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.PassBarCodeFormat
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.ui.edit.PassEditActivity
 import org.ligi.trulesk.TruleskActivityRule
 
@@ -32,9 +32,9 @@ class TheBarCodeEditing {
 
     val passStore: PassStore = TestApp.passStore
 
-    private lateinit var currentPass: PassImpl
+    private lateinit var currentPass: Pass
 
-    private fun start(setupPass: (pass: PassImpl) -> Unit = {}) {
+    private fun start(setupPass: (pass: Pass) -> Unit = {}) {
         currentPass = TestApp.populatePassStoreWithSinglePass()
 
         setupPass(currentPass)

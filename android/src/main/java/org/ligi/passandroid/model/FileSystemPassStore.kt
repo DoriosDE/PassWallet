@@ -11,7 +11,6 @@ import okio.sink
 import okio.source
 import org.ligi.passandroid.BuildConfig
 import org.ligi.passandroid.model.pass.Pass
-import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.model.pass.PassVisualClassifier
 import org.ligi.passandroid.reader.PkpassReader
 import java.io.File
@@ -53,7 +52,7 @@ class FileSystemPassStore(
 
     /** writes main.json of the pass - without announcing it, e.g. when a pass is only brought up to date while read */
     private fun write(pass: Pass) {
-        val jsonAdapter = moshi.adapter(PassImpl::class.java)
+        val jsonAdapter = moshi.adapter(Pass::class.java)
 
         val passDirectory = directoryOf(pass.id)
 
@@ -66,11 +65,11 @@ class FileSystemPassStore(
         if (BuildConfig.DEBUG) {
             val of = com.squareup.moshi.JsonWriter.of(buffer)
             of.indent = "  "
-            jsonAdapter.toJson(of, pass as PassImpl)
+            jsonAdapter.toJson(of, pass)
             buffer.close()
             of.close()
         } else {
-            jsonAdapter.toJson(buffer, pass as PassImpl)
+            jsonAdapter.toJson(buffer, pass)
             buffer.close()
         }
 
@@ -89,7 +88,7 @@ class FileSystemPassStore(
         var result: Pass? = null
         var dirty = true
         if (file.exists()) {
-            val jsonAdapter = moshi.adapter(PassImpl::class.java)
+            val jsonAdapter = moshi.adapter(Pass::class.java)
             dirty = false
             try {
                 result = jsonAdapter.fromJson(file.source().buffer())

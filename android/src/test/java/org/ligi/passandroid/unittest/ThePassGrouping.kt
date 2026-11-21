@@ -6,9 +6,9 @@ import org.ligi.passandroid.model.PassGroupFilter
 import org.ligi.passandroid.model.PassGroups
 import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.PassListEntry
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 
-private fun pass(id: String, groupKey: String? = null) = PassImpl(id).apply {
+private fun pass(id: String, groupKey: String? = null) = Pass(id).apply {
     grouping = groupKey?.let { PassGrouping.InGroup(it) } ?: PassGrouping.None
 }
 

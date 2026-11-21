@@ -9,7 +9,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.ligi.passandroid.model.pass.PassField
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.ui.edit.PassEditActivity
 import org.ligi.trulesk.TruleskIntentRule
 import java.util.*
@@ -22,7 +22,7 @@ class TheFieldListEditFragment {
 
     @Before
     fun before() {
-        val pass = PassImpl(UUID.randomUUID().toString()).apply {
+        val pass = Pass(UUID.randomUUID().toString()).apply {
             fields = arrayListOf(field)
         }
         TestApp.setSinglePass(pass)

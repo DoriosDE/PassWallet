@@ -18,14 +18,14 @@ import org.ligi.kaxt.inflate
 import org.ligi.passandroid.R
 import org.ligi.passandroid.location.LocationSearch
 import org.ligi.passandroid.location.LocationSearchResult
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassLocation
 import java.io.IOException
 import java.util.Locale
 
 fun showLocationEditDialog(
     activity: Activity,
-    pass: PassImpl,
+    pass: Pass,
     refreshCallback: () -> Unit,
 ) {
     val view = activity.inflate(R.layout.location_edit)

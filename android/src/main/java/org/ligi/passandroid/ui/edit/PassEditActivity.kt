@@ -21,7 +21,6 @@ import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.BarCode
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassBarCodeFormat
-import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.ui.edit.dialogs.showBarcodeEditDialog
 import org.ligi.passandroid.ui.edit.dialogs.showCategoryPickDialog
 import org.ligi.passandroid.ui.edit.dialogs.showColorPickDialog
@@ -36,7 +35,7 @@ import org.ligi.passandroid.ui.EXTRA_PASS_ID
 class PassEditActivity : AppCompatActivity() {
 
     private lateinit var binding: EditBinding
-    private lateinit var currentPass: PassImpl
+    private lateinit var currentPass: Pass
     private val imageEditHelper by lazy { ImageEditHelper(this, passStore) }
     private var pendingImageName: String? = null
     private var pendingScanCallback: ((String, String) -> Unit)? = null
@@ -85,7 +84,7 @@ class PassEditActivity : AppCompatActivity() {
             currentPass.description = "$it"
         }
 
-        val passFromIntent = intent.getStringExtra(EXTRA_PASS_ID)?.let { passStore.getPass(it) as? PassImpl }
+        val passFromIntent = intent.getStringExtra(EXTRA_PASS_ID)?.let { passStore.getPass(it) }
         if (passFromIntent == null) {
             finish()
             return

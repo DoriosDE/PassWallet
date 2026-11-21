@@ -4,7 +4,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.ligi.passandroid.reader.PkpassQuirkCorrector
 import org.ligi.passandroid.model.pass.PassField
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 import org.threeten.bp.ZonedDateTime
 import java.util.*
 
@@ -15,7 +15,7 @@ class ThePkpassQuirkCorrector {
 
     @Test
     fun testThatItDoesNothingWithNoField() {
-        val pass = PassImpl(UUID.randomUUID().toString())
+        val pass = Pass(UUID.randomUUID().toString())
 
         tested.correctQuirks(pass)
 
@@ -25,7 +25,7 @@ class ThePkpassQuirkCorrector {
 
     @Test
     fun testThatDateIsExtracted() {
-        val pass = PassImpl(UUID.randomUUID().toString())
+        val pass = Pass(UUID.randomUUID().toString())
 
         pass.fields = mutableListOf(PassField("date", "foo", DATE_PROBE, false))
 
@@ -36,7 +36,7 @@ class ThePkpassQuirkCorrector {
 
     @Test
     fun testThatInvalidDateIsIgnored() {
-        val pass = PassImpl(UUID.randomUUID().toString())
+        val pass = Pass(UUID.randomUUID().toString())
 
         pass.fields = mutableListOf(PassField("date", "foo", "invalid", false))
 
@@ -47,7 +47,7 @@ class ThePkpassQuirkCorrector {
 
     @Test
     fun testThatDateIsExtractedAfterWrongDatesBefore() {
-        val pass = PassImpl(UUID.randomUUID().toString())
+        val pass = Pass(UUID.randomUUID().toString())
 
         pass.fields = mutableListOf(PassField("date", "foo", "invalid", false), PassField("date", "foo", DATE_PROBE, false))
 

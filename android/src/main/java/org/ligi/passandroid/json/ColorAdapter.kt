@@ -3,14 +3,14 @@ package org.ligi.passandroid.json
 import androidx.core.graphics.toColorInt
 import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
-import org.ligi.passandroid.model.pass.PassImpl
+import org.ligi.passandroid.model.pass.Pass
 
 class ColorAdapter {
     @ToJson
-    internal fun toJson(@PassImpl.HexColor rgb: Int) = String.format("#%06x", rgb)
+    internal fun toJson(@Pass.HexColor rgb: Int) = String.format("#%06x", rgb)
 
     @FromJson
-    @PassImpl.HexColor
+    @Pass.HexColor
     internal fun fromJson(rgb: String) = parseHexColor(rgb) ?: rgb.toColorInt()
 
     /**
