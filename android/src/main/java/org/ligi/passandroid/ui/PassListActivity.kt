@@ -22,7 +22,7 @@ import kotlinx.coroutines.launch
 import org.ligi.kaxt.startActivityFromClass
 import org.ligi.passandroid.R
 import org.ligi.passandroid.databinding.PassListBinding
-import org.ligi.passandroid.functions.createAndAddEmptyPass
+import org.ligi.passandroid.model.createAndAddEmptyPass
 import org.ligi.passandroid.model.ArchiveState
 import org.ligi.tracedroid.TraceDroid
 import org.ligi.tracedroid.sending.sendTraceDroidStackTracesIfExist

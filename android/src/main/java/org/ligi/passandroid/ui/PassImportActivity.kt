@@ -19,8 +19,8 @@ import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.R
 import org.ligi.passandroid.backup.BackupArchive
 import org.ligi.passandroid.databinding.ActivityImportBinding
-import org.ligi.passandroid.functions.autoGroupImportedPasses
-import org.ligi.passandroid.functions.fromURI
+import org.ligi.passandroid.importer.autoGroupImportedPasses
+import org.ligi.passandroid.importer.fromURI
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.Settings
 

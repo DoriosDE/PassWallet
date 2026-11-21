@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.drawable.BitmapDrawable
 import androidx.core.graphics.drawable.toDrawable
 import com.squareup.moshi.JsonClass
-import org.ligi.passandroid.functions.generateBarCodeBitmap
 import timber.log.Timber
 import java.util.Locale
 

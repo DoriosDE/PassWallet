@@ -18,10 +18,6 @@ import androidx.core.graphics.drawable.toDrawable
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.card.MaterialCardView
 import org.ligi.passandroid.R
-import org.ligi.passandroid.functions.archiveWithUndoSnackbar
-import org.ligi.passandroid.functions.confirmAndDeletePasses
-import org.ligi.passandroid.functions.restoreWithUndoSnackbar
-import org.ligi.passandroid.functions.showPassListSnackbar
 import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.PassGroups

@@ -7,8 +7,7 @@ import android.widget.Toast
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.ligi.passandroid.R
-import org.ligi.passandroid.functions.confirmAndDeletePasses
-import org.ligi.passandroid.functions.setArchived
+import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.Settings
 import org.ligi.passandroid.model.pass.Pass
@@ -23,14 +22,14 @@ class PassMenuOptions(val activity: AppCompatActivity, val pass: Pass) : KoinCom
         when (item.itemId) {
 
             R.id.menu_archive_pass -> {
-                setArchived(passStore.archive, listOf(pass), true)
+                passStore.archive.setState(pass, ArchiveState.ARCHIVED)
                 Toast.makeText(activity, activity.resources.getQuantityString(R.plurals.passes_archived, 1, 1), Toast.LENGTH_SHORT).show()
                 closePassView()
                 return true
             }
 
             R.id.menu_restore_pass -> {
-                setArchived(passStore.archive, listOf(pass), false)
+                passStore.archive.setState(pass, ArchiveState.ACTIVE)
                 Toast.makeText(activity, activity.resources.getQuantityString(R.plurals.passes_restored, 1, 1), Toast.LENGTH_SHORT).show()
                 closePassView()
                 return true

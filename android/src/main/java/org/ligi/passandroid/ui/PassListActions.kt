@@ -1,4 +1,4 @@
-package org.ligi.passandroid.functions
+package org.ligi.passandroid.ui
 
 import android.app.Activity
 import android.view.View
@@ -8,7 +8,6 @@ import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassArchive
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
-import org.ligi.passandroid.ui.showDestructiveConfirmationDialog
 
 fun Activity.showPassListSnackbar(message: CharSequence, undo: (() -> Unit)? = null) {
     val anchor: View = findViewById(R.id.fam) ?: findViewById(android.R.id.content)
@@ -17,21 +16,18 @@ fun Activity.showPassListSnackbar(message: CharSequence, undo: (() -> Unit)? = n
     }.show()
 }
 
-fun setArchived(archive: PassArchive, passes: List<Pass>, archived: Boolean) =
-    archive.setState(passes, if (archived) ArchiveState.ARCHIVED else ArchiveState.ACTIVE)
-
 fun archiveWithUndoSnackbar(archive: PassArchive, passes: List<Pass>, activity: Activity) {
-    setArchived(archive, passes, true)
+    archive.setState(passes, ArchiveState.ARCHIVED)
     activity.showPassListSnackbar(
         activity.resources.getQuantityString(R.plurals.passes_archived, passes.size, passes.size)
-    ) { setArchived(archive, passes, false) }
+    ) { archive.setState(passes, ArchiveState.ACTIVE) }
 }
 
 fun restoreWithUndoSnackbar(archive: PassArchive, passes: List<Pass>, activity: Activity) {
-    setArchived(archive, passes, false)
+    archive.setState(passes, ArchiveState.ACTIVE)
     activity.showPassListSnackbar(
         activity.resources.getQuantityString(R.plurals.passes_restored, passes.size, passes.size)
-    ) { setArchived(archive, passes, true) }
+    ) { archive.setState(passes, ArchiveState.ARCHIVED) }
 }
 
 fun Activity.confirmAndDeletePasses(passStore: PassStore, passes: List<Pass>, onDeleted: () -> Unit = {}) {

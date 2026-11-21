@@ -1,11 +1,9 @@
-package org.ligi.passandroid.functions
+package org.ligi.passandroid.model
 
 import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import org.ligi.passandroid.R
-import org.ligi.passandroid.model.PassBitmapDefinitions
-import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassField
 import org.ligi.passandroid.model.pass.PassImpl

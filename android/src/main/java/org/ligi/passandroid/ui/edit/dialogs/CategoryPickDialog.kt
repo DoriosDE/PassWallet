@@ -8,7 +8,7 @@ import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.ligi.passandroid.R
 import org.ligi.passandroid.databinding.CategoryPickSheetBinding
 import org.ligi.passandroid.databinding.ItemCategoryPickBinding
-import org.ligi.passandroid.functions.getHumanCategoryString
+import org.ligi.passandroid.model.pass.labelRes
 import org.ligi.passandroid.model.PassBitmapDefinitions
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
@@ -29,7 +29,7 @@ fun showCategoryPickDialog(context: Context, pass: Pass, passStore: PassStore, r
         row.categoryView.setAccentColor(pass.accentColor)
         row.categoryView.setImageByCategory(type)
         iconBitmap?.let { row.categoryView.setIcon(it) }
-        row.navCategoryLabel.setText(getHumanCategoryString(type))
+        row.navCategoryLabel.setText(type.labelRes)
         row.categorySelectedCheck.visibility = if (pass.type == type) View.VISIBLE else View.GONE
         row.root.setOnClickListener {
             pass.type = type

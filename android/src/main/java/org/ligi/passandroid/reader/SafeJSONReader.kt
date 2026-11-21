@@ -1,4 +1,4 @@
-package org.ligi.passandroid.functions
+package org.ligi.passandroid.reader
 
 import org.json.JSONException
 import org.json.JSONObject

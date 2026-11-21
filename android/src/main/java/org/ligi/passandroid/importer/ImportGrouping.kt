@@ -1,4 +1,4 @@
-package org.ligi.passandroid.functions
+package org.ligi.passandroid.importer
 
 import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassGroups

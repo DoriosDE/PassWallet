@@ -1,34 +1,15 @@
-package org.ligi.passandroid.functions
+package org.ligi.passandroid.model.pass
 
-import android.content.res.Resources
 import android.graphics.Bitmap
-import android.graphics.drawable.BitmapDrawable
 import androidx.core.graphics.createBitmap
-import androidx.core.graphics.drawable.toDrawable
 import com.google.zxing.EncodeHintType
 import com.google.zxing.MultiFormatWriter
 import com.google.zxing.common.BitMatrix
-import org.ligi.passandroid.model.pass.PassBarCodeFormat
 import timber.log.Timber
 
 private const val MAX_WIDTH_1D = 1500
 private const val MAX_WIDTH_2D = 500
 private const val DEFAULT_1D_HEIGHT = 300
-
-fun generateBitmapDrawable(
-    resources: Resources,
-    data: String,
-    type: PassBarCodeFormat,
-    widthPx: Int? = null,
-    heightPx: Int? = null
-): BitmapDrawable? {
-    val bitmap = generateBarCodeBitmap(data, type, widthPx, heightPx) ?: return null
-
-    return bitmap.toDrawable(resources).apply {
-        isFilterBitmap = false
-        setAntiAlias(false)
-    }
-}
 
 fun generateBarCodeBitmap(data: String, type: PassBarCodeFormat, widthPx: Int? = null, heightPx: Int? = null): Bitmap? {
 

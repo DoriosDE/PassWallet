@@ -3,8 +3,8 @@ package org.ligi.passandroid
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Fail.fail
 import org.junit.Test
-import org.ligi.passandroid.functions.generateBarCodeBitmap
-import org.ligi.passandroid.functions.getBitMatrix
+import org.ligi.passandroid.model.pass.generateBarCodeBitmap
+import org.ligi.passandroid.model.pass.getBitMatrix
 import org.ligi.passandroid.model.pass.PassBarCodeFormat
 
 class TheBarcodeHelper {

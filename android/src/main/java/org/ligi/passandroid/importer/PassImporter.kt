@@ -2,7 +2,7 @@ package org.ligi.passandroid.importer
 
 import androidx.annotation.StringRes
 import org.ligi.passandroid.R
-import org.ligi.passandroid.functions.readJSONSafely
+import org.ligi.passandroid.reader.readJSONSafely
 import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream

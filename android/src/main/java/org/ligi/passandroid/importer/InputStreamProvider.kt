@@ -1,4 +1,4 @@
-package org.ligi.passandroid.functions
+package org.ligi.passandroid.importer
 
 import android.content.Context
 import android.net.Uri

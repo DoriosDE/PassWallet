@@ -8,8 +8,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.ligi.kaxt.parseColor
 import org.ligi.passandroid.R
-import org.ligi.passandroid.functions.getHumanCategoryString
-import org.ligi.passandroid.functions.readJSONSafely
 import org.ligi.passandroid.model.ApplePassbookQuirkCorrector
 import org.ligi.passandroid.model.AppleStylePassTranslation
 import org.ligi.passandroid.model.PassBitmapDefinitions
@@ -194,7 +192,7 @@ object AppleStylePassReader {
                 addFields(fieldList, typeJSON, "auxiliaryFields", translation)
                 addFields(fieldList, typeJSON, "backFields", translation, hide = true)
 
-                fieldList.add(PassField("", context.getString(R.string.type), context.getString(getHumanCategoryString(pass.type)), false))
+                fieldList.add(PassField("", context.getString(R.string.type), context.getString(pass.type.labelRes), false))
                 pass.fields = fieldList
             }
         } catch (ignored: JSONException) {
