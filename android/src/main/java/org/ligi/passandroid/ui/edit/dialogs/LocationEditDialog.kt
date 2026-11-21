@@ -11,25 +11,17 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import okhttp3.Call
-import okhttp3.Callback
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import org.json.JSONArray
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
 import org.ligi.kaxt.inflate
 import org.ligi.passandroid.R
+import org.ligi.passandroid.location.LocationSearch
+import org.ligi.passandroid.location.LocationSearchResult
 import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.model.pass.PassLocation
 import java.io.IOException
-import java.net.URLEncoder
 import java.util.Locale
-
-private data class LocationSearchResult(
-    val displayName: String,
-    val latitude: Double,
-    val longitude: Double,
-)
 
 fun showLocationEditDialog(
     activity: Activity,
@@ -53,6 +45,8 @@ fun showLocationEditDialog(
     val saveButton = view.findViewById<MaterialButton>(R.id.locationSaveButton)
     val removeButton = view.findViewById<MaterialButton>(R.id.locationRemoveButton)
     val dialog = BottomSheetDialog(activity)
+    val locationSearch = LocationSearch()
+    val searchScope = MainScope()
 
     fun setSearchLoading(isLoading: Boolean) {
         searchButton.isEnabled = !isLoading
@@ -108,56 +102,19 @@ fun showLocationEditDialog(
         searchStatus.text = ""
         resultsContainer.removeAllViews()
 
-        val encodedQuery = URLEncoder.encode(query, "UTF-8")
-        val language = Locale.getDefault().toLanguageTag()
-        val url = "https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&q=$encodedQuery"
-        val request = Request.Builder()
-            .url(url)
-            .header("User-Agent", "PassWallet Android (org.baumweg.passwallet)")
-            .header("Accept-Language", language)
-            .build()
-
-        OkHttpClient().newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: Call, e: IOException) {
-                activity.runOnUiThread {
-                    setSearchLoading(false)
-                    searchStatus.text = activity.getString(R.string.location_search_failed)
-                }
+        searchScope.launch {
+            val results = try {
+                locationSearch.search(query, Locale.getDefault().toLanguageTag())
+            } catch (_: IOException) {
+                null
             }
-
-            override fun onResponse(call: Call, response: Response) {
-                val results = mutableListOf<LocationSearchResult>()
-                var failed = !response.isSuccessful
-                try {
-                    val body = response.body()?.string().orEmpty()
-                    if (!failed) {
-                        val array = JSONArray(body)
-                        for (index in 0 until array.length()) {
-                            val obj = array.getJSONObject(index)
-                            val latitude = obj.optString("lat").toDoubleOrNull()
-                            val longitude = obj.optString("lon").toDoubleOrNull()
-                            val displayName = obj.optString("display_name")
-                            if (latitude != null && longitude != null && displayName.isNotBlank()) {
-                                results.add(LocationSearchResult(displayName, latitude, longitude))
-                            }
-                        }
-                    }
-                } catch (_: Exception) {
-                    failed = true
-                } finally {
-                    response.close()
-                }
-
-                activity.runOnUiThread {
-                    setSearchLoading(false)
-                    if (failed) {
-                        searchStatus.text = activity.getString(R.string.location_search_failed)
-                    } else {
-                        showSearchResults(results)
-                    }
-                }
+            setSearchLoading(false)
+            if (results == null) {
+                searchStatus.text = activity.getString(R.string.location_search_failed)
+            } else {
+                showSearchResults(results)
             }
-        })
+        }
     }
 
     fun saveLocation(): Boolean {
@@ -217,6 +174,7 @@ fun showLocationEditDialog(
         dialog.dismiss()
     }
 
+    dialog.setOnDismissListener { searchScope.cancel() }
     dialog.setContentView(view)
     dialog.show()
 }
