@@ -15,7 +15,7 @@ import org.ligi.passandroid.model.ApplePassbookQuirkCorrector
 import org.ligi.passandroid.model.AppleStylePassTranslation
 import org.ligi.passandroid.model.PassBitmapDefinitions
 import org.ligi.passandroid.model.PassDefinitions
-import org.ligi.passandroid.model.PassGroups
+import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.pass.*
 import org.threeten.bp.DateTimeException
 import org.threeten.bp.ZonedDateTime
@@ -136,7 +136,7 @@ object AppleStylePassReader {
         pass.authToken = readJsonSafeAsOptional(passJSON, "authenticationToken")
         pass.webServiceURL = readJsonSafeAsOptional(passJSON, "webServiceURL")
         pass.passIdent = readJsonSafeAsOptional(passJSON, "passTypeIdentifier")
-        pass.groupId = PassGroups.automaticGroupId(pass.passIdent, readJsonSafeAsOptional(passJSON, "groupingIdentifier"))
+        pass.grouping = PassGrouping.fromPassbook(pass.passIdent, readJsonSafeAsOptional(passJSON, "groupingIdentifier"))
 
         val locations = ArrayList<PassLocation>()
         try {

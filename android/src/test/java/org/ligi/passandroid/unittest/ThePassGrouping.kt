@@ -4,16 +4,19 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
 import org.ligi.passandroid.model.PassGroupFilter
 import org.ligi.passandroid.model.PassGroups
+import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.PassListEntry
 import org.ligi.passandroid.model.pass.PassImpl
 
-class ThePassGrouping {
+private fun pass(id: String, groupKey: String? = null) = PassImpl(id).apply {
+    grouping = groupKey?.let { PassGrouping.InGroup(it) } ?: PassGrouping.None
+}
 
-    private fun pass(id: String, groupId: String? = null) = PassImpl(id).apply { this.groupId = groupId }
+class ThePassGrouping {
 
     @Test
     fun ungroupedPassesStaySingle() {
-        val passes = listOf(pass("1"), pass("2", ""), pass("3"))
+        val passes = listOf(pass("1"), pass("2").apply { grouping = PassGrouping.UngroupedByUser }, pass("3"))
 
         val result = PassGroups.group(passes)
 
@@ -25,7 +28,7 @@ class ThePassGrouping {
     }
 
     @Test
-    fun passesWithSameGroupIdAreCollapsedAtPositionOfFirstMember() {
+    fun passesOfTheSameGroupAreCollapsedAtPositionOfFirstMember() {
         val a = pass("a")
         val g1 = pass("g1", "x")
         val b = pass("b")
@@ -35,7 +38,7 @@ class ThePassGrouping {
 
         assertThat(result).containsExactly(
             PassListEntry.Single(a),
-            PassListEntry.Group("x", listOf(g1, g2)),
+            PassListEntry.Group(PassGrouping.InGroup("x"), listOf(g1, g2)),
             PassListEntry.Single(b),
         )
     }
@@ -48,24 +51,25 @@ class ThePassGrouping {
     }
 
     @Test
-    fun automaticGroupIdNeedsGroupingIdentifier() {
-        assertThat(PassGroups.automaticGroupId("pass.com.example", null)).isNull()
-        assertThat(PassGroups.automaticGroupId("pass.com.example", " ")).isNull()
-        assertThat(PassGroups.automaticGroupId("pass.com.example", "event-42"))
-            .isEqualTo(PassGroups.automaticGroupId("pass.com.example", "event-42"))
-        assertThat(PassGroups.automaticGroupId("pass.com.example", "event-42"))
-            .isNotEqualTo(PassGroups.automaticGroupId("pass.com.other", "event-42"))
+    fun passbookGroupingNeedsGroupingIdentifier() {
+        assertThat(PassGrouping.fromPassbook("pass.com.example", null)).isEqualTo(PassGrouping.None)
+        assertThat(PassGrouping.fromPassbook("pass.com.example", " ")).isEqualTo(PassGrouping.None)
+        assertThat(PassGrouping.fromPassbook("pass.com.example", "event-42"))
+            .isInstanceOf(PassGrouping.InGroup::class.java)
+            .isEqualTo(PassGrouping.fromPassbook("pass.com.example", "event-42"))
+        assertThat(PassGrouping.fromPassbook("pass.com.example", "event-42"))
+            .isNotEqualTo(PassGrouping.fromPassbook("pass.com.other", "event-42"))
     }
 
     @Test
     fun joiningUngroupedTargetCreatesNewGroup() {
         val a = pass("a")
-        val b = pass("b", "")
+        val b = pass("b").apply { grouping = PassGrouping.UngroupedByUser }
 
         val changed = PassGroups.join(a, b)
 
         assertThat(changed).containsOnly(a, b).hasSize(2)
-        assertThat(a.groupId).isNotEmpty().isEqualTo(b.groupId)
+        assertThat(a.grouping).isInstanceOf(PassGrouping.InGroup::class.java).isEqualTo(b.grouping)
     }
 
     @Test
@@ -76,7 +80,7 @@ class ThePassGrouping {
         val changed = PassGroups.join(a, b)
 
         assertThat(changed).containsExactly(a)
-        assertThat(a.groupId).isEqualTo("existing")
+        assertThat(a.grouping).isEqualTo(PassGrouping.InGroup("existing"))
     }
 
     @Test
@@ -85,14 +89,34 @@ class ThePassGrouping {
 
         PassGroups.ungroup(listOf(a))
 
-        assertThat(a.groupId).isEqualTo(PassGroups.USER_UNGROUPED)
-        assertThat(PassGroups.isGrouped(a)).isFalse()
+        assertThat(a.grouping).isEqualTo(PassGrouping.UngroupedByUser)
+    }
+
+    @Test
+    fun updatedPassKeepsTheGroupingOfThePreviousVersion() {
+        val updated = pass("p")
+
+        PassGroups.keepGroupingAfterUpdate(PassGrouping.InGroup("x"), updated)
+        assertThat(updated.grouping).isEqualTo(PassGrouping.InGroup("x"))
+
+        val updatedAfterUngroup = pass("q")
+        PassGroups.keepGroupingAfterUpdate(PassGrouping.UngroupedByUser, updatedAfterUngroup)
+        assertThat(updatedAfterUngroup.grouping).isEqualTo(PassGrouping.UngroupedByUser)
+    }
+
+    @Test
+    fun updatedPassWithOwnPassbookGroupKeepsIt() {
+        val updated = pass("p", "from-passbook")
+
+        val changed = PassGroups.keepGroupingAfterUpdate(PassGrouping.InGroup("x"), updated)
+
+        assertThat(changed).isFalse()
+        assertThat(updated.grouping).isEqualTo(PassGrouping.InGroup("from-passbook"))
     }
 }
 
 class ThePassGroupFilter {
 
-    private fun pass(id: String, groupId: String? = null) = PassImpl(id).apply { this.groupId = groupId }
 
     private val single = pass("single")
     private val lonely = pass("lonely", "y")

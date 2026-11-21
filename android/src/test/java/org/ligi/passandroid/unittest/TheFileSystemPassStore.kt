@@ -5,6 +5,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.ligi.passandroid.model.ArchiveState
+import org.ligi.passandroid.model.PassGrouping
 import java.io.File
 
 /**
@@ -34,7 +35,7 @@ class TheFileSystemPassStore {
 
         assertThat(loaded).isNotNull
         assertThat(loaded!!.description).isEqualTo("Concert")
-        assertThat(loaded.groupId).isEqualTo("manual:group")
+        assertThat(loaded.grouping).isEqualTo(PassGrouping.InGroup("group"))
         assertThat(restarted.archive.isArchived(loaded)).isTrue()
     }
 
@@ -132,5 +133,17 @@ class TheFileSystemPassStore {
 
         assertThat(restarted.archive.passesIn(ArchiveState.ARCHIVED).map { it.id }).containsExactly("archived")
         assertThat(restarted.archive.passesIn(ArchiveState.ACTIVE).map { it.id }).containsExactly("active")
+    }
+
+    @Test
+    fun ungroupedByUserAndNoGroupSurviveRestart() {
+        val store = newStore()
+        store.save(pass("ungrouped", "Ungrouped").apply { grouping = PassGrouping.UngroupedByUser })
+        store.save(pass("single", "Single").apply { grouping = PassGrouping.None })
+
+        val restarted = newStore()
+
+        assertThat(restarted.getPassbookForId("ungrouped")!!.grouping).isEqualTo(PassGrouping.UngroupedByUser)
+        assertThat(restarted.getPassbookForId("single")!!.grouping).isEqualTo(PassGrouping.None)
     }
 }

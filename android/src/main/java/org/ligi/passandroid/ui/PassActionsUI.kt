@@ -23,6 +23,7 @@ import org.ligi.passandroid.functions.confirmAndDeletePasses
 import org.ligi.passandroid.functions.restoreWithUndoSnackbar
 import org.ligi.passandroid.functions.showPassListSnackbar
 import org.ligi.passandroid.model.ArchiveState
+import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.PassGroups
 import org.ligi.passandroid.model.PassListEntry
 import org.ligi.passandroid.model.PassStore
@@ -86,7 +87,7 @@ internal class PassActionsUI(
                 showGroupPicker()
             })
         }
-        if (PassGroups.isGrouped(pass)) {
+        if (pass.grouping.group != null) {
             container.addView(createRow(R.drawable.ic_pass_ungroup_24, R.color.accent, context.getString(R.string.pass_group_remove)) {
                 ungroup(listOf(pass), R.string.pass_group_removed)
                 dialog.dismiss()
@@ -100,7 +101,7 @@ internal class PassActionsUI(
      */
     private fun groupCandidates(): List<Pass> {
         return passStore.archive.passesIn(passStore.archive.stateOf(pass)).filter { candidate ->
-            candidate.id != pass.id && !(PassGroups.isGrouped(pass) && candidate.groupId == pass.groupId)
+            candidate.id != pass.id && !(pass.grouping.group != null && candidate.grouping == pass.grouping)
         }
     }
 
@@ -129,13 +130,13 @@ internal class PassActionsUI(
     }
 
     private fun ungroup(passesToUngroup: List<Pass>, messageRes: Int) {
-        val previousGroupIds = passesToUngroup.associateWith { it.groupId }
+        val previousGroupings = passesToUngroup.associateWith { it.grouping }
         PassGroups.ungroup(passesToUngroup).forEach { passStore.save(it) }
         passStore.notifyChange()
 
         context.showPassListSnackbar(context.getString(messageRes)) {
-            previousGroupIds.forEach { (pass, groupId) ->
-                pass.groupId = groupId
+            previousGroupings.forEach { (pass, grouping) ->
+                pass.grouping = grouping
                 passStore.save(pass)
             }
             passStore.notifyChange()

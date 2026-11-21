@@ -4,14 +4,12 @@ import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.ConfigurationCompat
 import com.jakewharton.threetenabp.AndroidThreeTen
-import com.squareup.moshi.Moshi
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.module
-import org.ligi.passandroid.json_adapter.ColorAdapter
-import org.ligi.passandroid.json_adapter.ZonedTimeAdapter
+import org.ligi.passandroid.json_adapter.PassWalletMoshi
 import org.ligi.passandroid.model.AndroidFileSystemPassStore
 import org.ligi.passandroid.model.AndroidSettings
 import org.ligi.passandroid.model.PassStore
@@ -21,10 +19,7 @@ import java.util.Locale
 
 open class App : Application() {
 
-    private val moshi = Moshi.Builder()
-            .add(ZonedTimeAdapter())
-            .add(ColorAdapter())
-            .build()
+    private val moshi = PassWalletMoshi.create()
 
     private val settings by lazy { AndroidSettings(this) }
 

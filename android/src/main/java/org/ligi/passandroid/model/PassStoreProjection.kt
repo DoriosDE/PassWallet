@@ -12,14 +12,14 @@ sealed class PassGroupFilter {
     object All : PassGroupFilter()
 
     /** only the members of one group */
-    data class OnlyGroup(val groupId: String) : PassGroupFilter()
+    data class OnlyGroup(val group: PassGrouping.InGroup) : PassGroupFilter()
 
     /** only passes that are not stacked in a group (with at least two members in this list) */
     object OnlyUngrouped : PassGroupFilter()
 
     fun apply(passes: List<Pass>): List<Pass> = when (this) {
         All -> passes
-        is OnlyGroup -> passes.filter { it.groupId == groupId }
+        is OnlyGroup -> passes.filter { it.grouping == group }
         OnlyUngrouped -> PassGroups.group(passes).filterIsInstance<PassListEntry.Single>().map { it.pass }
     }
 
@@ -29,10 +29,10 @@ sealed class PassGroupFilter {
          * or - for passes outside of groups - between the other ungrouped passes.
          */
         fun forPass(pass: Pass, listPasses: List<Pass>): PassGroupFilter {
-            val group = PassGroups.group(listPasses)
+            val groupEntry = PassGroups.group(listPasses)
                 .filterIsInstance<PassListEntry.Group>()
-                .firstOrNull { it.groupId == pass.groupId }
-            return if (group != null) OnlyGroup(group.groupId) else OnlyUngrouped
+                .firstOrNull { it.group == pass.grouping }
+            return if (groupEntry != null) OnlyGroup(groupEntry.group) else OnlyUngrouped
         }
     }
 }

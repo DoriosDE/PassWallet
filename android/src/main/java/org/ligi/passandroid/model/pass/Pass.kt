@@ -3,6 +3,7 @@ package org.ligi.passandroid.model.pass
 import android.graphics.Bitmap
 import androidx.annotation.StringDef
 import org.ligi.passandroid.model.PassBitmapDefinitions.*
+import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.PassStore
 
 
@@ -42,11 +43,8 @@ interface Pass {
 
     val passIdent: String?
 
-    /**
-     * Identifies passes that belong together and are shown as one stack in the pass list.
-     * null = no group, [org.ligi.passandroid.model.PassGroups.USER_UNGROUPED] = taken out of a group by the user.
-     */
-    var groupId: String?
+    /** the stack of passes this pass belongs to in the pass list */
+    var grouping: PassGrouping
 
     /** text shown next to / instead of the logo (pkpass "logoText") */
     var logoText: String?

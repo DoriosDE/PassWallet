@@ -266,7 +266,7 @@ open class PassViewActivityBase : PassAndroidActivity() {
                     return@Runnable
                 }
                 dlg.dismissSafely()
-                val previousGroupId = currentPass.groupId
+                val previousGrouping = currentPass.grouping
                 if (currentPass.id != uuid) {
                     passStore.deletePassWithId(currentPass.id)
                 }
@@ -280,8 +280,7 @@ open class PassViewActivityBase : PassAndroidActivity() {
                     return@Runnable
                 }
                 // an update replaces the stored pass - keep it in the group it belonged to
-                if (!PassGroups.isGrouped(newPass) && previousGroupId != null) {
-                    newPass.groupId = previousGroupId
+                if (PassGroups.keepGroupingAfterUpdate(previousGrouping, newPass)) {
                     passStore.save(newPass)
                 }
                 passStore.currentPass = newPass

@@ -2,6 +2,7 @@ package org.ligi.passandroid.unittest
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.PassGroups
 import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.model.pass.PassType
@@ -17,13 +18,13 @@ class ThePassAutoGrouping {
         description: String = "Concert ticket",
         date: ZonedDateTime? = concertDay,
         type: PassType = PassType.EVENT,
-        groupId: String? = "",
+        grouping: PassGrouping = PassGrouping.None,
     ) = PassImpl(id).apply {
         passIdent = issuer
         this.description = description
         calendarTimespan = date?.let { PassImpl.TimeSpan(from = it) }
         this.type = type
-        this.groupId = groupId
+        this.grouping = grouping
     }
 
     @Test
@@ -34,17 +35,17 @@ class ThePassAutoGrouping {
         val changed = PassGroups.autoGroup(listOf(imported), listOf(existing))
 
         assertThat(changed).containsOnly(imported, existing).hasSize(2)
-        assertThat(imported.groupId).isNotEmpty().isEqualTo(existing.groupId)
+        assertThat(imported.grouping).isInstanceOf(PassGrouping.InGroup::class.java).isEqualTo(existing.grouping)
     }
 
     @Test
     fun newTicketJoinsExistingGroup() {
-        val grouped = ticket("grouped", groupId = "pk:stack")
+        val grouped = ticket("grouped", grouping = PassGrouping.InGroup("stack"))
         val imported = ticket("imported")
 
         assertThat(PassGroups.autoGroup(listOf(imported), listOf(ticket("other", description = "Other"), grouped)))
             .containsExactly(imported)
-        assertThat(imported.groupId).isEqualTo("pk:stack")
+        assertThat(imported.grouping).isEqualTo(PassGrouping.InGroup("stack"))
     }
 
     @Test
@@ -65,12 +66,12 @@ class ThePassAutoGrouping {
 
     @Test
     fun passesUngroupedByUserAreLeftAlone() {
-        val ungroupedByUser = ticket("existing", groupId = PassGroups.USER_UNGROUPED)
+        val ungroupedByUser = ticket("existing", grouping = PassGrouping.UngroupedByUser)
         val imported = ticket("imported")
 
         assertThat(PassGroups.autoGroup(listOf(imported), listOf(ungroupedByUser))).isEmpty()
 
-        val importedAgain = ticket("again", groupId = PassGroups.USER_UNGROUPED)
+        val importedAgain = ticket("again", grouping = PassGrouping.UngroupedByUser)
         assertThat(PassGroups.autoGroup(listOf(importedAgain), listOf(ticket("x")))).isEmpty()
     }
 
@@ -81,6 +82,6 @@ class ThePassAutoGrouping {
 
         PassGroups.autoGroup(listOf(first, second), emptyList())
 
-        assertThat(first.groupId).isNotEmpty().isEqualTo(second.groupId)
+        assertThat(first.grouping).isInstanceOf(PassGrouping.InGroup::class.java).isEqualTo(second.grouping)
     }
 }

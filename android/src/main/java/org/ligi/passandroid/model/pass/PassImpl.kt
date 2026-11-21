@@ -4,6 +4,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.JsonQualifier
+import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.PassStore
 import org.threeten.bp.ZonedDateTime
 import java.io.File
@@ -67,7 +68,7 @@ class PassImpl(override val id: String) : Pass {
 
     override var passIdent: String? = null
 
-    override var groupId: String? = null
+    override var grouping: PassGrouping = PassGrouping.None
 
     override var logoText: String? = null
 
