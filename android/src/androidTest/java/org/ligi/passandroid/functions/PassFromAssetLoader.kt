@@ -2,6 +2,8 @@ package org.ligi.passandroid.functions
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
+import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Fail.fail
 import org.ligi.passandroid.TestApp
 import org.ligi.passandroid.model.InputStreamWithSource
@@ -9,9 +11,7 @@ import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.reader.AppleStylePassReader
 import org.ligi.passandroid.ui.PassImportController
-import org.ligi.passandroid.ui.PassImportController.FailCallback
-import org.ligi.passandroid.ui.PassImportController.InputStreamImportSpec
-import org.mockito.Mockito.*
+import org.mockito.Mockito.mock
 import java.io.File
 
 
@@ -25,24 +25,20 @@ fun loadPassFromAsset(asset: String, callback: (pass: Pass?) -> Unit) {
         val inputStream = instrumentation.context.resources.assets.open(asset)
         val inputStreamWithSource = InputStreamWithSource("none", inputStream)
 
-        val mock = mock(FailCallback::class.java)
-        val spec = InputStreamImportSpec(inputStreamWithSource, instrumentation.targetContext, mock(
-                PassStore::class.java),
-                object : PassImportController.SuccessCallback {
-                    override fun call(uuids: List<String>) {
-                        val uuid = uuids.first()
-                        callback.invoke(AppleStylePassReader.read(File(getTestTargetPath(instrumentation.targetContext), uuid), "en",
-                                instrumentation.targetContext,TestApp.tracker))
-                    }
-                },
-                mock
-        )
+        val targetPath = getTestTargetPath(instrumentation.targetContext)
+        val outcome = runBlocking {
+            PassImportController.import(
+                instrumentation.targetContext,
+                mock(PassStore::class.java),
+                inputStreamWithSource,
+                overwrite = true,
+                passesDir = targetPath,
+            )
+        }
 
-        spec.overwrite = true
-        spec.targetPath = getTestTargetPath(spec.context)
-        PassImportController.processInputStream(spec)
-
-        verify(mock, never()).fail(anyString())
+        assertThat(outcome.errorMessages).isEmpty()
+        val uuid = outcome.passIds.first()
+        callback.invoke(AppleStylePassReader.read(File(targetPath, uuid), "en", instrumentation.targetContext, TestApp.tracker))
 
     } catch (e: Exception) {
         fail("should be able to load file ", e)

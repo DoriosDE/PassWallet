@@ -1,7 +1,6 @@
 package org.ligi.passandroid.ui
 
 import android.annotation.SuppressLint
-import android.app.Dialog
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
@@ -13,19 +12,22 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import androidx.core.graphics.scale
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import com.google.android.material.snackbar.Snackbar
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.ligi.passandroid.R
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import org.ligi.passandroid.model.InputStreamWithSource
 import org.ligi.passandroid.model.ArchiveState
-import org.ligi.passandroid.model.PassGroups
+import org.ligi.passandroid.model.applyUpdate
 import org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_ICON
 import org.ligi.passandroid.model.State
 import org.ligi.passandroid.model.pass.Pass
-import org.ligi.passandroid.ui.PassImportController.InputStreamImportSpec
 import java.io.IOException
 
 @SuppressLint("Registered")
@@ -139,7 +141,7 @@ open class PassViewActivityBase : PassAndroidActivity() {
             }
 
             R.id.menu_update -> {
-                Thread(UpdateAsync()).start()
+                updatePass()
                 true
             }
 
@@ -166,133 +168,97 @@ open class PassViewActivityBase : PassAndroidActivity() {
         ShortcutManagerCompat.requestPinShortcut(this, shortcutInfo, null)
     }
 
-    inner class UpdateAsync : Runnable {
+    private sealed class UpdateOutcome {
+        /** the update was imported and taken over - [updatedPass] is null when that failed */
+        class Imported(val updatedPass: Pass?, val errorText: String?) : UpdateOutcome()
+        class Unavailable(val statusCode: Int) : UpdateOutcome()
+        class NetworkError(val error: IOException) : UpdateOutcome()
+    }
 
-        private lateinit var dlg: Dialog
-
-        override fun run() {
-            val pass = currentPass
-            val dialogReady = CountDownLatch(1)
-            runOnUiThread {
-                dlg = createProgressDialog(getString(R.string.downloading_new_pass_version))
-                dlg.show()
-                dialogReady.countDown()
+    /** downloads the latest version of the pass from its provider and replaces the stored one */
+    private fun updatePass() {
+        val pass = currentPass
+        lifecycleScope.launch {
+            val dialog = createProgressDialog(getString(R.string.downloading_new_pass_version))
+            dialog.show()
+            val outcome = try {
+                // the stored pass is changed - finish that even when the screen is closed meanwhile
+                withContext(NonCancellable) { downloadAndApplyUpdate(pass) }
+            } finally {
+                dialog.dismissSafely()
             }
-            dialogReady.await()
+            showUpdateOutcome(outcome)
+        }
+    }
 
-            val client = OkHttpClient.Builder()
-                .connectTimeout(10, TimeUnit.SECONDS)
-                .readTimeout(20, TimeUnit.SECONDS)
-                .writeTimeout(10, TimeUnit.SECONDS)
-                .build()
+    private suspend fun downloadAndApplyUpdate(pass: Pass): UpdateOutcome = withContext(Dispatchers.IO) {
+        val client = OkHttpClient.Builder()
+            .connectTimeout(10, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(10, TimeUnit.SECONDS)
+            .build()
 
-            val url = pass.webServiceURL + "/v1/passes/" + pass.passIdent + "/" + pass.serial
-            val requestBuilder = Request.Builder().url(url)
-            requestBuilder.addHeader("Authorization", "ApplePass " + pass.authToken)
+        val url = pass.webServiceURL + "/v1/passes/" + pass.passIdent + "/" + pass.serial
+        val request = Request.Builder()
+            .url(url)
+            .addHeader("Authorization", "ApplePass " + pass.authToken)
+            .build()
 
-            val request = requestBuilder.build()
-
-            try {
-                client.newCall(request).execute().use { response ->
-                    when (val result = interpretPassUpdateResponse(response)) {
-                        is PassUpdateResult.Available -> {
-                            val inputStreamWithSource = InputStreamWithSource(url, result.body.byteStream())
-                            val spec = InputStreamImportSpec(
-                                inputStreamWithSource,
-                                this@PassViewActivityBase,
-                                passStore,
-                                UpdateSuccessCallback(dlg),
-                                UpdateFailCallback(dlg),
-                            )
-                            spec.overwrite = true
-                            PassImportController.processInputStream(spec)
+        try {
+            client.newCall(request).execute().use { response ->
+                when (val result = interpretPassUpdateResponse(response)) {
+                    is PassUpdateResult.Available -> {
+                        val imported = PassImportController.import(
+                            this@PassViewActivityBase,
+                            passStore,
+                            InputStreamWithSource(url, result.body.byteStream()),
+                            overwrite = true,
+                        )
+                        // the pass store is used by the screens on the main thread - take the update over there
+                        val updatedPass = withContext(Dispatchers.Main) {
+                            imported.passIds.firstOrNull()?.let { passStore.applyUpdate(pass, it) }
                         }
-                        is PassUpdateResult.Unavailable -> showUpdateUnavailable(dlg, result.statusCode)
+                        UpdateOutcome.Imported(updatedPass, imported.errorText.takeIf { it.isNotEmpty() })
                     }
+                    is PassUpdateResult.Unavailable -> UpdateOutcome.Unavailable(result.statusCode)
                 }
-            } catch (e: IOException) {
-                showUpdateNetworkError(dlg, e)
             }
-
+        } catch (e: IOException) {
+            UpdateOutcome.NetworkError(e)
         }
     }
 
-    private fun showUpdateUnavailable(dlg: Dialog, statusCode: Int) {
-        runOnUiThread {
-            if (!isFinishing) {
-                dlg.dismissSafely()
-                showImportErrorDialog(
-                    title = getString(R.string.update_unavailable_title),
-                    message = getString(R.string.update_unavailable_message, statusCode),
-                )
-            }
-        }
-    }
-
-    private fun showUpdateNetworkError(dlg: Dialog, error: IOException) {
-        runOnUiThread {
-            if (!isFinishing) {
-                dlg.dismissSafely()
-                showImportErrorDialog(
-                    title = getString(R.string.update_error_title),
-                    message = getString(R.string.update_error_network_message, error.localizedMessage ?: error.javaClass.simpleName),
-                )
-            }
-        }
-    }
-
-    inner class UpdateFailCallback constructor(private val dlg: Dialog) : PassImportController.FailCallback {
-
-        override fun fail(reason: String) {
-            runOnUiThread {
-                if (!isFinishing) {
-                    dlg.dismissSafely()
-                    showImportErrorDialog(
-                        title = getString(R.string.update_error_title),
-                        message = getString(R.string.update_error_invalid_message, reason),
+    private fun showUpdateOutcome(outcome: UpdateOutcome) {
+        if (isFinishing) return
+        when (outcome) {
+            is UpdateOutcome.Unavailable -> showImportErrorDialog(
+                title = getString(R.string.update_unavailable_title),
+                message = getString(R.string.update_unavailable_message, outcome.statusCode),
+            )
+            is UpdateOutcome.NetworkError -> showUpdateError(
+                getString(R.string.update_error_network_message, outcome.error.localizedMessage ?: outcome.error.javaClass.simpleName)
+            )
+            is UpdateOutcome.Imported -> {
+                outcome.updatedPass?.let { updatedPass ->
+                    passStore.currentPass = updatedPass
+                    currentPass = updatedPass
+                    refresh()
+                    Snackbar.make(window.decorView, R.string.pass_updated, Snackbar.LENGTH_LONG).show()
+                }
+                when {
+                    outcome.errorText != null -> showUpdateError(getString(R.string.update_error_invalid_message, outcome.errorText))
+                    outcome.updatedPass == null -> showUpdateError(
+                        getString(R.string.update_error_invalid_message, getString(R.string.update_error_not_saved))
                     )
                 }
             }
-
         }
     }
 
-    inner class UpdateSuccessCallback constructor(private val dlg: Dialog) : PassImportController.SuccessCallback {
-
-        override fun call(uuids: List<String>) {
-            val uuid = uuids.firstOrNull() ?: return
-            runOnUiThread(Runnable {
-                if (isFinishing) {
-                    return@Runnable
-                }
-                dlg.dismissSafely()
-                val previousGrouping = currentPass.grouping
-                if (currentPass.id != uuid) {
-                    passStore.deletePassWithId(currentPass.id)
-                }
-                // the update replaced the files on disk - read the new version
-                val newPass = passStore.reload(uuid)
-                if (newPass == null) {
-                    showImportErrorDialog(
-                        title = getString(R.string.update_error_title),
-                        message = getString(R.string.update_error_invalid_message, getString(R.string.update_error_not_saved)),
-                    )
-                    return@Runnable
-                }
-                // an update replaces the stored pass - keep it in the group it belonged to
-                if (PassGroups.keepGroupingAfterUpdate(previousGrouping, newPass)) {
-                    passStore.save(newPass)
-                }
-                passStore.currentPass = newPass
-                currentPass = newPass
-                refresh()
-
-                Snackbar.make(window.decorView, R.string.pass_updated, Snackbar.LENGTH_LONG).show()
-            })
-
-        }
-
-    }
+    private fun showUpdateError(message: String) = showImportErrorDialog(
+        title = getString(R.string.update_error_title),
+        message = message,
+    )
 
     private fun setToFullBrightness() {
         val win = window

@@ -6,6 +6,7 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import org.ligi.passandroid.model.ArchiveState
 import org.ligi.passandroid.model.PassGrouping
+import org.ligi.passandroid.model.applyUpdate
 import java.io.File
 
 /**
@@ -145,5 +146,22 @@ class TheFileSystemPassStore {
 
         assertThat(restarted.getPassbookForId("ungrouped")!!.grouping).isEqualTo(PassGrouping.UngroupedByUser)
         assertThat(restarted.getPassbookForId("single")!!.grouping).isEqualTo(PassGrouping.None)
+    }
+
+    @Test
+    fun applyingAnUpdateWithANewIdReplacesTheOldPassAndKeepsItsGroup() {
+        val store = newStore()
+        val old = pass("old-id", "Old").apply { grouping = PassGrouping.InGroup("stack") }
+        store.save(old)
+        store.archive.setState(old, ArchiveState.ARCHIVED)
+        // the update was imported under a new id
+        newStore().save(pass("new-id", "New").apply { grouping = PassGrouping.None })
+
+        val updated = store.applyUpdate(previous = old, updatedPassId = "new-id")
+
+        assertThat(updated!!.description).isEqualTo("New")
+        assertThat(updated.grouping).isEqualTo(PassGrouping.InGroup("stack"))
+        assertThat(store.getPassbookForId("old-id")).isNull()
+        assertThat(newStore().getPassbookForId("new-id")!!.grouping).isEqualTo(PassGrouping.InGroup("stack"))
     }
 }

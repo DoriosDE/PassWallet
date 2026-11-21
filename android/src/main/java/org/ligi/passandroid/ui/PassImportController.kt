@@ -1,64 +1,55 @@
 package org.ligi.passandroid.ui
 
 import android.content.Context
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import org.ligi.passandroid.Tracker
 import org.ligi.passandroid.importer.ImageOrPdfImport
+import org.ligi.passandroid.importer.ImportError
 import org.ligi.passandroid.importer.PassImporter
 import org.ligi.passandroid.model.InputStreamWithSource
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.Settings
+import java.io.File
 
 /**
- * Connects the screens to the [PassImporter]: runs an import and reports the result through the callbacks
- * (every problem to the fail callback, the imported passes to the success callback).
+ * Connects the screens to the [PassImporter]: imports in the background and returns the result
+ * with translated error messages.
  */
 object PassImportController : KoinComponent {
 
-    val tracker: Tracker by inject()
-    val settings: Settings by inject()
+    private val tracker: Tracker by inject()
+    private val settings: Settings by inject()
 
-    interface SuccessCallback {
-        fun call(uuids: List<String>)
+    /** imported pass ids and the (translated) problems found on the way */
+    data class Outcome(val passIds: List<String>, val errorMessages: List<String>) {
+        /** all problems as one text for an error dialog */
+        val errorText: String get() = errorMessages.joinToString("\n\n")
     }
 
-    interface FailCallback {
-        fun fail(reason: String)
-    }
-
-    fun processInputStream(spec: InputStreamImportSpec) {
-        val importer = PassImporter(
-            passesDir = spec.targetPath,
-            workDir = spec.context.cacheDir,
-            fallbackImport = ImageOrPdfImport(spec.context, spec.passStore),
-            tracker = tracker,
-        )
-
-        val result = importer.import(
-            input = spec.inputStreamWithSource.inputStream,
-            source = spec.inputStreamWithSource.source,
-            overwrite = spec.overwrite,
-        )
-
-        result.errors.forEach { error ->
-            val message = if (error.detail != null) {
-                spec.context.getString(error.messageRes, error.detail)
-            } else {
-                spec.context.getString(error.messageRes)
-            }
-            spec.failCallback?.fail(message)
-        }
-        if (result.passIds.isNotEmpty()) {
-            spec.onSuccessCallback?.call(result.passIds)
-        }
-    }
-
-    class InputStreamImportSpec(
-        internal val inputStreamWithSource: InputStreamWithSource,
+    /**
+     * @param overwrite true when updating a pass: an existing pass with the same id is replaced
+     * @param passesDir where the passes are stored - only tests use another directory
+     */
+    suspend fun import(
         context: Context,
         passStore: PassStore,
-        onSuccessCallback: SuccessCallback?,
-        failCallback: FailCallback?,
-    ) : PassImportSpec(context, passStore, onSuccessCallback, failCallback, settings)
+        input: InputStreamWithSource,
+        overwrite: Boolean = false,
+        passesDir: File = settings.getPassesDir(),
+    ): Outcome = withContext(Dispatchers.IO) {
+        val importer = PassImporter(
+            passesDir = passesDir,
+            workDir = context.cacheDir,
+            fallbackImport = ImageOrPdfImport(context, passStore),
+            tracker = tracker,
+        )
+        val result = importer.import(input.inputStream, input.source, overwrite)
+        Outcome(result.passIds, result.errors.map { it.message(context) })
+    }
+
+    private fun ImportError.message(context: Context) =
+        if (detail != null) context.getString(messageRes, detail) else context.getString(messageRes)
 }

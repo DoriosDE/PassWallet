@@ -8,7 +8,9 @@ import android.view.View.GONE
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
@@ -46,6 +48,50 @@ class PassImportActivity : AppCompatActivity() {
         getParcelableExtra(Intent.EXTRA_STREAM)
     }
 
+    /** imported passes become active and are stacked with matching passes - returns how many were grouped */
+    private fun takeOverImportedPasses(passIds: List<String>): Int {
+        if (passIds.isEmpty()) return 0
+        passStore.archive.setState(passIds.mapNotNull { passStore.getPassbookForId(it) }, ArchiveState.ACTIVE)
+        return autoGroupImportedPasses(passStore, settings, passIds)
+    }
+
+    private fun onImported(outcome: PassImportController.Outcome) {
+        val groupedCount = takeOverImportedPasses(outcome.passIds)
+        if (isFinishing) return
+
+        if (groupedCount > 0) {
+            Toast.makeText(
+                this,
+                resources.getQuantityString(R.plurals.passes_auto_grouped, groupedCount, groupedCount),
+                Toast.LENGTH_LONG
+            ).show()
+        }
+
+        // e.g. broken passes in a collection: the good ones are imported, all problems are shown together
+        if (outcome.errorMessages.isNotEmpty()) {
+            showImportErrorDialog(
+                title = getString(R.string.invalid_passbook_title),
+                message = outcome.errorText,
+                finishOnOk = true,
+            )
+            return
+        }
+
+        if (outcome.passIds.isEmpty()) {
+            finish()
+        } else if (outcome.passIds.size == 1) {
+            val importedId = outcome.passIds.first()
+            passStore.currentPass = passStore.getPassbookForId(importedId)
+            startActivity(
+                Intent(this, PassViewActivity::class.java)
+                    .putExtra(PassViewActivityBase.EXTRA_KEY_UUID, importedId)
+            )
+        } else {
+            startActivityFromClass(PassListActivity::class.java)
+        }
+        finish()
+    }
+
     private fun doImport() {
         lifecycleScope.launch(Dispatchers.IO) {
             try {
@@ -69,44 +115,21 @@ class PassImportActivity : AppCompatActivity() {
                     } else {
 
                         if (isFinishing) {
-                            // finish with no UI/Dialogs
-                            // let's do it silently TODO check if we need to jump to a service here as the activity is dying
-                            val spec = PassImportController.InputStreamImportSpec(fromURI, application, passStore, object : PassImportController.SuccessCallback {
-                                override fun call(uuids: List<String>) {
-                                    passStore.archive.setState(uuids.mapNotNull { passStore.getPassbookForId(it) }, ArchiveState.ACTIVE)
-                                    autoGroupImportedPasses(passStore, settings, uuids)
-                                }
-                            }, null)
-                            PassImportController.processInputStream(spec)
+                            // the screen is already closing: import silently without dialogs
+                            withContext(NonCancellable) {
+                                val outcome = PassImportController.import(application, passStore, fromURI)
+                                takeOverImportedPasses(outcome.passIds)
+                            }
                         } else {
-                            PassImportDialog.show(fromURI, this@PassImportActivity, passStore) { importedIds ->
-                                passStore.archive.setState(importedIds.mapNotNull { passStore.getPassbookForId(it) }, ArchiveState.ACTIVE)
-
-                                val groupedCount = autoGroupImportedPasses(passStore, settings, importedIds)
-                                if (groupedCount > 0) {
-                                    Toast.makeText(
-                                        this@PassImportActivity,
-                                        resources.getQuantityString(R.plurals.passes_auto_grouped, groupedCount, groupedCount),
-                                        Toast.LENGTH_LONG
-                                    ).show()
-                                }
-
-                                if (importedIds.size == 1) {
-                                    val importedId = importedIds.first()
-                                    val passbookForId = passStore.getPassbookForId(importedId)
-                                    passStore.currentPass = passbookForId
-                                    startActivity(
-                                        Intent(this@PassImportActivity, PassViewActivity::class.java)
-                                            .putExtra(PassViewActivityBase.EXTRA_KEY_UUID, importedId)
-                                    )
-                                } else {
-                                    startActivityFromClass(PassListActivity::class.java)
-                                }
-                                finish()
+                            val outcome = PassImportDialog.importWithProgress(this@PassImportActivity, passStore, fromURI)
+                            if (outcome != null) {
+                                onImported(outcome)
                             }
                         }
                     }
                 }
+            } catch (e: CancellationException) {
+                throw e // the screen was closed - not an import error
             } catch (e: Exception) {
                 if (e.message?.contains("Permission") == true) {
                     withContext(Dispatchers.Main) {
