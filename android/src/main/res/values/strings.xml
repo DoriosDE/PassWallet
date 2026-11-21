@@ -159,10 +159,18 @@
     <string name="backup_import_title">Import Backup</string>
     <string name="backup_import_summary">Restore passes, groups, archive and preferences from a PassWallet backup ZIP.</string>
     <string name="backup_import_action">Choose backup ZIP</string>
+    <string name="backup_restore_dialog_title">Restore backup?</string>
+    <string name="backup_restore_dialog_message">Passes, archive and preferences from the backup will be taken over. Passes that are also in the backup are replaced by the backed up version.</string>
+    <string name="backup_restore_action">Restore</string>
+    <plurals name="backup_restore_remove_others">
+        <item quantity="one">Remove %d pass that is not in the backup</item>
+        <item quantity="other">Remove %d passes that are not in the backup</item>
+    </plurals>
     <string name="backup_export_success">Backup exported</string>
     <string name="backup_import_success">Backup imported</string>
     <string name="pass_export_error">Could not export pass: %s</string>
     <string name="backup_export_error">Could not export backup: %s</string>
+    <string name="backup_import_not_a_backup">This file is not a PassWallet backup.</string>
     <string name="backup_import_error">Could not import backup: %s</string>
     <string name="launcher_shortcut">Launcher shortcut</string>
     <string name="import_pass">Import</string>

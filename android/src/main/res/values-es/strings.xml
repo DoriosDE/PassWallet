@@ -149,10 +149,18 @@
     <string name="backup_import_title">Importar copia</string>
     <string name="backup_import_summary">Restaura pases, grupos, archivo y preferencias desde una copia ZIP de PassWallet.</string>
     <string name="backup_import_action">Elegir ZIP de copia</string>
+    <string name="backup_restore_dialog_title">¿Restaurar copia de seguridad?</string>
+    <string name="backup_restore_dialog_message">Se recuperarán los pases, el archivo y las preferencias de la copia. Los pases que también estén en la copia se sustituirán por la versión guardada.</string>
+    <string name="backup_restore_action">Restaurar</string>
+    <plurals name="backup_restore_remove_others">
+        <item quantity="one">Eliminar %d pase que no está en la copia</item>
+        <item quantity="other">Eliminar %d pases que no están en la copia</item>
+    </plurals>
     <string name="backup_export_success">Copia exportada</string>
     <string name="backup_import_success">Copia importada</string>
     <string name="pass_export_error">No se pudo exportar el pase: %s</string>
     <string name="backup_export_error">No se pudo exportar la copia: %s</string>
+    <string name="backup_import_not_a_backup">Este archivo no es una copia de seguridad de PassWallet.</string>
     <string name="backup_import_error">No se pudo importar la copia: %s</string>
     <string name="launcher_shortcut">Acceso directo</string>
     <string name="import_pass">Importar</string>

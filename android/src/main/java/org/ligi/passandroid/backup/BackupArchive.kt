@@ -15,6 +15,7 @@ import java.util.zip.ZipOutputStream
 object BackupArchive {
 
     private const val MANIFEST_ENTRY = "manifest.json"
+    private const val PASSES_PREFIX = "passes/"
     private const val PREFERENCES_ENTRY = "preferences.json"
     private const val CLASSIFIER_STATE = "classifier_state.json"
     private const val MAX_BACKUP_TOTAL_BYTES = 100L * 1024L * 1024L
@@ -48,6 +49,29 @@ object BackupArchive {
             }
         }
         return null
+    }
+
+    /**
+     * Ids of the passes contained in a backup (the directories below "passes/").
+     */
+    fun passIds(inputStream: InputStream): Set<String> {
+        val ids = linkedSetOf<String>()
+        ZipInputStream(BufferedInputStream(inputStream)).use { zip ->
+            var entryCount = 0
+            while (true) {
+                val entry = zip.nextEntry ?: break
+                entryCount++
+                if (entryCount > MAX_BACKUP_ENTRIES) {
+                    throw IllegalArgumentException("Backup contains too many files")
+                }
+                val id = entry.name.removePrefix(PASSES_PREFIX).substringBefore('/')
+                if (entry.name.startsWith(PASSES_PREFIX) && id.isNotBlank() && id != entry.name.removePrefix(PASSES_PREFIX)) {
+                    ids += id
+                }
+                zip.closeEntry()
+            }
+        }
+        return ids
     }
 
     fun looksLikePassWalletBackup(inputStream: InputStream): Boolean {

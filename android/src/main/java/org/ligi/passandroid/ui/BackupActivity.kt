@@ -33,6 +33,7 @@ import org.koin.android.ext.android.inject
 import org.ligi.passandroid.BuildConfig
 import org.ligi.passandroid.R
 import org.ligi.passandroid.backup.BackupArchive
+import org.ligi.passandroid.backup.BackupRestore
 import org.ligi.passandroid.model.PassStore
 import org.ligi.passandroid.model.Settings
 import java.text.SimpleDateFormat
@@ -317,29 +318,62 @@ class BackupActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
+            val passesNotInBackup = withContext(Dispatchers.IO) {
+                runCatching { BackupRestore.passesNotInBackup(passStore) { openBackup(uri) } }
+            }.getOrElse {
+                showImportError(it)
+                return@launch
+            }
+
+            showDestructiveConfirmationDialog(
+                titleRes = R.string.backup_restore_dialog_title,
+                message = getString(R.string.backup_restore_dialog_message),
+                confirmTextRes = R.string.backup_restore_action,
+                iconRes = R.drawable.ic_backup_import_24,
+                checkboxText = passesNotInBackup.size.takeIf { it > 0 }?.let {
+                    resources.getQuantityString(R.plurals.backup_restore_remove_others, it, it)
+                },
+                checkboxChecked = true,
+            ) { removeOthers ->
+                restoreBackup(uri, removePassesNotInBackup = removeOthers && passesNotInBackup.isNotEmpty())
+            }
+        }
+    }
+
+    private fun restoreBackup(uri: Uri, removePassesNotInBackup: Boolean) {
+        lifecycleScope.launch {
             val result = withContext(Dispatchers.IO) {
                 runCatching {
-                    contentResolver.openInputStream(uri)?.use { input ->
-                        BackupArchive.importBackup(
-                            inputStream = input,
-                            passesDir = settings.getPassesDir(),
-                            stateDir = settings.getStateDir(),
-                            restorePreferences = ::restorePreferences,
-                        )
-                    } ?: error("Could not open input document")
+                    BackupRestore.restore(
+                        openBackup = { openBackup(uri) },
+                        passStore = passStore,
+                        settings = settings,
+                        removePassesNotInBackup = removePassesNotInBackup,
+                        restorePreferences = ::restorePreferences,
+                    )
                 }
             }
             result.onSuccess {
-                passStore.reloadAll()
                 Toast.makeText(this@BackupActivity, R.string.backup_import_success, Toast.LENGTH_LONG).show()
                 startActivity(Intent(this@BackupActivity, PassListActivity::class.java).apply {
                     addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
                 })
                 finish()
             }.onFailure {
-                Toast.makeText(this@BackupActivity, getString(R.string.backup_import_error, it.localizedMessage), Toast.LENGTH_LONG).show()
+                showImportError(it)
             }
         }
+    }
+
+    private fun openBackup(uri: Uri) = contentResolver.openInputStream(uri) ?: error("Could not open input document")
+
+    private fun showImportError(error: Throwable) {
+        val message = if (error is BackupRestore.NotABackupException) {
+            getString(R.string.backup_import_not_a_backup)
+        } else {
+            getString(R.string.backup_import_error, error.localizedMessage)
+        }
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
     }
 
     private fun restorePreferences(preferences: Map<String, Any>) {

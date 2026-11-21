@@ -156,10 +156,18 @@
     <string name="backup_import_title">Sicherung importieren</string>
     <string name="backup_import_summary">Pässe, Gruppen, Archiv und Einstellungen aus einer PassWallet-ZIP-Sicherung wiederherstellen.</string>
     <string name="backup_import_action">ZIP-Sicherung auswählen</string>
+    <string name="backup_restore_dialog_title">Backup wiederherstellen?</string>
+    <string name="backup_restore_dialog_message">Pässe, Archiv und Einstellungen aus dem Backup werden übernommen. Pässe, die auch im Backup enthalten sind, werden durch die gesicherte Fassung ersetzt.</string>
+    <string name="backup_restore_action">Wiederherstellen</string>
+    <plurals name="backup_restore_remove_others">
+        <item quantity="one">%d Pass entfernen, der nicht im Backup enthalten ist</item>
+        <item quantity="other">%d Pässe entfernen, die nicht im Backup enthalten sind</item>
+    </plurals>
     <string name="backup_export_success">Sicherung exportiert</string>
     <string name="backup_import_success">Sicherung importiert</string>
     <string name="pass_export_error">Pass konnte nicht exportiert werden: %s</string>
     <string name="backup_export_error">Sicherung konnte nicht exportiert werden: %s</string>
+    <string name="backup_import_not_a_backup">Diese Datei ist keine PassWallet-Sicherung.</string>
     <string name="backup_import_error">Sicherung konnte nicht importiert werden: %s</string>
     <string name="launcher_shortcut">Verknüpfung auf dem Startbildschirm</string>
     <string name="import_pass">Importieren</string>

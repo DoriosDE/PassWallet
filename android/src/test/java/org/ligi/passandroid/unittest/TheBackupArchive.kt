@@ -126,6 +126,20 @@ class TheBackupArchive {
         assertThat(BackupArchive.looksLikePassWalletBackup(ByteArrayInputStream(archive))).isFalse()
     }
 
+    @Test
+    fun listsThePassesContainedInABackup() {
+        val archive = zipOf(
+            "manifest.json" to "{}",
+            "passes/pass-1/main.json" to "{}",
+            "passes/pass-1/logo.png" to "png",
+            "passes/pass-2/pass.json" to "{}",
+            "state/classifier_state.json" to "{}",
+            "preferences.json" to "{}",
+        )
+
+        assertThat(BackupArchive.passIds(ByteArrayInputStream(archive))).containsOnly("pass-1", "pass-2")
+    }
+
     private fun assertImportRejected(archive: ByteArray, targetRoot: File) {
         try {
             BackupArchive.importBackup(

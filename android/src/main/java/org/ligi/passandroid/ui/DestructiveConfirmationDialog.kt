@@ -20,6 +20,7 @@ fun Activity.showDestructiveConfirmationDialog(
     @StringRes confirmTextRes: Int,
     @DrawableRes iconRes: Int = R.drawable.ic_action_delete,
     checkboxText: CharSequence? = null,
+    checkboxChecked: Boolean = false,
     onConfirm: (checkboxChecked: Boolean) -> Unit
 ) {
     val view = LayoutInflater.from(this).inflate(R.layout.dialog_destructive_confirmation, null)
@@ -33,6 +34,7 @@ fun Activity.showDestructiveConfirmationDialog(
     } else {
         checkBox.visibility = View.VISIBLE
         checkBox.text = checkboxText
+        checkBox.isChecked = checkboxChecked
     }
 
     val dialog = MaterialAlertDialogBuilder(this)
