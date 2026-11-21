@@ -168,7 +168,7 @@ class PassAdapter(
     private fun openPass(pass: Pass) {
         passStore.currentPass = pass
         val intent = Intent(passListActivity, PassViewActivity::class.java)
-            .putExtra(PassViewActivityBase.EXTRA_KEY_UUID, pass.id)
+            .putExtra(SinglePassActivity.EXTRA_KEY_UUID, pass.id)
         passListActivity.startActivity(intent)
     }
 

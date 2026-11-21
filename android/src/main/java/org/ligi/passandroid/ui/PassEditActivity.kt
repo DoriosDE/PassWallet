@@ -82,7 +82,7 @@ class PassEditActivity : AppCompatActivity() {
             currentPass.description = "$it"
         }
 
-        val passFromIntent = intent.getStringExtra(PassViewActivityBase.EXTRA_KEY_UUID)
+        val passFromIntent = intent.getStringExtra(SinglePassActivity.EXTRA_KEY_UUID)
             ?.let { passStore.getPass(it) as? PassImpl }
         val currentPass = passFromIntent ?: passStore.currentPass as? PassImpl
         if (currentPass != null) {

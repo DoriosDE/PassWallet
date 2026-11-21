@@ -50,7 +50,7 @@ class PassMenuActions(val activity: AppCompatActivity, val pass: Pass) : KoinCom
                 passStore.currentPass = pass
                 activity.startActivity(
                     Intent(activity, PassEditActivity::class.java)
-                        .putExtra(PassViewActivityBase.EXTRA_KEY_UUID, pass.id)
+                        .putExtra(SinglePassActivity.EXTRA_KEY_UUID, pass.id)
                 )
                 return true
             }
@@ -65,7 +65,7 @@ class PassMenuActions(val activity: AppCompatActivity, val pass: Pass) : KoinCom
 
     /** leave the pass view after the pass was archived, restored or deleted - back to the list it was opened from */
     private fun closePassView() {
-        if (activity is PassViewActivityBase) {
+        if (activity is SinglePassActivity) {
             activity.finish()
         }
     }

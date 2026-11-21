@@ -11,7 +11,7 @@ import timber.log.Timber
 import kotlin.math.max
 import kotlin.math.min
 
-class FullscreenBarcodeActivity : PassViewActivityBase() {
+class FullscreenBarcodeActivity : SinglePassActivity() {
 
     private lateinit var binding: FullscreenImageBinding
 

@@ -22,8 +22,12 @@ import org.ligi.passandroid.model.PassBitmapDefinitions.BITMAP_ICON
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.update.PassUpdater
 
+/**
+ * Base of the screens that show one pass, given by its id in [EXTRA_KEY_UUID]: the pass menu
+ * (archive, delete, share, edit, print, update, shortcut) and full brightness while a pass is shown.
+ */
 @SuppressLint("Registered")
-open class PassViewActivityBase : PassAndroidActivity() {
+open class SinglePassActivity : PassWalletActivity() {
 
     lateinit var currentPass: Pass
     private var fullBrightnessSet = false
@@ -159,7 +163,7 @@ open class PassViewActivityBase : PassAndroidActivity() {
             dialog.show()
             val outcome = try {
                 // the stored pass is changed - finish that even when the screen is closed meanwhile
-                withContext(NonCancellable) { PassUpdater(this@PassViewActivityBase, passStore).update(pass) }
+                withContext(NonCancellable) { PassUpdater(this@SinglePassActivity, passStore).update(pass) }
             } finally {
                 dialog.dismissSafely()
             }

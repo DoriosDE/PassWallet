@@ -31,7 +31,7 @@ import org.ligi.passandroid.model.pass.PassVisualType
 internal const val LINKIFY_MASK = Linkify.WEB_URLS or Linkify.EMAIL_ADDRESSES or Linkify.PHONE_NUMBERS
 
 /**
- * One page of the pass view, showing the pass whose id is in the arguments ([PassViewActivityBase.EXTRA_KEY_UUID]).
+ * One page of the pass view, showing the pass whose id is in the arguments ([SinglePassActivity.EXTRA_KEY_UUID]).
  * The subclasses lay out the pass - [forPass] picks the one that fits.
  */
 abstract class PassPageFragment : Fragment() {
@@ -45,8 +45,8 @@ abstract class PassPageFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         val rootView = inflater.inflate(R.layout.activity_pass_view_page, container, false)
-        arguments?.takeIf { it.containsKey(PassViewActivityBase.EXTRA_KEY_UUID) }?.apply {
-            val uuid = getString(PassViewActivityBase.EXTRA_KEY_UUID)
+        arguments?.takeIf { it.containsKey(SinglePassActivity.EXTRA_KEY_UUID) }?.apply {
+            val uuid = getString(SinglePassActivity.EXTRA_KEY_UUID)
             pass = if (uuid != null) {
                 passStore.getPass(uuid) ?: passStore.currentPass
             } else {
@@ -95,7 +95,7 @@ abstract class PassPageFragment : Fragment() {
         val openFullscreenBarcode = View.OnClickListener { view ->
             passStore.currentPass = pass
             val intent = Intent(view.context, FullscreenBarcodeActivity::class.java)
-            intent.putExtra(PassViewActivityBase.EXTRA_KEY_UUID, pass.id)
+            intent.putExtra(SinglePassActivity.EXTRA_KEY_UUID, pass.id)
             startActivity(intent)
         }
         root.findViewById<View>(R.id.barcode_img).setOnClickListener(openFullscreenBarcode)
@@ -172,7 +172,7 @@ abstract class PassPageFragment : Fragment() {
                     else -> GenericPassFragment()
                 }
             }
-            fragment.arguments = bundleOf(PassViewActivityBase.EXTRA_KEY_UUID to pass.id)
+            fragment.arguments = bundleOf(SinglePassActivity.EXTRA_KEY_UUID to pass.id)
             return fragment
         }
     }

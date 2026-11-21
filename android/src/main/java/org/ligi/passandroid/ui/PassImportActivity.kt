@@ -83,7 +83,7 @@ class PassImportActivity : AppCompatActivity() {
             passStore.currentPass = passStore.getPass(importedId)
             startActivity(
                 Intent(this, PassViewActivity::class.java)
-                    .putExtra(PassViewActivityBase.EXTRA_KEY_UUID, importedId)
+                    .putExtra(SinglePassActivity.EXTRA_KEY_UUID, importedId)
             )
         } else {
             startActivityFromClass(PassListActivity::class.java)

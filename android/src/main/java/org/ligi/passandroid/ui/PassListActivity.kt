@@ -27,7 +27,7 @@ import org.ligi.passandroid.model.ArchiveState
 import org.ligi.tracedroid.TraceDroid
 import org.ligi.tracedroid.sending.sendTraceDroidStackTracesIfExist
 
-class PassListActivity : PassAndroidActivity() {
+class PassListActivity : PassWalletActivity() {
 
     private lateinit var binding: PassListBinding
     private var fabMenuExpanded = false

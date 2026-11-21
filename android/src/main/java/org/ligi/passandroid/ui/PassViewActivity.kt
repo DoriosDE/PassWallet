@@ -19,7 +19,7 @@ import org.ligi.passandroid.model.PassSortOrder
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.update.PassUpdater
 
-class PassViewActivity : PassViewActivityBase() {
+class PassViewActivity : SinglePassActivity() {
     private lateinit var pagerAdapter: CollectionPagerAdapter
     private lateinit var viewPager: ViewPager2
 
