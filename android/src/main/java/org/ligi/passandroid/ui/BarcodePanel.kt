@@ -7,19 +7,25 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.AppCompatImageView
+import org.ligi.kaxt.getSizeAsPointCompat
 import org.ligi.kaxt.getSmallestSide
 import org.ligi.passandroid.R
 import org.ligi.passandroid.model.pass.BarCode
 import kotlin.math.max
 import kotlin.math.min
 
-internal class BarcodeUIController(private val rootView: View, private val barCode: BarCode?, activity: Activity, private val passViewHelper: PassViewHelper) {
+/**
+ * Shows the barcode of a pass (or hides the barcode panel when there is none) in the views below [rootView],
+ * sized to the screen.
+ */
+internal class BarcodePanel(private val rootView: View, private val barCode: BarCode?, activity: Activity) {
 
-    fun getBarcodeView(): ImageView = rootView.findViewById(R.id.barcode_img)
+    private val fingerSize = activity.resources.getDimensionPixelSize(R.dimen.finger)
+    private val windowWidth = activity.windowManager.getSizeAsPointCompat().x
 
     private val zoomIn = rootView.findViewById<AppCompatImageView>(R.id.zoomIn)
     private val zoomOut = rootView.findViewById<AppCompatImageView>(R.id.zoomOut)
-    private val barcodeImage = rootView.findViewById<ImageView>(R.id.barcode_img)
+    val barcodeImage: ImageView = rootView.findViewById(R.id.barcode_img)
     private val barcodeAltText = rootView.findViewById<TextView>(R.id.barcode_alt_text)
     private val barcodePanel = rootView.findViewById<View>(R.id.barcode_panel)
 
@@ -50,7 +56,7 @@ internal class BarcodeUIController(private val rootView: View, private val barCo
             }
 
         } else {
-            passViewHelper.setBitmapSafe(barcodeImage, null)
+            barcodeImage.showBitmapOrHide(null)
             barcodePanel.visibility = GONE
             barcodeAltText.visibility = GONE
         }
@@ -58,13 +64,13 @@ internal class BarcodeUIController(private val rootView: View, private val barCo
 
     private fun getBarCodeSize(smallestSide: Int): Pair<Int, Int> {
         val quadratic = barCode!!.format?.isQuadratic() ?: true
-        val maxBarcodeWidth = (passViewHelper.windowWidth - passViewHelper.fingerSize * 2).coerceAtLeast(1)
+        val maxBarcodeWidth = (windowWidth - fingerSize * 2).coerceAtLeast(1)
         val width = if (quadratic) {
             min((smallestSide * 0.66f).toInt(), maxBarcodeWidth)
         } else {
             maxBarcodeWidth
         }
-        val height = if (quadratic) width else max(passViewHelper.fingerSize, (width * 0.2f).toInt())
+        val height = if (quadratic) width else max(fingerSize, (width * 0.2f).toInt())
         return width to height
     }
 

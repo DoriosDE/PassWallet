@@ -82,7 +82,7 @@ class PassAdapter(
         card.contentDescription = titleOf(pass)
         card.setOnClickListener { openPass(pass) }
         card.setOnLongClickListener {
-            PassActionsUI(passListActivity, passStore, listOf(pass), groupingEnabled).show()
+            PassActionsSheet(passListActivity, passStore, listOf(pass), groupingEnabled).show()
             true
         }
     }
@@ -105,7 +105,7 @@ class PassAdapter(
         )
         card.setOnClickListener { openPass(frontPass) }
         card.setOnLongClickListener {
-            PassActionsUI(passListActivity, passStore, group.passes, groupingEnabled).show()
+            PassActionsSheet(passListActivity, passStore, group.passes, groupingEnabled).show()
             true
         }
     }

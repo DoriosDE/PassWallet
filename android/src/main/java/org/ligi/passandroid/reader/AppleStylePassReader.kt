@@ -11,7 +11,6 @@ import org.ligi.passandroid.R
 import org.ligi.passandroid.model.ApplePassbookQuirkCorrector
 import org.ligi.passandroid.model.AppleStylePassTranslation
 import org.ligi.passandroid.model.PassBitmapDefinitions
-import org.ligi.passandroid.model.PassDefinitions
 import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.pass.*
 import org.threeten.bp.DateTimeException
@@ -171,13 +170,13 @@ object AppleStylePassReader {
 
         // try to find in a predefined set of tickets
 
-        PassDefinitions.TYPE_TO_NAME.forEach {
-            if (passJSON.has(it.value)) {
-                pass.type = it.key
+        PassType.pkpassStyles.forEach {
+            if (passJSON.has(it.pkpassStyleKey)) {
+                pass.type = it
             }
         }
 
-        val type = PassDefinitions.TYPE_TO_NAME[pass.type]
+        val type = pass.type.pkpassStyleKey
         try {
             if (type != null) {
                 val typeJSON = passJSON.getJSONObject(type)

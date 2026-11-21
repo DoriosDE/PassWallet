@@ -10,8 +10,8 @@ import org.ligi.kaxt.doAfterEdit
 import org.ligi.passandroid.R
 import org.ligi.passandroid.model.pass.BarCode
 import org.ligi.passandroid.model.pass.PassBarCodeFormat
-import org.ligi.passandroid.ui.BarcodeUIController
-import org.ligi.passandroid.ui.PassViewHelper
+import org.ligi.passandroid.ui.BarcodePanel
+import org.ligi.passandroid.ui.showBitmapOrHide
 
 class BarcodeEditController(
     private val rootView: View,
@@ -80,8 +80,7 @@ class BarcodeEditController(
     }
 
     fun refresh() {
-        val barcodeUIController = BarcodeUIController(rootView, getBarCode(), context, PassViewHelper(context))
-        val isBarcodeShown = barcodeUIController.getBarcodeView().isVisible
+        val isBarcodeShown = BarcodePanel(rootView, getBarCode(), context).barcodeImage.isVisible
 
         val message = messageInput.text?.toString().orEmpty()
         if (message.isBlank() || isBarcodeShown) {

@@ -103,7 +103,7 @@ open class PassViewActivityBase : PassAndroidActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if (PassMenuOptions(this, currentPass).process(item)) {
+        if (PassMenuActions(this, currentPass).process(item)) {
             return true
         }
 

@@ -59,7 +59,6 @@ class PassEditActivity : AppCompatActivity() {
 
     internal val passStore: PassStore by inject()
 
-    private val passViewHelper: PassViewHelper by lazy { PassViewHelper(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -157,8 +156,7 @@ class PassEditActivity : AppCompatActivity() {
         prepareImageUI(R.id.footer_img, R.id.add_footer, PassBitmapDefinitions.BITMAP_FOOTER)
 
         binding.addBarcodeButton.visibility = if (pass.barCode == null) View.VISIBLE else View.GONE
-        val barcodeUIController = BarcodeUIController(window.decorView, pass.barCode, this, passViewHelper)
-        barcodeUIController.getBarcodeView().setOnClickListener {
+        BarcodePanel(window.decorView, pass.barCode, this).barcodeImage.setOnClickListener {
             showBarcodeEditDialog(this@PassEditActivity, refreshCallback, currentPass, currentPass.barCode!!, ::launchBarcodeScan)
         }
     }
@@ -175,7 +173,7 @@ class PassEditActivity : AppCompatActivity() {
         }
 
         val logoImage = findViewById<ImageView>(logo_img)
-        passViewHelper.setBitmapSafe(logoImage, bitmap)
+        logoImage.showBitmapOrHide(bitmap)
         logoImage.setOnClickListener(listener)
         addButton.setOnClickListener(listener)
     }

@@ -28,7 +28,6 @@ private const val LINKIFY_MASK = Linkify.WEB_URLS or Linkify.EMAIL_ADDRESSES or 
 
 class PassViewFragment : Fragment() {
 
-    private val passViewHelper by lazy { PassViewHelper(requireActivity()) }
     internal val passStore: PassStore by inject()
     lateinit var pass: Pass
 
@@ -44,7 +43,7 @@ class PassViewFragment : Fragment() {
                 startActivity(intent)
             }
         }
-        passViewHelper.setBitmapSafe(view, bitmap)
+        view.showBitmapOrHide(bitmap)
     }
 
     override fun onResume() {
@@ -74,7 +73,7 @@ class PassViewFragment : Fragment() {
         root.findViewById<View>(R.id.barcode_img).setOnClickListener(openFullscreenBarcode)
         root.findViewById<View>(R.id.barcode_panel).setOnClickListener(openFullscreenBarcode)
 
-        BarcodeUIController(requireView(), pass.barCode, requireActivity(), passViewHelper)
+        BarcodePanel(requireView(), pass.barCode, requireActivity())
 
         val explicitLogoBitmap = pass.getBitmap(passStore, PassBitmapDefinitions.BITMAP_LOGO)
         val logoBitmap = explicitLogoBitmap ?: pass.takeIconAsDetailLogoIfManualSimplePass()

@@ -37,7 +37,6 @@ private val CREDENTIAL_PURPLE = Color.rgb(102, 51, 153)
 
 class PassViewPKFragment : Fragment() {
 
-    private val passViewHelper by lazy { PassViewHelper(requireActivity()) }
     internal val passStore: PassStore by inject()
     lateinit var pass: Pass
 
@@ -55,7 +54,7 @@ class PassViewPKFragment : Fragment() {
         } else {
             view.setOnClickListener(null)
         }
-        passViewHelper.setBitmapSafe(view, bitmap)
+        view.showBitmapOrHide(bitmap)
     }
 
     override fun onResume() {
@@ -105,7 +104,7 @@ class PassViewPKFragment : Fragment() {
         root.findViewById<View>(R.id.barcode_img).setOnClickListener(openFullscreenBarcode)
         root.findViewById<View>(R.id.barcode_panel).setOnClickListener(openFullscreenBarcode)
 
-        BarcodeUIController(requireView(), pass.barCode, requireActivity(), passViewHelper)
+        BarcodePanel(requireView(), pass.barCode, requireActivity())
 
         val explicitLogoBitmap = pass.getBitmap(passStore, PassBitmapDefinitions.BITMAP_LOGO)
         val logoBitmap = explicitLogoBitmap ?: pass.takeIconAsDetailLogoIfManualSimplePass()

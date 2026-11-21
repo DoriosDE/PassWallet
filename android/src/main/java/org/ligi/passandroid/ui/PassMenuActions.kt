@@ -14,7 +14,7 @@ import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.printing.printPass
 import org.ligi.passandroid.share.sharePass
 
-class PassMenuOptions(val activity: AppCompatActivity, val pass: Pass) : KoinComponent {
+class PassMenuActions(val activity: AppCompatActivity, val pass: Pass) : KoinComponent {
 
     val passStore: PassStore by inject()
     val settings: Settings by inject()

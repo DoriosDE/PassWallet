@@ -30,7 +30,7 @@ import org.ligi.passandroid.ui.rendering.PassRenderers
  * Bottom sheet shown on long press in the pass list: archive / restore / delete a pass (or a whole group of passes)
  * and manage pass groups.
  */
-internal class PassActionsUI(
+internal class PassActionsSheet(
     private val context: Activity,
     private val passStore: PassStore,
     private val passes: List<Pass>,
