@@ -32,7 +32,6 @@ abstract class PassViewHolder(val view: CardView) : RecyclerView.ViewHolder(view
         val categoryView = view.findViewById<CategoryIndicatorViewWithIcon>(R.id.categoryView)
         iconBitmap?.let { categoryView.setIcon(it) }
 
-        BoardingTransitIcon.ensureTransitType(pass, passStore)
         categoryView.setImageByCategory(pass.type)
         if (pass.type == PassType.PKBOARDING || pass.type == PassType.BOARDING) {
             categoryView.findViewById<ImageView>(R.id.topImageView)

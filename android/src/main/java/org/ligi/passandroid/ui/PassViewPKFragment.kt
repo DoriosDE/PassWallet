@@ -106,7 +106,6 @@ class PassViewPKFragment : Fragment() {
         root.findViewById<View>(R.id.barcode_panel).setOnClickListener(openFullscreenBarcode)
 
         BarcodeUIController(requireView(), pass.barCode, requireActivity(), passViewHelper)
-        BoardingTransitIcon.ensureTransitType(pass, passStore)
 
         val explicitLogoBitmap = pass.getBitmap(passStore, PassBitmapDefinitions.BITMAP_LOGO)
         val logoBitmap = explicitLogoBitmap ?: pass.takeIconAsDetailLogoIfManualSimplePass()

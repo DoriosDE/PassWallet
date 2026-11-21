@@ -27,64 +27,10 @@ import java.util.*
 
 object AppleStylePassReader {
 
-    fun readBoardingTransitType(passFile: File): BoardingTransitType {
-        val file = File(passFile, "pass.json")
-        return try {
-            val plainJsonString = AppleStylePassTranslation.readFileAsStringGuessEncoding(file)
-            readJSONSafely(plainJsonString)?.let(::readBoardingTransitType) ?: BoardingTransitType.GENERIC
-        } catch (e: Exception) {
-            Timber.i("could not read boarding transit type: $e")
-            BoardingTransitType.GENERIC
-        }
-    }
-
-    /**
-     * Reads the automatic group id (passTypeIdentifier + groupingIdentifier) of an already imported pkpass.
-     * Returns an empty string when the pass has no grouping information, null when it could not be read.
-     */
-    fun readGroupId(passFile: File): String? {
-        val file = File(passFile, "pass.json")
-        if (!file.exists()) return null
-        return try {
-            val plainJsonString = AppleStylePassTranslation.readFileAsStringGuessEncoding(file)
-            readJSONSafely(plainJsonString)?.let { json ->
-                PassGroups.automaticGroupId(
-                    readJsonSafeAsOptional(json, "passTypeIdentifier"),
-                    readJsonSafeAsOptional(json, "groupingIdentifier")
-                ) ?: ""
-            }
-        } catch (e: Exception) {
-            Timber.i("could not read grouping identifier: $e")
-            null
-        }
-    }
-
-    const val APPEARANCE_VERSION = 1
-
     private fun applyListAppearance(pass: Pass, passJSON: JSONObject, translation: AppleStylePassTranslation) {
         pass.logoText = readJsonSafeAsOptional(passJSON, "logoText")?.let { translation.translate(it) }?.takeIf { it.isNotBlank() }
         pass.foregroundColorValue = readJsonSafeAsOptional(passJSON, "foregroundColor")
         pass.labelColorValue = readJsonSafeAsOptional(passJSON, "labelColor")
-        pass.appearanceVersion = APPEARANCE_VERSION
-    }
-
-    /**
-     * Fills logo text and text colors of an already imported pkpass (imported before these were stored).
-     * Returns false when the pass has no readable pass.json.
-     */
-    fun readListAppearance(passFile: File, language: String, tracker: Tracker, pass: Pass): Boolean {
-        val file = File(passFile, "pass.json")
-        if (!file.exists()) return false
-        return try {
-            val passJSON = readJSONSafely(AppleStylePassTranslation.readFileAsStringGuessEncoding(file)) ?: return false
-            val translation = AppleStylePassTranslation()
-            findLocalizedPath(passFile, language, tracker)?.let { translation.loadFromFile(File(it, "pass.strings")) }
-            applyListAppearance(pass, passJSON, translation)
-            true
-        } catch (e: Exception) {
-            Timber.i("could not read list appearance: $e")
-            false
-        }
     }
 
     fun read(passFile: File, language: String, context: Context, tracker: Tracker): Pass? {

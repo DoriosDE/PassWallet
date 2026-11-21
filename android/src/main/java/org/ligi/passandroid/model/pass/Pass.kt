@@ -44,8 +44,7 @@ interface Pass {
 
     /**
      * Identifies passes that belong together and are shown as one stack in the pass list.
-     * null = not decided yet (may be backfilled from the pkpass groupingIdentifier),
-     * empty = explicitly not grouped.
+     * null = no group, [org.ligi.passandroid.model.PassGroups.USER_UNGROUPED] = taken out of a group by the user.
      */
     var groupId: String?
 
@@ -55,9 +54,6 @@ interface Pass {
     /** pkpass "foregroundColor" / "labelColor" as found in the pass (e.g. "rgb(1,2,3)" or "#010203") */
     var foregroundColorValue: String?
     var labelColorValue: String?
-
-    /** version of the list appearance data above - older passes get it backfilled from pass.json */
-    var appearanceVersion: Int
 
     val app: String?
 

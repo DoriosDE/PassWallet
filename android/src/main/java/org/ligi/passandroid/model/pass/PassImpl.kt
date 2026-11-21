@@ -75,8 +75,6 @@ class PassImpl(override val id: String) : Pass {
 
     override var labelColorValue: String? = null
 
-    override var appearanceVersion: Int = 0
-
     override fun getBitmap(passStore: PassStore, @Pass.PassBitmap passBitmap: String): Bitmap? {
         return try {
             val file = File(passStore.getPathForID(id), passBitmap + FILETYPE_IMAGES)

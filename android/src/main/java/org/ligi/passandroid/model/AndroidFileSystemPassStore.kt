@@ -11,13 +11,10 @@ import okio.sink
 import okio.source
 import org.ligi.passandroid.BuildConfig
 import org.ligi.passandroid.Tracker
-import org.ligi.passandroid.model.pass.BoardingTransitType
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassImpl
-import org.ligi.passandroid.model.pass.PassType
 import org.ligi.passandroid.model.pass.PassVisualClassifier
 import org.ligi.passandroid.reader.AppleStylePassReader
-import org.ligi.passandroid.reader.PassReader
 import java.io.File
 
 object PassStoreUpdateEvent
@@ -101,26 +98,12 @@ class AndroidFileSystemPassStore(
             }
         }
 
-        if (result == null && File(pathForID, "data.json").exists()) {
-            result = PassReader.read(pathForID)
-            File(pathForID, "data.json").delete()
-        }
-
         if (result == null && File(pathForID, "pass.json").exists()) {
             result = AppleStylePassReader.read(pathForID, language, context, tracker)
         }
 
         if (result != null) {
-            if (backfillBoardingTransitType(pathForID, result)) {
-                dirty = true
-            }
-            if (backfillVisualType(result)) {
-                dirty = true
-            }
-            if (backfillGroupId(pathForID, result)) {
-                dirty = true
-            }
-            if (backfillListAppearance(pathForID, language, result)) {
+            if (updateVisualType(result)) {
                 dirty = true
             }
             if (dirty) {
@@ -132,35 +115,8 @@ class AndroidFileSystemPassStore(
         return result
     }
 
-    private fun backfillBoardingTransitType(pathForID: File, pass: Pass): Boolean {
-        if (pass.type != PassType.PKBOARDING && pass.type != PassType.BOARDING) return false
-        if (pass.boardingTransitType != BoardingTransitType.GENERIC) return false
-
-        val parsedTransitType = AppleStylePassReader.readBoardingTransitType(pathForID)
-        if (parsedTransitType == BoardingTransitType.GENERIC) return false
-
-        pass.boardingTransitType = parsedTransitType
-        return true
-    }
-
-    private fun backfillListAppearance(pathForID: File, language: String, pass: Pass): Boolean {
-        if (pass.appearanceVersion >= AppleStylePassReader.APPEARANCE_VERSION) return false
-
-        if (!AppleStylePassReader.readListAppearance(pathForID, language, tracker, pass)) {
-            // custom / image / PDF passes have no pass.json - nothing to read, do not try again
-            pass.appearanceVersion = AppleStylePassReader.APPEARANCE_VERSION
-        }
-        return true
-    }
-
-    private fun backfillGroupId(pathForID: File, pass: Pass): Boolean {
-        if (pass.groupId != null) return false
-
-        pass.groupId = AppleStylePassReader.readGroupId(pathForID) ?: ""
-        return true
-    }
-
-    private fun backfillVisualType(pass: Pass): Boolean {
+    /** the visual type depends on the pass content (e.g. a membership card shown as credential) - kept up to date */
+    private fun updateVisualType(pass: Pass): Boolean {
         val classifiedVisualType = PassVisualClassifier.classify(pass)
         if (pass.visualType == classifiedVisualType) return false
 
