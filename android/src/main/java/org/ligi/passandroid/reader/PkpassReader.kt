@@ -8,8 +8,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import org.ligi.kaxt.parseColor
 import org.ligi.passandroid.R
-import org.ligi.passandroid.model.ApplePassbookQuirkCorrector
-import org.ligi.passandroid.model.AppleStylePassTranslation
 import org.ligi.passandroid.model.PassBitmapDefinitions
 import org.ligi.passandroid.model.PassGrouping
 import org.ligi.passandroid.model.pass.*
@@ -21,9 +19,9 @@ import java.io.FileOutputStream
 import java.nio.charset.Charset
 import java.util.*
 
-object AppleStylePassReader {
+object PkpassReader {
 
-    private fun applyListAppearance(pass: Pass, passJSON: JSONObject, translation: AppleStylePassTranslation) {
+    private fun applyListAppearance(pass: Pass, passJSON: JSONObject, translation: PkpassTranslation) {
         pass.logoText = readJsonSafeAsOptional(passJSON, "logoText")?.let { translation.translate(it) }?.takeIf { it.isNotBlank() }
         pass.foregroundColorValue = readJsonSafeAsOptional(passJSON, "foregroundColor")
         pass.labelColorValue = readJsonSafeAsOptional(passJSON, "labelColor")
@@ -31,7 +29,7 @@ object AppleStylePassReader {
 
     fun read(passFile: File, language: String, context: Context): Pass? {
 
-        val translation = AppleStylePassTranslation()
+        val translation = PkpassTranslation()
 
         val pass = PassImpl(passFile.name)
 
@@ -53,7 +51,7 @@ object AppleStylePassReader {
         val file = File(passFile, "pass.json")
 
         try {
-            val plainJsonString = AppleStylePassTranslation.readFileAsStringGuessEncoding(file)
+            val plainJsonString = PkpassTranslation.readFileAsStringGuessEncoding(file)
             passJSON = readJSONSafely(plainJsonString)
         } catch (e: Exception) {
             Timber.i("PassParse Exception: $e")
@@ -204,13 +202,13 @@ object AppleStylePassReader {
             // ok - we have no organisation - big deal ..-)
         }
 
-        ApplePassbookQuirkCorrector().correctQuirks(pass)
+        PkpassQuirkCorrector().correctQuirks(pass)
         pass.visualType = PassVisualClassifier.classify(pass)
 
         return pass
     }
 
-    private fun getField(jsonObject: JSONObject, key: String, translation: AppleStylePassTranslation): String? {
+    private fun getField(jsonObject: JSONObject, key: String, translation: PkpassTranslation): String? {
         if (jsonObject.has(key)) {
             try {
                 return translation.translate(jsonObject.getString(key))
@@ -221,7 +219,7 @@ object AppleStylePassReader {
         return null
     }
 
-    private fun addFields(list: ArrayList<PassField>, type_json: JSONObject, fieldsName: String, translation: AppleStylePassTranslation, hide: Boolean = false) {
+    private fun addFields(list: ArrayList<PassField>, type_json: JSONObject, fieldsName: String, translation: PkpassTranslation, hide: Boolean = false) {
         try {
             val jsonArray = type_json.getJSONArray(fieldsName)
             for (i in 0 until jsonArray.length()) {

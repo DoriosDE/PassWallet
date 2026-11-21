@@ -1,11 +1,11 @@
-package org.ligi.passandroid.model
+package org.ligi.passandroid.reader
 
 import org.ligi.passandroid.model.pass.PassField
 import org.ligi.passandroid.model.pass.PassImpl
 import org.threeten.bp.DateTimeException
 import org.threeten.bp.ZonedDateTime
 
-class ApplePassbookQuirkCorrector {
+class PkpassQuirkCorrector {
 
     fun correctQuirks(pass: PassImpl) {
         // Vendor specific fixes

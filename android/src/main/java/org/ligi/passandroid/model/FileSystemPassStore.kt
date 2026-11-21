@@ -13,7 +13,7 @@ import org.ligi.passandroid.BuildConfig
 import org.ligi.passandroid.model.pass.Pass
 import org.ligi.passandroid.model.pass.PassImpl
 import org.ligi.passandroid.model.pass.PassVisualClassifier
-import org.ligi.passandroid.reader.AppleStylePassReader
+import org.ligi.passandroid.reader.PkpassReader
 import java.io.File
 
 /**
@@ -100,7 +100,7 @@ class FileSystemPassStore(
         }
 
         if (result == null && File(passDirectory, "pass.json").exists()) {
-            result = AppleStylePassReader.read(passDirectory, language, context)
+            result = PkpassReader.read(passDirectory, language, context)
         }
 
         if (result != null) {

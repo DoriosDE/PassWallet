@@ -1,4 +1,4 @@
-package org.ligi.passandroid.model
+package org.ligi.passandroid.reader
 
 import androidx.annotation.VisibleForTesting
 import com.ibm.icu.text.CharsetDetector
@@ -9,7 +9,7 @@ import java.nio.charset.Charset
 /**
  * Translations of a Passbook pass (pass.strings of the matching language): key -> translated text.
  */
-class AppleStylePassTranslation : HashMap<String, String>() {
+class PkpassTranslation : HashMap<String, String>() {
 
     /** the translation of [key], or [key] itself when there is none */
     fun translate(key: String?): String? = key?.let { get(it) } ?: key

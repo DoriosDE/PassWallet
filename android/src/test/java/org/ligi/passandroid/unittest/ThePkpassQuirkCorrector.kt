@@ -2,7 +2,7 @@ package org.ligi.passandroid.unittest
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
-import org.ligi.passandroid.model.ApplePassbookQuirkCorrector
+import org.ligi.passandroid.reader.PkpassQuirkCorrector
 import org.ligi.passandroid.model.pass.PassField
 import org.ligi.passandroid.model.pass.PassImpl
 import org.threeten.bp.ZonedDateTime
@@ -10,8 +10,8 @@ import java.util.*
 
 private const val DATE_PROBE = "2016-07-06T21:00:00-04:00"
 
-class TheAppleStyleQuirkCorrector {
-    private val tested = ApplePassbookQuirkCorrector()
+class ThePkpassQuirkCorrector {
+    private val tested = PkpassQuirkCorrector()
 
     @Test
     fun testThatItDoesNothingWithNoField() {

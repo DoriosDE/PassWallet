@@ -5,7 +5,7 @@ import org.json.JSONObject
 import org.junit.Test
 import org.ligi.passandroid.reader.getBarcodeJson
 
-class TheAppleStylePassReaderFunctions {
+class ThePkpassJson {
 
 
     @Test
