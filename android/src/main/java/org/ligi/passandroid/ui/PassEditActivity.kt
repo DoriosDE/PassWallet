@@ -28,6 +28,7 @@ import org.ligi.passandroid.ui.edit.dialogs.showBarcodeEditDialog
 import org.ligi.passandroid.ui.edit.dialogs.showCategoryPickDialog
 import org.ligi.passandroid.ui.edit.dialogs.showColorPickDialog
 import org.ligi.passandroid.ui.pass_view_holder.EditViewHolder
+import org.ligi.passandroid.ui.scan.ScanBarcodeActivity
 
 class PassEditActivity : AppCompatActivity() {
 
@@ -48,8 +49,8 @@ class PassEditActivity : AppCompatActivity() {
 
     private val barcodeScanLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val data = result.data
-        val scanResultFormat = data?.getStringExtra("SCAN_RESULT_FORMAT")
-        val scanResult = data?.getStringExtra("SCAN_RESULT")
+        val scanResultFormat = data?.getStringExtra(ScanBarcodeActivity.EXTRA_SCAN_RESULT_FORMAT)
+        val scanResult = data?.getStringExtra(ScanBarcodeActivity.EXTRA_SCAN_RESULT)
         if (scanResultFormat != null && scanResult != null) {
             pendingScanCallback?.invoke(scanResultFormat, scanResult)
         }

@@ -197,7 +197,7 @@
         </activity>
 
         <activity
-            android:name=".ui.ScanBarcodeActivity"
+            android:name=".ui.scan.ScanBarcodeActivity"
             android:theme="@style/AppThemeNoActionbar" />
 
         <activity
