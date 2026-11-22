@@ -3,8 +3,8 @@
     <color name="dividing_color">#2DD4BF</color>
     <color name="accent">#26A69A</color>
     <color name="secondary">#0F766E</color>
-    <color name="status_bar">#0B1615</color>
-    <color name="top_app_bar">#0B1615</color>
+    <color name="status_bar">#10302E</color>
+    <color name="top_app_bar">#10302E</color>
     <color name="surface">#0B1615</color>
     <color name="surface_container">#142221</color>
     <color name="outline_variant">#22403C</color>
