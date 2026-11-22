@@ -87,6 +87,8 @@
             android:src="@drawable/ic_add_24"
             app:backgroundTint="@color/accent"
             app:borderWidth="0dp"
+            app:elevation="@dimen/fab_elevation"
+            app:pressedTranslationZ="@dimen/fab_pressed_translation_z"
             app:tint="@android:color/white" />
 
     </LinearLayout>

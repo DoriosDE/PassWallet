@@ -13,4 +13,7 @@
     <dimen name="pass_stack_stroke_width">1dp</dimen>
     <dimen name="pass_stack_edge_offset">8dp</dimen>
     <dimen name="pass_stack_edge_inset">3dp</dimen>
+    <!-- Shadow of the floating buttons on the pass list (add, import, create). -->
+    <dimen name="fab_elevation">6dp</dimen>
+    <dimen name="fab_pressed_translation_z">6dp</dimen>
 </resources>
