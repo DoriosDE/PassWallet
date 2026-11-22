@@ -25,7 +25,6 @@
     </style>
 
     <style name="PassWallet.BottomSheetDialog" parent="ThemeOverlay.MaterialComponents.DayNight.BottomSheetDialog">
-        <item name="android:backgroundDimEnabled">false</item>
         <item name="bottomSheetStyle">@style/PassWallet.TransparentBottomSheet</item>
     </style>
 
@@ -183,7 +182,6 @@
     <style name="PassWallet.TransparentBottomSheetDialog" parent="ThemeOverlay.MaterialComponents.BottomSheetDialog">
         <item name="android:colorBackground">@android:color/transparent</item>
         <item name="android:windowBackground">@android:color/transparent</item>
-        <item name="android:backgroundDimEnabled">false</item>
         <item name="bottomSheetStyle">@style/PassWallet.TransparentBottomSheet</item>
     </style>
 

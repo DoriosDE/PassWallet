@@ -6,7 +6,6 @@ import android.graphics.Typeface
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
-import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -213,8 +212,6 @@ internal class PassActionsSheet(
     private fun makeBottomSheetChromeTransparent(dialog: BottomSheetDialog) {
         dialog.window?.apply {
             setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
-            clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-            setDimAmount(0f)
         }
         var current = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
         repeat(5) {
