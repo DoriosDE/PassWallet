@@ -1,7 +1,6 @@
 package org.ligi.passandroid.ui.passlist
 
 import android.app.Activity
-import android.graphics.Color
 import android.graphics.Typeface
 import android.view.Gravity
 import android.view.LayoutInflater
@@ -13,7 +12,6 @@ import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.toDrawable
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.card.MaterialCardView
 import org.ligi.passandroid.R
@@ -136,11 +134,10 @@ internal class PassActionsSheet(
     }
 
     private fun createSheet(title: CharSequence, subtitle: CharSequence?): Pair<BottomSheetDialog, LinearLayout> {
-        val dialog = BottomSheetDialog(context, R.style.PassWallet_TransparentBottomSheetDialog)
+        val dialog = BottomSheetDialog(context)
         val view = LayoutInflater.from(context).inflate(R.layout.dialog_pass_actions, FrameLayout(context), false)
         dialog.setContentView(view)
         dialog.show()
-        makeBottomSheetChromeTransparent(dialog)
 
         view.findViewById<TextView>(R.id.pass_actions_title).text = title
         view.findViewById<TextView>(R.id.pass_actions_subtitle).apply {
@@ -207,17 +204,6 @@ internal class PassActionsSheet(
         val outValue = android.util.TypedValue()
         context.theme.resolveAttribute(android.R.attr.selectableItemBackground, outValue, true)
         return outValue.resourceId
-    }
-
-    private fun makeBottomSheetChromeTransparent(dialog: BottomSheetDialog) {
-        dialog.window?.apply {
-            setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
-        }
-        var current = dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-        repeat(5) {
-            current?.background = Color.TRANSPARENT.toDrawable()
-            current = current?.parent as? View
-        }
     }
 
     private fun dp(value: Int): Int = (value * context.resources.displayMetrics.density).toInt()

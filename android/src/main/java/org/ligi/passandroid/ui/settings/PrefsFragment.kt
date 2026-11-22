@@ -2,16 +2,13 @@ package org.ligi.passandroid.ui.settings
 
 import android.content.Intent
 import android.content.res.ColorStateList
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.preference.ListPreference
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
-import androidx.core.graphics.drawable.toDrawable
 import androidx.core.widget.TextViewCompat
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import org.ligi.passandroid.R
@@ -79,11 +76,6 @@ class PrefsFragment : PreferenceFragmentCompat() {
         }
 
         dialog.setContentView(binding.root)
-        dialog.setOnShowListener {
-            dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
-            dialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet)
-                ?.setBackgroundColor(Color.TRANSPARENT)
-        }
         dialog.show()
     }
 
