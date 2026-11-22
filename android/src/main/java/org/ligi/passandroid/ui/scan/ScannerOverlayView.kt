@@ -22,13 +22,13 @@ class ScannerOverlayView(context: Context) : View(context) {
         strokeWidth = 1.5f * density
     }
     private val cornerPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xFFD8A657.toInt()
+        color = 0xFF2DD4BF.toInt()
         style = Paint.Style.STROKE
         strokeCap = Paint.Cap.ROUND
         strokeWidth = 5f * density
     }
     private val scanPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-        color = 0xCCD8A657.toInt()
+        color = 0xCC2DD4BF.toInt()
         strokeCap = Paint.Cap.ROUND
         strokeWidth = 2f * density
     }

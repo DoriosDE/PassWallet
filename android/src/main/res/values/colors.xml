@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="dividing_color">#ff0099cc</color>
-    <color name="accent">#B88235</color>
-    <color name="secondary">#8F6428</color>
-    <color name="status_bar">#0F141A</color>
-    <color name="top_app_bar">#0F141A</color>
-    <color name="surface">#F7F9FC</color>
+    <color name="dividing_color">#0F766E</color>
+    <color name="accent">#0D9488</color>
+    <color name="secondary">#0F766E</color>
+    <color name="status_bar">#0B4146</color>
+    <color name="top_app_bar">#0F5257</color>
+    <color name="surface">#F4F8F7</color>
     <color name="surface_container">#FFFFFFFF</color>
-    <color name="outline_variant">#D6DFEB</color>
-    <color name="edit_action_background">#EEF4FF</color>
-    <color name="edit_action_text">#183866</color>
-    <color name="edit_action_stroke">#C8D8EF</color>
-    <color name="ic_launcher_background">#18233A</color>
+    <color name="outline_variant">#D3E3E0</color>
+    <color name="edit_action_background">#E8F5F3</color>
+    <color name="edit_action_text">#0F3D3E</color>
+    <color name="edit_action_stroke">#BFDCD7</color>
+    <color name="ic_launcher_background">#0F5257</color>
     <color name="danger">#BA1A1A</color>
     <color name="danger_container">#FFDAD6</color>
     <color name="danger_on_container">#93000A</color>
@@ -19,5 +19,5 @@
     <color name="card_view_background">#FFFFFFFF</color>
 
     <color name="icon_green">#ffbfdf00</color>
-    <color name="tab_text">#6B7280</color>
+    <color name="tab_text">#64748B</color>
 </resources>

@@ -89,8 +89,8 @@ class ScannerLayout(
 
     /** shows whether the torch is on */
     fun showTorch(enabled: Boolean) {
-        val activeColor = if (enabled) 0xFFD8A657.toInt() else Color.WHITE
-        val backgroundColor = if (enabled) 0x33D8A657 else 0x22FFFFFF
+        val activeColor = if (enabled) 0xFF2DD4BF.toInt() else Color.WHITE
+        val backgroundColor = if (enabled) 0x332DD4BF else 0x22FFFFFF
         torchButton.apply {
             setTextColor(activeColor)
             iconTint = ColorStateList.valueOf(activeColor)
