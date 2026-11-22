@@ -59,7 +59,7 @@ class ScannerLayout(
         val buttons = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER
-            background = roundedDrawable(0xCC111820.toInt(), 34.dp.toFloat(), 0x33FFFFFF, 1.dp)
+            background = roundedDrawable(0xCC0B1615.toInt(), 34.dp.toFloat(), 0x33FFFFFF, 1.dp)
             setPadding(10.dp, 10.dp, 10.dp, 10.dp)
         }
         buttons.addView(torchButton)
@@ -114,7 +114,7 @@ class ScannerLayout(
         val panel = LinearLayout(context).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = Gravity.CENTER_VERTICAL
-            background = roundedDrawable(0xAA111820.toInt(), 24.dp.toFloat(), 0x22FFFFFF, 1.dp)
+            background = roundedDrawable(0xAA0B1615.toInt(), 24.dp.toFloat(), 0x22FFFFFF, 1.dp)
             setPadding(10.dp, 10.dp, 16.dp, 10.dp)
         }
 
